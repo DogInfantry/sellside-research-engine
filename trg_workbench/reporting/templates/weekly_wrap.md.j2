@@ -1,0 +1,59 @@
+# Weekly Research Wrap
+
+Week ending: {{ report_date }}
+Data as of: {{ data_as_of }}
+
+## Weekly Theme
+**{{ weekly_theme.title }}**
+
+{{ weekly_theme.body }}
+
+## Top Screen Candidates
+| Rank | Ticker | Company | Sector | Fwd EPS Growth | Target Upside | Next Earnings | Research Score |
+| ---: | --- | --- | --- | ---: | ---: | --- | ---: |
+{% for row in top_candidates %}
+| {{ row.screen_rank|int }} | {{ row.ticker }} | {{ row.company_name }} | {{ row.sector or "n/a" }} | {{ row.forward_eps_growth|pct }} | {{ row.target_upside|pct }} | {% if row.next_earnings_date %}{{ row.next_earnings_date.strftime("%Y-%m-%d") }}{% else %}n/a{% endif %} | {{ "%.2f"|format(row.research_score) }} |
+{% endfor %}
+
+## Bottom-Up Equity Callouts
+{% for item in stock_callouts %}
+- {{ item }}
+{% endfor %}
+
+## Sector Narratives
+{% for item in sector_narratives %}
+- {{ item }}
+{% endfor %}
+
+## Client Angles
+{% for item in client_angles %}
+- {{ item }}
+{% endfor %}
+
+{% if management_notes %}
+## Management / IR Hooks
+{% for item in management_notes %}
+- {{ item }}
+{% endfor %}
+{% endif %}
+
+{% if analyst_overlays %}
+## Analyst Overlays
+{% for row in analyst_overlays %}
+- {{ row.ticker }}{% if row.stance %} ({{ row.stance }}){% endif %}: {{ row.thesis }}{% if row.catalyst %} Catalyst: {{ row.catalyst }}.{% endif %}{% if row.risk %} Risk: {{ row.risk }}.{% endif %}
+{% endfor %}
+{% endif %}
+
+## Catalyst Calendar
+| Ticker | Company | Next Earnings | EPS Avg | Revenue Avg |
+| --- | --- | --- | ---: | ---: |
+{% for row in catalyst_calendar %}
+| {{ row.ticker }} | {{ row.company_name }} | {{ row.next_earnings_date.strftime("%Y-%m-%d") }} | {{ row.calendar_earnings_average|number(2) }} | {{ row.calendar_revenue_average|number }} |
+{% endfor %}
+
+## Europe Overlay
+| Index | 1W | 1M |
+| --- | ---: | ---: |
+{% for row in europe_summary %}
+| {{ row.display_name }} | {{ row.ret_1w|pct }} | {{ row.ret_1m|pct }} |
+{% endfor %}

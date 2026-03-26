@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>TRG KPI Report</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 32px; color: #10233f; }
+    h1, h2 { color: #163b65; }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(260px, 1fr)); gap: 16px; margin: 20px 0 28px; }
+    .card { border: 1px solid #d6e0ea; border-radius: 10px; padding: 16px; background: #f8fbfd; }
+    table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+    th, td { border: 1px solid #d6e0ea; padding: 8px 10px; text-align: left; }
+    th { background: #edf4f9; }
+    img { width: 100%; max-width: 760px; border: 1px solid #d6e0ea; border-radius: 8px; margin: 12px 0 24px; }
+    .muted { color: #4b6078; }
+  </style>
+</head>
+<body>
+  <h1>TRG Research Production KPI Report</h1>
+  <p class="muted">Month: 2026-03</p>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Report Count</h2>
+      <p>8</p>
+    </div>
+    <div class="card">
+      <h2>Fetch Events</h2>
+      <p>16</p>
+    </div>
+    <div class="card">
+      <h2>Sources Seen</h2>
+      <p>ECB, Yahoo Finance, Yahoo Finance fallback</p>
+    </div>
+    <div class="card">
+      <h2>Latest Data Cut</h2>
+      <p>2026-03-26</p>
+    </div>
+  </div>
+
+  <h2>Coverage Snapshot</h2>
+  <table>
+    <tr><th>Metric</th><th>Value</th></tr>
+    <tr><td>Us Equities</td><td>21</td></tr>
+    <tr><td>Sector Proxies</td><td>10</td></tr>
+    <tr><td>Europe Indices</td><td>5</td></tr>
+    <tr><td>Macro Series</td><td>4</td></tr>
+  </table>
+
+  <h2>Report Mix</h2>
+  <img src="charts/report_mix_2026_03.png" alt="Report mix chart">
+
+  <h2>Rows Fetched by Source</h2>
+  <img src="charts/fetch_by_source_2026_03.png" alt="Rows fetched by source chart">
+
+  <h2>Publishing Cadence</h2>
+  <img src="charts/report_cadence_2026_03.png" alt="Publishing cadence chart">
+
+  <h2>Source Freshness</h2>
+  <table>
+    <tr><th>Source</th><th>Last Timestamp</th></tr>
+    <tr><td>Yahoo Finance fallback</td><td>2026-03-26 06:18:01+00:00</td></tr>
+    <tr><td>Yahoo Finance</td><td>2026-03-26 06:18:01+00:00</td></tr>
+    <tr><td>ECB</td><td>2026-03-26 06:18:01+00:00</td></tr>
+  </table>
+</body>
+</html>

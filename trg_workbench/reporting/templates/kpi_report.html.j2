@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>TRG KPI Report</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 32px; color: #10233f; }
+    h1, h2 { color: #163b65; }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(260px, 1fr)); gap: 16px; margin: 20px 0 28px; }
+    .card { border: 1px solid #d6e0ea; border-radius: 10px; padding: 16px; background: #f8fbfd; }
+    table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+    th, td { border: 1px solid #d6e0ea; padding: 8px 10px; text-align: left; }
+    th { background: #edf4f9; }
+    img { width: 100%; max-width: 760px; border: 1px solid #d6e0ea; border-radius: 8px; margin: 12px 0 24px; }
+    .muted { color: #4b6078; }
+  </style>
+</head>
+<body>
+  <h1>TRG Research Production KPI Report</h1>
+  <p class="muted">Month: {{ summary.month }}</p>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Report Count</h2>
+      <p>{{ summary.report_count }}</p>
+    </div>
+    <div class="card">
+      <h2>Fetch Events</h2>
+      <p>{{ summary.fetch_count }}</p>
+    </div>
+    <div class="card">
+      <h2>Sources Seen</h2>
+      <p>{{ summary.sources_seen|join(", ") if summary.sources_seen else "No events logged yet" }}</p>
+    </div>
+    <div class="card">
+      <h2>Latest Data Cut</h2>
+      <p>{{ summary.latest_manifest_date or "n/a" }}</p>
+    </div>
+  </div>
+
+  <h2>Coverage Snapshot</h2>
+  <table>
+    <tr><th>Metric</th><th>Value</th></tr>
+    {% for key, value in summary.coverage.items() %}
+    <tr><td>{{ key.replace("_", " ").title() }}</td><td>{{ value }}</td></tr>
+    {% endfor %}
+  </table>
+
+  {% if charts.report_mix %}
+  <h2>Report Mix</h2>
+  <img src="charts/{{ charts.report_mix }}" alt="Report mix chart">
+  {% endif %}
+
+  {% if charts.fetch_by_source %}
+  <h2>Rows Fetched by Source</h2>
+  <img src="charts/{{ charts.fetch_by_source }}" alt="Rows fetched by source chart">
+  {% endif %}
+
+  {% if charts.report_cadence %}
+  <h2>Publishing Cadence</h2>
+  <img src="charts/{{ charts.report_cadence }}" alt="Publishing cadence chart">
+  {% endif %}
+
+  <h2>Source Freshness</h2>
+  <table>
+    <tr><th>Source</th><th>Last Timestamp</th></tr>
+    {% for row in source_freshness %}
+    <tr><td>{{ row.source }}</td><td>{{ row.last_timestamp }}</td></tr>
+    {% endfor %}
+  </table>
+</body>
+</html>

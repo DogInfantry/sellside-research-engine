@@ -1,0 +1,8 @@
+.pytest_cache/
+__pycache__/
+*.pyc
+data/cache/
+data/logs/
+data/normalized/
+*.jsonl
+tests_runtime_kpis/

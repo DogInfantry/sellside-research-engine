@@ -1,0 +1,56 @@
+# Daily Tactical Note
+
+Report date: {{ report_date }}
+Data as of: {{ data_as_of }}
+
+## Macro Snapshot
+| Metric | Latest | 1W Change | Last Updated |
+| --- | ---: | ---: | --- |
+{% for row in macro_summary %}
+| {{ row.display_name }} | {% if row.category == "rates" %}{{ "%.2f"|format(row.latest_value) }}{% else %}{{ "%.3f"|format(row.latest_value) }}{% endif %} | {% if row.category == "rates" %}{{ row.one_week_change|bps }}{% else %}{{ row.one_week_change|pct(2) }}{% endif %} | {{ row.last_updated.strftime("%Y-%m-%d") }} |
+{% endfor %}
+
+## US Sector Tape
+| Sector | Proxy | 1D | 1W | 1M |
+| --- | --- | ---: | ---: | ---: |
+{% for row in sector_summary %}
+| {{ row.display_name }} | {{ row.ticker }} | {{ row.ret_1d|pct }} | {{ row.ret_1w|pct }} | {{ row.ret_1m|pct }} |
+{% endfor %}
+
+## Europe Overlay
+| Index | Ticker | 1D | 1W | 1M |
+| --- | --- | ---: | ---: | ---: |
+{% for row in europe_summary %}
+| {{ row.display_name }} | {{ row.ticker }} | {{ row.ret_1d|pct }} | {{ row.ret_1w|pct }} | {{ row.ret_1m|pct }} |
+{% endfor %}
+
+## Screen Leaders
+| Rank | Ticker | Company | Sector | Fwd EPS Growth | Target Upside | Buy Ratio | Research Score |
+| ---: | --- | --- | --- | ---: | ---: | ---: | ---: |
+{% for row in top_candidates %}
+| {{ row.screen_rank|int }} | {{ row.ticker }} | {{ row.company_name }} | {{ row.sector or "n/a" }} | {{ row.forward_eps_growth|pct }} | {{ row.target_upside|pct }} | {{ row.analyst_buy_ratio|pct }} | {{ "%.2f"|format(row.research_score) }} |
+{% endfor %}
+
+## Sector Narratives
+{% for item in sector_narratives %}
+- {{ item }}
+{% endfor %}
+
+## Catalyst Calendar
+| Ticker | Company | Next Earnings | EPS Avg | Revenue Avg |
+| --- | --- | --- | ---: | ---: |
+{% for row in catalyst_calendar %}
+| {{ row.ticker }} | {{ row.company_name }} | {{ row.next_earnings_date.strftime("%Y-%m-%d") }} | {{ row.calendar_earnings_average|number(2) }} | {{ row.calendar_revenue_average|number }} |
+{% endfor %}
+
+{% if analyst_overlays %}
+## Analyst Overlays
+{% for row in analyst_overlays %}
+- {{ row.ticker }}{% if row.stance %} ({{ row.stance }}){% endif %}: {{ row.thesis }}{% if row.catalyst %} Catalyst: {{ row.catalyst }}.{% endif %}{% if row.risk %} Risk: {{ row.risk }}.{% endif %}
+{% endfor %}
+{% endif %}
+
+## Tactical Takeaways
+{% for item in takeaways %}
+- {{ item }}
+{% endfor %}
