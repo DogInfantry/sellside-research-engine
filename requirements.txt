@@ -5,3 +5,8 @@ requests>=2.32
 yfinance>=0.2.66
 pytest>=8.3
 
+# v2 additions
+scipy>=1.13
+numpy>=1.26
+seaborn>=0.13
+weasyprint>=62.0

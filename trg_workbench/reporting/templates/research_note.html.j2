@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>{{ report_title | default("TRG Research Note") }} — {{ as_of_date }}</title>
+<style>
+  /* ── Reset & Base ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Arial', 'Helvetica Neue', sans-serif;
+    font-size: 10pt;
+    color: #1a1a2e;
+    background: #ffffff;
+    line-height: 1.55;
+  }
+  a { color: #003366; text-decoration: none; }
+
+  /* ── GS Color Palette ── */
+  :root {
+    --gs-navy:   #003366;
+    --gs-gold:   #C8A951;
+    --gs-light:  #F0F4F8;
+    --gs-red:    #C0392B;
+    --gs-green:  #1A7340;
+    --gs-grey:   #6B7280;
+    --gs-border: #D1D5DB;
+    --page-pad:  2.2cm;
+  }
+
+  /* ── Cover / Header Banner ── */
+  .cover-band {
+    background: var(--gs-navy);
+    color: white;
+    padding: 18px var(--page-pad);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+  .cover-band .firm-name {
+    font-size: 8pt;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gs-gold);
+    font-weight: 700;
+  }
+  .cover-band .report-type {
+    font-size: 8pt;
+    color: rgba(255,255,255,0.65);
+    text-align: right;
+  }
+
+  .title-block {
+    background: var(--gs-navy);
+    color: white;
+    padding: 20px var(--page-pad) 24px;
+    border-bottom: 3px solid var(--gs-gold);
+  }
+  .title-block h1 {
+    font-size: 20pt;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-bottom: 4px;
+  }
+  .title-block .subtitle {
+    font-size: 10pt;
+    color: rgba(255,255,255,0.75);
+    margin-bottom: 14px;
+  }
+
+  /* ── Rating Box ── */
+  .rating-strip {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+  .rating-chip {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(200,169,81,0.5);
+    border-radius: 4px;
+    padding: 6px 14px;
+    font-size: 9pt;
+    color: white;
+  }
+  .rating-chip .label { color: var(--gs-gold); font-size: 7.5pt; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; display: block; margin-bottom: 2px; }
+  .rating-chip .value { font-weight: 700; font-size: 11pt; }
+  .rating-chip.buy   .value { color: #4ade80; }
+  .rating-chip.sell  .value { color: #f87171; }
+  .rating-chip.neutral .value { color: #fbbf24; }
+
+  /* ── Body Layout ── */
+  .body-wrap { padding: 22px var(--page-pad); }
+
+  /* ── Section Titles ── */
+  h2.section-title {
+    font-size: 10.5pt;
+    font-weight: 700;
+    color: var(--gs-navy);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    border-bottom: 2px solid var(--gs-gold);
+    padding-bottom: 4px;
+    margin: 22px 0 10px;
+  }
+  h3.sub-title {
+    font-size: 9.5pt;
+    font-weight: 700;
+    color: var(--gs-navy);
+    margin: 14px 0 6px;
+  }
+
+  /* ── Executive Summary Box ── */
+  .exec-summary {
+    background: var(--gs-light);
+    border-left: 4px solid var(--gs-navy);
+    padding: 14px 18px;
+    margin-bottom: 18px;
+    border-radius: 0 4px 4px 0;
+  }
+  .exec-summary ul { padding-left: 16px; }
+  .exec-summary li { margin-bottom: 5px; font-size: 9.5pt; line-height: 1.5; }
+
+  /* ── Thesis / Narrative paragraphs ── */
+  .narrative p { margin-bottom: 8px; font-size: 9.5pt; }
+
+  /* ── Tables ── */
+  table.research-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 8.5pt;
+    margin-bottom: 14px;
+  }
+  table.research-table thead tr {
+    background: var(--gs-navy);
+    color: white;
+  }
+  table.research-table thead th {
+    padding: 6px 8px;
+    text-align: right;
+    font-weight: 700;
+    font-size: 7.5pt;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+  }
+  table.research-table thead th:first-child { text-align: left; }
+  table.research-table tbody tr:nth-child(even) { background: var(--gs-light); }
+  table.research-table tbody tr:hover { background: #dbeafe; }
+  table.research-table tbody td {
+    padding: 5px 8px;
+    text-align: right;
+    border-bottom: 1px solid var(--gs-border);
+    white-space: nowrap;
+  }
+  table.research-table tbody td:first-child { text-align: left; font-weight: 600; color: var(--gs-navy); }
+  .pos { color: var(--gs-green); font-weight: 700; }
+  .neg { color: var(--gs-red);   font-weight: 700; }
+  .neutral-val { color: var(--gs-grey); }
+
+  /* ── Metric Cards (top stats row) ── */
+  .metric-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+  }
+  .metric-card {
+    flex: 1;
+    min-width: 130px;
+    background: var(--gs-light);
+    border: 1px solid var(--gs-border);
+    border-top: 3px solid var(--gs-navy);
+    border-radius: 4px;
+    padding: 10px 14px;
+  }
+  .metric-card .mc-label { font-size: 7pt; text-transform: uppercase; letter-spacing: 0.8px; color: var(--gs-grey); font-weight: 700; }
+  .metric-card .mc-value { font-size: 16pt; font-weight: 800; color: var(--gs-navy); margin: 3px 0; }
+  .metric-card .mc-sub   { font-size: 7.5pt; color: var(--gs-grey); }
+
+  /* ── Chart Images ── */
+  .chart-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+  .chart-grid.three-col { grid-template-columns: 1fr 1fr 1fr; }
+  .chart-grid.full-width { grid-template-columns: 1fr; }
+  .chart-box {
+    background: var(--gs-light);
+    border: 1px solid var(--gs-border);
+    border-radius: 4px;
+    padding: 8px;
+    text-align: center;
+  }
+  .chart-box img { max-width: 100%; height: auto; display: block; margin: 0 auto; border-radius: 2px; }
+  .chart-box .chart-caption { font-size: 7pt; color: var(--gs-grey); margin-top: 5px; font-style: italic; }
+
+  /* ── Callout Cards ── */
+  .callout-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .callout-card {
+    border: 1px solid var(--gs-border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .callout-card .cc-header {
+    background: var(--gs-navy);
+    color: white;
+    padding: 7px 12px;
+    font-weight: 700;
+    font-size: 9pt;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .callout-card .cc-header .cc-rating { font-size: 7.5pt; padding: 2px 7px; border-radius: 3px; font-weight: 700; }
+  .cc-buy    { background: var(--gs-green); }
+  .cc-sell   { background: var(--gs-red); }
+  .cc-neutral { background: #92400e; }
+  .callout-card .cc-body { padding: 10px 12px; font-size: 8.5pt; background: white; }
+  .callout-card .cc-body .cc-row { display: flex; justify-content: space-between; margin-bottom: 4px; }
+  .callout-card .cc-body .cc-row .cc-key { color: var(--gs-grey); font-size: 7.5pt; }
+  .callout-card .cc-thesis { font-size: 8pt; color: #374151; font-style: italic; margin-top: 6px; border-top: 1px solid var(--gs-border); padding-top: 6px; line-height: 1.45; }
+
+  /* ── Risk Section ── */
+  .risk-table-wrap { overflow-x: auto; }
+
+  /* ── Scenario Box ── */
+  .scenario-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .scenario-box { border-radius: 4px; padding: 12px 14px; border: 1px solid var(--gs-border); }
+  .scenario-box.bear { border-top: 3px solid var(--gs-red); background: #fef2f2; }
+  .scenario-box.base { border-top: 3px solid var(--gs-navy); background: var(--gs-light); }
+  .scenario-box.bull { border-top: 3px solid var(--gs-green); background: #f0fdf4; }
+  .scenario-box .s-label { font-size: 7.5pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; }
+  .scenario-box.bear .s-label { color: var(--gs-red); }
+  .scenario-box.base .s-label { color: var(--gs-navy); }
+  .scenario-box.bull .s-label { color: var(--gs-green); }
+  .scenario-box .s-price { font-size: 18pt; font-weight: 800; margin: 4px 0; }
+  .scenario-box .s-desc { font-size: 7.5pt; color: var(--gs-grey); line-height: 1.45; }
+
+  /* ── Footer ── */
+  .footer {
+    margin-top: 28px;
+    padding: 14px var(--page-pad);
+    background: var(--gs-light);
+    border-top: 2px solid var(--gs-navy);
+    font-size: 7pt;
+    color: var(--gs-grey);
+    line-height: 1.5;
+  }
+  .footer strong { color: var(--gs-navy); }
+
+  /* ── Page breaks for PDF ── */
+  @media print {
+    .page-break { page-break-before: always; }
+    body { font-size: 9pt; }
+  }
+  @page { margin: 2cm; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════
+     HEADER BAND
+══════════════════════════════════════════════════════════ -->
+<div class="cover-band">
+  <div>
+    <div class="firm-name">TRG Research Workbench</div>
+    <div style="color:rgba(255,255,255,0.55);font-size:7.5pt;margin-top:2px;">Equities | Global Coverage</div>
+  </div>
+  <div class="report-type">
+    {{ report_type | default("Daily Research Note") }}<br/>
+    {{ as_of_date }}
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     TITLE BLOCK
+══════════════════════════════════════════════════════════ -->
+<div class="title-block">
+  <h1>{{ report_title | default("Market Intelligence Note") }}</h1>
+  <div class="subtitle">{{ report_subtitle | default("US Equities | Multi-Factor Screen | Macro Overlay") }}</div>
+
+  <div class="rating-strip">
+    {% if macro_regime %}
+    <div class="rating-chip">
+      <span class="label">Macro Regime</span>
+      <span class="value">{{ macro_regime }}</span>
+    </div>
+    {% endif %}
+    {% if yield_curve_shape %}
+    <div class="rating-chip">
+      <span class="label">Yield Curve</span>
+      <span class="value">{{ yield_curve_shape }}</span>
+    </div>
+    {% endif %}
+    {% if vix_level %}
+    <div class="rating-chip">
+      <span class="label">VIX</span>
+      <span class="value">{{ "%.1f"|format(vix_level) }}</span>
+    </div>
+    {% endif %}
+    {% if top_screen_count %}
+    <div class="rating-chip">
+      <span class="label">Screen Leaders</span>
+      <span class="value">{{ top_screen_count }} Names</span>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<div class="body-wrap">
+
+<!-- ═══════════════════════════════════════════════════════
+     EXECUTIVE SUMMARY
+══════════════════════════════════════════════════════════ -->
+{% if executive_summary_bullets %}
+<h2 class="section-title">Executive Summary</h2>
+<div class="exec-summary">
+  <ul>
+    {% for bullet in executive_summary_bullets %}
+    <li>{{ bullet }}</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+<!-- ═══════════════════════════════════════════════════════
+     US MACRO SNAPSHOT
+══════════════════════════════════════════════════════════ -->
+{% if us_macro_rows %}
+<h2 class="section-title">US & Global Macro Snapshot</h2>
+{% if charts.macro_dashboard %}
+<div class="chart-grid full-width">
+  <div class="chart-box">
+    <img src="{{ charts.macro_dashboard | img_b64 }}" alt="Macro Dashboard"/>
+    <div class="chart-caption">Figure 1 — US & Global Macro Indicators: Latest Values with 1D / 1W / 1M Δ</div>
+  </div>
+</div>
+{% else %}
+<table class="research-table">
+  <thead><tr>
+    <th>Indicator</th><th>Latest</th><th>1-Day Δ</th><th>1-Week Δ</th><th>1-Month Δ</th><th>Category</th>
+  </tr></thead>
+  <tbody>
+  {% for row in us_macro_rows %}
+  <tr>
+    <td>{{ row.label }}</td>
+    <td>{{ row.value_fmt }}</td>
+    <td class="{{ 'pos' if row.chg_1d > 0 else 'neg' if row.chg_1d < 0 else '' }}">{{ row.chg_1d | signed_pct }}</td>
+    <td class="{{ 'pos' if row.chg_1w > 0 else 'neg' if row.chg_1w < 0 else '' }}">{{ row.chg_1w | signed_pct }}</td>
+    <td class="{{ 'pos' if row.chg_1m > 0 else 'neg' if row.chg_1m < 0 else '' }}">{{ row.chg_1m | signed_pct }}</td>
+    <td class="neutral-val">{{ row.category }}</td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+{% if yield_curve %}
+<div class="narrative">
+  <p><strong>Yield Curve:</strong> 10Y at {{ "%.2f"|format(yield_curve.ust_10y) }}% | 2Y at {{ "%.2f"|format(yield_curve.ust_2y) }}% | 10Y–2Y Spread: <strong>{{ "%+.0f"|format(yield_curve.spread_10y2y * 100) }}bps</strong> ({{ yield_curve.curve_shape }}). {{ yield_curve_narrative | default("") }}</p>
+</div>
+{% endif %}
+{% endif %}
+
+<!-- ═══════════════════════════════════════════════════════
+     ECB / EUROPE MACRO
+══════════════════════════════════════════════════════════ -->
+{% if ecb_rows %}
+<h2 class="section-title">ECB Policy & European FX</h2>
+<table class="research-table">
+  <thead><tr><th>Series</th><th>Latest</th><th>1-Week Δ</th></tr></thead>
+  <tbody>
+  {% for row in ecb_rows %}
+  <tr>
+    <td>{{ row.display_name }}</td>
+    <td>{{ row.value_fmt }}</td>
+    <td class="{{ 'pos' if row.chg_1w > 0 else 'neg' if row.chg_1w < 0 else '' }}">{{ row.chg_1w_fmt }}</td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+
+<!-- ═══════════════════════════════════════════════════════
+     SECTOR PERFORMANCE
+══════════════════════════════════════════════════════════ -->
+{% if sector_rows %}
+<h2 class="section-title">US Sector Performance</h2>
+{% if charts.sector_heatmap %}
+<div class="chart-grid full-width">
+  <div class="chart-box">
+    <img src="{{ charts.sector_heatmap | img_b64 }}" alt="Sector Heatmap"/>
+    <div class="chart-caption">Figure 2 — SPDR Sector ETF Returns: 1-Day, 1-Week, 1-Month, 3-Month</div>
+  </div>
+</div>
+{% else %}
+<table class="research-table">
+  <thead><tr><th>Sector</th><th>ETF</th><th>1-Day</th><th>1-Week</th><th>1-Month</th><th>3-Month</th></tr></thead>
+  <tbody>
+  {% for row in sector_rows %}
+  <tr>
+    <td>{{ row.sector_name }}</td>
+    <td>{{ row.ticker }}</td>
+    <td class="{{ 'pos' if row.ret_1d > 0 else 'neg' }}">{{ row.ret_1d | pct }}</td>
+    <td class="{{ 'pos' if row.ret_1w > 0 else 'neg' }}">{{ row.ret_1w | pct }}</td>
+    <td class="{{ 'pos' if row.ret_1m > 0 else 'neg' }}">{{ row.ret_1m | pct }}</td>
+    <td class="{{ 'pos' if row.ret_3m > 0 else 'neg' }}">{{ row.ret_3m | pct }}</td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+{% endif %}
+
+<!-- ═══════════════════════════════════════════════════════
+     RISK-RETURN MAP
+══════════════════════════════════════════════════════════ -->
+{% if charts.risk_return or charts.correlation_heatmap %}
+<h2 class="section-title">Risk Analytics</h2>
+<div class="chart-grid">
+  {% if charts.risk_return %}
+  <div class="chart-box">
+    <img src="{{ charts.risk_return | img_b64 }}" alt="Risk-Return Map"/>
+    <div class="chart-caption">Figure 3 — Risk-Return Map: Annualized Vol vs 1Y Return (color = Sharpe)</div>
+  </div>
+  {% endif %}
+  {% if charts.correlation_heatmap %}
+  <div class="chart-box">
+    <img src="{{ charts.correlation_heatmap | img_b64 }}" alt="Correlation Heatmap"/>
+    <div class="chart-caption">Figure 4 — Spearman Return Correlation Matrix (US Equities)</div>
+  </div>
+  {% endif %}
+</div>
+{% endif %}
+
+<!-- Risk Table -->
+{% if risk_rows %}
+<div class="risk-table-wrap">
+<table class="research-table">
+  <thead><tr>
+    <th>Ticker</th><th>Vol 21D</th><th>Vol 63D</th><th>Beta</th>
+    <th>Sharpe</th><th>Sortino</th><th>Max DD</th><th>VaR 95%</th><th>CVaR 95%</th><th>YTD</th><th>1Y Ret</th>
+  </tr></thead>
+  <tbody>
+  {% for row in risk_rows %}
+  <tr>
+    <td>{{ row.ticker }}</td>
+    <td>{{ row.vol_21d | pct }}</td>
+    <td>{{ row.vol_63d | pct }}</td>
+    <td>{{ "%.2f"|format(row.beta) if row.beta == row.beta else "N/A" }}</td>
+    <td class="{{ 'pos' if row.sharpe > 0 else 'neg' }}">{{ "%.2f"|format(row.sharpe) if row.sharpe == row.sharpe else "N/A" }}</td>
+    <td class="{{ 'pos' if row.sortino > 0 else 'neg' }}">{{ "%.2f"|format(row.sortino) if row.sortino == row.sortino else "N/A" }}</td>
+    <td class="neg">{{ row.max_drawdown | pct }}</td>
+    <td class="neg">{{ row.var_95_1d | pct }}</td>
+    <td class="neg">{{ row.cvar_95_1d | pct }}</td>
+    <td class="{{ 'pos' if row.ret_ytd > 0 else 'neg' }}">{{ row.ret_ytd | pct }}</td>
+    <td class="{{ 'pos' if row.ret_1y > 0 else 'neg' }}">{{ row.ret_1y | pct }}</td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endif %}
+
+<!-- ═══════════════════════════════════════════════════════
+     SCREEN LEADERS
+══════════════════════════════════════════════════════════ -->
+{% if screen_rows %}
+<h2 class="section-title">Multi-Factor Screen — Top Candidates</h2>
+{% if charts.screen_dashboard %}
+<div class="chart-grid full-width">
+  <div class="chart-box">
+    <img src="{{ charts.screen_dashboard | img_b64 }}" alt="Screen Dashboard"/>
+    <div class="chart-caption">Figure 5 — Factor Score Breakdown: Top Screen Candidates</div>
+  </div>
+</div>
+{% endif %}
+<table class="research-table">
+  <thead><tr>
+    <th>Ticker</th><th>Sector</th><th>Mkt Cap</th><th>Val Score</th>
+    <th>Growth</th><th>Quality</th><th>Momentum</th><th>Forward</th>
+    <th>Research Score</th><th>Screen Rank</th>
+  </tr></thead>
+  <tbody>
+  {% for row in screen_rows %}
+  <tr>
+    <td>{{ row.ticker }}</td>
+    <td class="neutral-val">{{ row.sector | default("—") }}</td>
+    <td>{{ row.market_cap | number if row.market_cap else "—" }}</td>
+    <td>{{ "%.2f"|format(row.valuation_score) if row.valuation_score == row.valuation_score else "—" }}</td>
+    <td>{{ "%.2f"|format(row.growth_score) if row.growth_score == row.growth_score else "—" }}</td>
+    <td>{{ "%.2f"|format(row.quality_score) if row.quality_score == row.quality_score else "—" }}</td>
+    <td>{{ "%.2f"|format(row.momentum_score) if row.momentum_score == row.momentum_score else "—" }}</td>
+    <td>{{ "%.2f"|format(row.forward_score) if row.forward_score == row.forward_score else "—" }}</td>
+    <td class="pos"><strong>{{ "%.3f"|format(row.research_score) if row.research_score == row.research_score else "—" }}</strong></td>
+    <td>{{ row.screen_rank | default("—") }}</td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+
+<!-- ═══════════════════════════════════════════════════════
+     STOCK CALLOUTS (top 3)
+══════════════════════════════════════════════════════════ -->
+{% if callout_cards %}
+<h2 class="section-title">Stock Highlights</h2>
+<div class="callout-grid">
+{% for card in callout_cards %}
+<div class="callout-card">
+  <div class="cc-header">
+    <span>{{ card.ticker }}</span>
+    {% if card.rating %}
+    <span class="cc-rating cc-{{ card.rating | lower }}">{{ card.rating }}</span>
+    {% endif %}
+  </div>
+  <div class="cc-body">
+    <div class="cc-row"><span class="cc-key">Price</span><span>${{ "%.2f"|format(card.price) if card.price else "—" }}</span></div>
+    <div class="cc-row"><span class="cc-key">Target</span><span class="pos">${{ "%.2f"|format(card.target) if card.target else "—" }}</span></div>
+    <div class="cc-row"><span class="cc-key">Upside</span><span class="pos">{{ card.upside | pct if card.upside else "—" }}</span></div>
+    <div class="cc-row"><span class="cc-key">Fwd P/E</span><span>{{ "%.1f"|format(card.forward_pe) if card.forward_pe and card.forward_pe == card.forward_pe else "—" }}x</span></div>
+    <div class="cc-row"><span class="cc-key">EPS Growth</span><span class="pos">{{ card.eps_growth | pct if card.eps_growth else "—" }}</span></div>
+    <div class="cc-row"><span class="cc-key">Research Score</span><span><strong>{{ "%.3f"|format(card.research_score) if card.research_score else "—" }}</strong></span></div>
+    {% if card.thesis %}
+    <div class="cc-thesis">{{ card.thesis }}</div>
+    {% endif %}
+  </div>
+</div>
+{% endfor %}
+</div>
+
+<!-- Per-ticker charts -->
+{% for card in callout_cards %}
+{% if charts["price_" + card.ticker] or charts["radar_" + card.ticker] or charts["var_" + card.ticker] %}
+<h3 class="sub-title">{{ card.ticker }} — Chart Pack</h3>
+<div class="chart-grid three-col">
+  {% if charts["price_" + card.ticker] %}
+  <div class="chart-box">
+    <img src="{{ charts["price_" + card.ticker] | img_b64 }}" alt="{{ card.ticker }} Price"/>
+    <div class="chart-caption">{{ card.ticker }}: Price + 50/200 MA + Volume</div>
+  </div>
+  {% endif %}
+  {% if charts["radar_" + card.ticker] %}
+  <div class="chart-box">
+    <img src="{{ charts["radar_" + card.ticker] | img_b64 }}" alt="{{ card.ticker }} Radar"/>
+    <div class="chart-caption">{{ card.ticker }}: Multi-Factor Profile</div>
+  </div>
+  {% endif %}
+  {% if charts["var_" + card.ticker] %}
+  <div class="chart-box">
+    <img src="{{ charts["var_" + card.ticker] | img_b64 }}" alt="{{ card.ticker }} VaR"/>
+    <div class="chart-caption">{{ card.ticker }}: Return Distribution & VaR 95%</div>
+  </div>
+  {% endif %}
+</div>
+{% endif %}
+{% endfor %}
+{% endif %}
+
+<!-- ═══════════════════════════════════════════════════════
+     DCF / VALUATION (if available)
+══════════════════════════════════════════════════════════ -->
+{% if dcf_results %}
+<div class="page-break"></div>
+<h2 class="section-title">Valuation Analysis</h2>
+{% for ticker_dcf in dcf_results %}
+<h3 class="sub-title">{{ ticker_dcf.ticker }} — DCF & Scenario Analysis</h3>
+
+{% if ticker_dcf.scenarios %}
+<div class="scenario-grid">
+  <div class="scenario-box bear">
+    <div class="s-label">Bear Case</div>
+    <div class="s-price neg">${{ "%.2f"|format(ticker_dcf.scenarios["Bear Case"].intrinsic_value_per_share) }}</div>
+    <div class="s-desc">WACC: {{ ticker_dcf.scenarios["Bear Case"].wacc_used | pct }} | TGR: {{ ticker_dcf.scenarios["Bear Case"].tgr_used | pct }}</div>
+  </div>
+  <div class="scenario-box base">
+    <div class="s-label">Base Case</div>
+    <div class="s-price">${{ "%.2f"|format(ticker_dcf.scenarios["Base Case"].intrinsic_value_per_share) }}</div>
+    <div class="s-desc">WACC: {{ ticker_dcf.scenarios["Base Case"].wacc_used | pct }} | TGR: {{ ticker_dcf.scenarios["Base Case"].tgr_used | pct }}</div>
+  </div>
+  <div class="scenario-box bull">
+    <div class="s-label">Bull Case</div>
+    <div class="s-price pos">${{ "%.2f"|format(ticker_dcf.scenarios["Bull Case"].intrinsic_value_per_share) }}</div>
+    <div class="s-desc">WACC: {{ ticker_dcf.scenarios["Bull Case"].wacc_used | pct }} | TGR: {{ ticker_dcf.scenarios["Bull Case"].tgr_used | pct }}</div>
+  </div>
+</div>
+{% endif %}
+
+{% if charts["dcf_sensitivity_" + ticker_dcf.ticker] or charts["football_" + ticker_dcf.ticker] %}
+<div class="chart-grid">
+  {% if charts["dcf_sensitivity_" + ticker_dcf.ticker] %}
+  <div class="chart-box">
+    <img src="{{ charts["dcf_sensitivity_" + ticker_dcf.ticker] | img_b64 }}" alt="DCF Sensitivity"/>
+    <div class="chart-caption">{{ ticker_dcf.ticker }}: DCF Sensitivity — WACC vs Terminal Growth Rate</div>
+  </div>
+  {% endif %}
+  {% if charts["football_" + ticker_dcf.ticker] %}
+  <div class="chart-box">
+    <img src="{{ charts["football_" + ticker_dcf.ticker] | img_b64 }}" alt="Football Field"/>
+    <div class="chart-caption">{{ ticker_dcf.ticker }}: Football Field — Valuation Range Across Methodologies</div>
+  </div>
+  {% endif %}
+</div>
+{% endif %}
+{% endfor %}
+{% endif %}
+
+<!-- ═══════════════════════════════════════════════════════
+     CATALYST CALENDAR
+══════════════════════════════════════════════════════════ -->
+{% if catalyst_rows %}
+<h2 class="section-title">Catalyst Calendar</h2>
+<table class="research-table">
+  <thead><tr><th>Ticker</th><th>Event Date</th><th>Event</th><th>EPS Est.</th><th>Revenue Est.</th></tr></thead>
+  <tbody>
+  {% for row in catalyst_rows %}
+  <tr>
+    <td>{{ row.ticker }}</td>
+    <td>{{ row.date }}</td>
+    <td>{{ row.event }}</td>
+    <td>{{ row.eps_est | default("—") }}</td>
+    <td>{{ row.rev_est | default("—") }}</td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+
+<!-- ═══════════════════════════════════════════════════════
+     TACTICAL TAKEAWAYS
+══════════════════════════════════════════════════════════ -->
+{% if tactical_takeaways %}
+<h2 class="section-title">Tactical Takeaways</h2>
+<div class="exec-summary">
+  <ul>
+    {% for t in tactical_takeaways %}
+    <li>{{ t }}</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+<!-- ═══════════════════════════════════════════════════════
+     ANALYST OVERLAYS
+══════════════════════════════════════════════════════════ -->
+{% if analyst_overlays %}
+<h2 class="section-title">Analyst Overlays</h2>
+<table class="research-table">
+  <thead><tr><th>Ticker</th><th>Stance</th><th>Conviction</th><th>Thesis</th><th>Catalyst</th></tr></thead>
+  <tbody>
+  {% for row in analyst_overlays %}
+  <tr>
+    <td>{{ row.ticker }}</td>
+    <td class="{{ 'pos' if row.stance in ['Overweight','Buy'] else 'neg' if row.stance in ['Underweight','Sell'] else '' }}">{{ row.stance }}</td>
+    <td>{{ row.conviction }}/5</td>
+    <td>{{ row.thesis | default("—") }}</td>
+    <td>{{ row.catalyst | default("—") }}</td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+
+</div><!-- /body-wrap -->
+
+<!-- ═══════════════════════════════════════════════════════
+     FOOTER / DISCLOSURES
+══════════════════════════════════════════════════════════ -->
+<div class="footer">
+  <strong>Important Disclosures & Disclaimers</strong><br/>
+  This report is produced by TRG Research Workbench for educational and portfolio-project purposes only. It does not constitute investment advice, a solicitation, or an offer to buy or sell any security.
+  All data sourced from Yahoo Finance (unofficial API), SEC EDGAR (public filings), and ECB SDMX (public API). Data is provided "as is" without warranty of accuracy or completeness.
+  Past performance is not indicative of future results. Price targets and DCF outputs are model-based estimates derived from publicly available information and should not be relied upon for investment decisions.
+  The analyst(s) responsible for this report may hold positions in securities mentioned.
+  <br/><br/>
+  <strong>Data Sources:</strong> Yahoo Finance · SEC EDGAR XBRL API · ECB SDMX CSV API · US Treasury (via Yahoo Finance proxies)
+  &nbsp;|&nbsp; <strong>Generated:</strong> {{ as_of_date }} &nbsp;|&nbsp; <strong>Model Version:</strong> TRG Workbench v2.0
+</div>
+
+</body>
+</html>
