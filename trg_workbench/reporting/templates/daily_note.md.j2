@@ -1,56 +1,51 @@
 # Daily Tactical Note
 
-Report date: {{ report_date }}
-Data as of: {{ data_as_of }}
+Report date: {{ as_of_date }}
+Data as of: {{ as_of_date }}
 
 ## Macro Snapshot
-| Metric | Latest | 1W Change | Last Updated |
-| --- | ---: | ---: | --- |
-{% for row in macro_summary %}
-| {{ row.display_name }} | {% if row.category == "rates" %}{{ "%.2f"|format(row.latest_value) }}{% else %}{{ "%.3f"|format(row.latest_value) }}{% endif %} | {% if row.category == "rates" %}{{ row.one_week_change|bps }}{% else %}{{ row.one_week_change|pct(2) }}{% endif %} | {{ row.last_updated.strftime("%Y-%m-%d") }} |
+| Metric | Value | 1D | 1W |
+| --- | ---: | ---: | ---: |
+{% for row in us_macro_rows %}
+| {{ row.get("label", row.get("ticker", "")) }} | {{ row.get("value_fmt", row.get("value", "")) }} | {{ "%.2f"|format(row.get("chg_1d", 0)) }} | {{ "%.2f"|format(row.get("chg_1w", 0)) }} |
 {% endfor %}
 
 ## US Sector Tape
-| Sector | Proxy | 1D | 1W | 1M |
-| --- | --- | ---: | ---: | ---: |
-{% for row in sector_summary %}
-| {{ row.display_name }} | {{ row.ticker }} | {{ row.ret_1d|pct }} | {{ row.ret_1w|pct }} | {{ row.ret_1m|pct }} |
+| Sector | 1D | 1W | 1M |
+| --- | ---: | ---: | ---: |
+{% for row in sector_rows %}
+| {{ row.get("sector_name", row.get("ticker", "")) }} | {{ "%.2f%%"|format(row.get("ret_1d", 0) * 100) }} | {{ "%.2f%%"|format(row.get("ret_1w", 0) * 100) }} | {{ "%.2f%%"|format(row.get("ret_1m", 0) * 100) }} |
 {% endfor %}
 
 ## Europe Overlay
-| Index | Ticker | 1D | 1W | 1M |
-| --- | --- | ---: | ---: | ---: |
-{% for row in europe_summary %}
-| {{ row.display_name }} | {{ row.ticker }} | {{ row.ret_1d|pct }} | {{ row.ret_1w|pct }} | {{ row.ret_1m|pct }} |
+| Index | Value | 1W Change |
+| --- | ---: | ---: |
+{% for row in ecb_rows %}
+| {{ row.get("label", "") }} | {{ row.get("value_fmt", "") }} | {{ row.get("chg_1w_fmt", "") }} |
 {% endfor %}
 
 ## Screen Leaders
-| Rank | Ticker | Company | Sector | Fwd EPS Growth | Target Upside | Buy Ratio | Research Score |
-| ---: | --- | --- | --- | ---: | ---: | ---: | ---: |
-{% for row in top_candidates %}
-| {{ row.screen_rank|int }} | {{ row.ticker }} | {{ row.company_name }} | {{ row.sector or "n/a" }} | {{ row.forward_eps_growth|pct }} | {{ row.target_upside|pct }} | {{ row.analyst_buy_ratio|pct }} | {{ "%.2f"|format(row.research_score) }} |
-{% endfor %}
-
-## Sector Narratives
-{% for item in sector_narratives %}
-- {{ item }}
+| Rank | Ticker | Company | Sector | Score |
+| ---: | --- | --- | --- | ---: |
+{% for row in screen_rows %}
+| {{ row.get("screen_rank", loop.index) }} | {{ row.get("ticker", "") }} | {{ row.get("company_name", "") }} | {{ row.get("sector", "n/a") or "n/a" }} | {{ "%.2f"|format(row.get("research_score", 0)) }} |
 {% endfor %}
 
 ## Catalyst Calendar
-| Ticker | Company | Next Earnings | EPS Avg | Revenue Avg |
-| --- | --- | --- | ---: | ---: |
-{% for row in catalyst_calendar %}
-| {{ row.ticker }} | {{ row.company_name }} | {{ row.next_earnings_date.strftime("%Y-%m-%d") }} | {{ row.calendar_earnings_average|number(2) }} | {{ row.calendar_revenue_average|number }} |
+| Ticker | Company | Next Earnings |
+| --- | --- | --- |
+{% for row in catalyst_rows %}
+| {{ row.get("ticker", "") }} | {{ row.get("company_name", "") }} | {{ row.get("next_earnings_date", "") }} |
 {% endfor %}
 
 {% if analyst_overlays %}
 ## Analyst Overlays
 {% for row in analyst_overlays %}
-- {{ row.ticker }}{% if row.stance %} ({{ row.stance }}){% endif %}: {{ row.thesis }}{% if row.catalyst %} Catalyst: {{ row.catalyst }}.{% endif %}{% if row.risk %} Risk: {{ row.risk }}.{% endif %}
+- {{ row.ticker }}{% if row.stance %} ({{ row.stance }}){% endif %}: {{ row.thesis }}
 {% endfor %}
 {% endif %}
 
 ## Tactical Takeaways
-{% for item in takeaways %}
+{% for item in tactical_takeaways %}
 - {{ item }}
 {% endfor %}
