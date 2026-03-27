@@ -136,10 +136,12 @@ def build_risk_table(
         ret_ytd = float("nan")
         ret_1y = float("nan")
         if len(px) >= 2:
-            # YTD from Jan 1 approximate (first available in year)
-            this_year = px.last("365D")
+            # 1Y return: trailing 365 days (pandas 2.x compatible — no .last())
+            cutoff_1y = px.index[-1] - pd.Timedelta(days=365)
+            this_year = px[px.index >= cutoff_1y]
             if len(this_year) >= 2:
                 ret_1y = float((this_year.iloc[-1] / this_year.iloc[0]) - 1)
+            # YTD return: from Jan 1 of current year
             ytd_start = px[px.index >= pd.Timestamp(px.index[-1].year, 1, 1)]
             if len(ytd_start) >= 2:
                 ret_ytd = float((ytd_start.iloc[-1] / ytd_start.iloc[0]) - 1)

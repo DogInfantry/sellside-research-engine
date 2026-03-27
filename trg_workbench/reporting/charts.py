@@ -210,7 +210,8 @@ def plot_factor_radar(
 
     # Benchmark (universe median) — dashed grey at 50
     bench_values = benchmark_scores if benchmark_scores else {k: 0.5 for k in labels}
-    bench_vals = [max(0, min(100, v * 100)) if v <= 1 else max(0, min(100, v)) for v in bench_vals_raw := list(bench_values.values())]
+    bench_vals_raw = list(bench_values.values())
+    bench_vals = [max(0, min(100, v * 100)) if v <= 1 else max(0, min(100, v)) for v in bench_vals_raw]
     ax.plot(angles_plot, bench_vals + [bench_vals[0]], "--", color=GS_GREY, linewidth=1.2, alpha=0.6, label="Universe Median")
     ax.fill(angles_plot, bench_vals + [bench_vals[0]], color=GS_GREY, alpha=0.05)
 

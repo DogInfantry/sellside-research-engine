@@ -29,7 +29,7 @@ def _validate_date(s: str) -> str:
 def cmd_fetch_all(args: argparse.Namespace) -> int:
     from trg_workbench.pipeline_v2 import fetch_data_v2
     result = fetch_data_v2(args.as_of)
-    print(f"✓ All data fetched for {args.as_of}")
+    print(f"[OK] All data fetched for {args.as_of}")
     if "us_macro_snapshot" in result:
         n = len(result["us_macro_snapshot"])
         print(f"  US macro: {n} series")
@@ -47,7 +47,7 @@ def cmd_build_report(args: argparse.Namespace) -> int:
         print("ERROR: Report generation failed. Run fetch-all first.", file=sys.stderr)
         return 1
 
-    print(f"\n✓ Report generation complete ({len(outputs)} files):")
+    print(f"\n[DONE] Report generation complete ({len(outputs)} files):")
     for fmt, path in outputs.items():
         print(f"  [{fmt.upper()}] {path}")
 

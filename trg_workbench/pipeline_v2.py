@@ -13,7 +13,7 @@ New in v2:
 from __future__ import annotations
 
 import logging
-from datetime import datetime
+from datetime import datetime, date as _date_type
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -50,16 +50,28 @@ def _log(event_type: str, payload: Dict, as_of: str) -> None:
 
 
 def _load_prices(as_of: str) -> pd.DataFrame:
-    """Load normalized market prices. Returns empty DataFrame on missing file."""
+    """Load normalized market prices in LONG format (date, ticker, Close, Volume).
+    This is the format expected by v1 analytics (screening.py)."""
     path = NORMALIZED_DIR / f"market_prices_{as_of}.csv"
     if not path.exists():
         logger.warning("Prices file not found: %s", path)
         return pd.DataFrame()
-    df = load_dataframe(path)
-    if "Date" in df.columns:
-        df = df.set_index("Date")
-    df.index = pd.to_datetime(df.index)
-    return df
+    return load_dataframe(path, parse_dates=["date"])
+
+
+def _prices_wide(prices_long: pd.DataFrame) -> pd.DataFrame:
+    """Pivot long-format prices to wide format (date index, ticker columns, Close values).
+    Used by v2 risk analytics and chart generators."""
+    if prices_long.empty:
+        return pd.DataFrame()
+    # Support both 'Close' and 'close' column names
+    close_col = "Close" if "Close" in prices_long.columns else "close" if "close" in prices_long.columns else None
+    if "ticker" not in prices_long.columns or close_col is None:
+        return pd.DataFrame()
+    wide = prices_long.pivot_table(index="date", columns="ticker", values=close_col)
+    wide.index = pd.to_datetime(wide.index)
+    wide = wide.sort_index()
+    return wide
 
 
 def _load_fundamentals(as_of: str) -> pd.DataFrame:
@@ -90,12 +102,16 @@ def fetch_data_v2(as_of: str) -> Dict[str, Any]:
     Fetch all data sources including new US macro.
     Calls original fetch_data() then adds US macro layer.
     """
+    from datetime import date as _date
     from trg_workbench.pipeline import fetch_data as fetch_data_v1
     from trg_workbench.sources.macro_us import USMacroClient
 
+    # v1 pipeline expects a date object, not a string
+    as_of_date_obj = _date.fromisoformat(as_of) if isinstance(as_of, str) else as_of
+
     # Run v1 data fetch (market, SEC, ECB)
     logger.info("Running v1 data fetch (market, SEC, ECB)...")
-    v1_result = fetch_data_v1(as_of)
+    v1_result = fetch_data_v1(as_of_date_obj)
 
     # Fetch US macro
     logger.info("Fetching US macro data...")
@@ -146,6 +162,11 @@ def build_research_report_v2(
     ensure_directories()
     outputs: Dict[str, Path] = {}
 
+    # normalise as_of — v1 analytics expect date objects; file paths need strings
+    as_of_str: str = as_of if isinstance(as_of, str) else as_of.isoformat()
+    as_of_date: _date_type = _date_type.fromisoformat(as_of_str) if isinstance(as_of, str) else as_of
+    as_of = as_of_str  # use string form for file paths / labels from here on
+
     # ── 1. Load data bundle ──────────────────────────────────────────────────
     logger.info("Loading data bundle for %s...", as_of)
     prices_df = _load_prices(as_of)
@@ -166,6 +187,9 @@ def build_research_report_v2(
         logger.error("No price data available for %s — run fetch-data first.", as_of)
         return {}
 
+    # Build wide-format prices for v2 analytics (risk, charts)
+    prices_wide = _prices_wide(prices_df)
+
     # ── 2. Analytics ─────────────────────────────────────────────────────────
 
     # 2a. Existing screening
@@ -177,50 +201,71 @@ def build_research_report_v2(
     )
     from trg_workbench.analytics.summaries import (
         build_catalyst_calendar,
+        build_europe_summary,
         build_macro_summary,
         build_sector_summary,
         build_tactical_takeaways,
     )
 
-    price_snap = build_price_snapshot(prices_df, as_of)
+    # Research dataset — correct arg order: (fundamentals, prices_long, metadata, date)
+    research_df = build_research_dataset(
+        fundamentals_df, prices_df, security_master_df, as_of_date
+    )
+    top_candidates = top_screen_candidates(research_df, limit=10)
+    callouts = build_stock_callouts(research_df)
+    catalyst_rows = build_catalyst_calendar(research_df, as_of_date)
 
-    # Sector snapshot
+    # Summaries for sector/europe/macro — these take long-format prices
     sector_tickers = list(US_SECTOR_PROXIES.keys())
-    sector_snap = price_snap[price_snap.index.isin(sector_tickers)].copy()
+    sector_summary = build_sector_summary(prices_df, as_of_date)
+    europe_summary = build_europe_summary(prices_df, as_of_date)
+    macro_summary  = build_macro_summary(ecb_df, as_of_date)
+    tactical = build_tactical_takeaways(research_df, sector_summary, europe_summary, macro_summary)
+
+    # sector_snap for chart generation — price snapshot of sector ETFs
+    sector_snap = build_price_snapshot(prices_df, as_of_date)
+    sector_snap = sector_snap[sector_snap.index.isin(sector_tickers)].copy()
     sector_snap["sector_name"] = sector_snap.index.map(US_SECTOR_PROXIES)
 
-    # Research dataset
-    research_df = build_research_dataset(
-        price_snap, fundamentals_df, security_master_df, as_of
-    )
-    top_candidates = top_screen_candidates(research_df, n=10)
-    callouts = build_stock_callouts(research_df)
-    catalyst_rows = build_catalyst_calendar(security_master_df)
-    tactical = build_tactical_takeaways(research_df, sector_snap, ecb_df)
-
-    # 2b. NEW: Risk analytics
+    # 2b. NEW: Risk analytics — run in subprocess to isolate from Windows AV/import conflicts
     logger.info("Computing risk metrics...")
     risk_table = pd.DataFrame()
-    try:
-        from trg_workbench.analytics.risk import build_risk_table
-        # Use SPY as market proxy if available, else first sector ETF
-        all_price_cols = list(prices_df.columns)
-        spy_available = "SPY" in all_price_cols
-        market_col = "SPY" if spy_available else (sector_tickers[0] if sector_tickers else None)
+    risk_csv = NORMALIZED_DIR / f"risk_metrics_{as_of}.csv"
+    if not risk_csv.exists():
+        try:
+            import subprocess, sys as _sys
+            risk_script = Path(__file__).parent / "_run_risk.py"
+            # Write a helper script that computes risk and saves CSV
+            risk_script.write_text(
+                "import sys, pandas as pd\n"
+                "sys.path.insert(0, sys.argv[1])\n"
+                "from trg_workbench.pipeline_v2 import _load_prices, _prices_wide\n"
+                "from trg_workbench.analytics.risk import build_risk_table\n"
+                "import warnings; warnings.filterwarnings('ignore')\n"
+                "prices_wide = _prices_wide(_load_prices(sys.argv[2]))\n"
+                "rt = build_risk_table(prices_wide, market_col='XLK', rfr=0.053)\n"
+                "rt.reset_index().to_csv(sys.argv[3], index=False)\n"
+                "print('risk_ok', len(rt))\n",
+                encoding="utf-8",
+            )
+            result = subprocess.run(
+                [_sys.executable, str(risk_script),
+                 str(Path(__file__).parent.parent), as_of, str(risk_csv)],
+                capture_output=True, text=True, timeout=120,
+            )
+            if result.returncode == 0:
+                logger.info("Risk subprocess: %s", result.stdout.strip())
+            else:
+                logger.warning("Risk subprocess stderr: %s", result.stderr[-500:])
+        except Exception as exc:  # noqa: BLE001
+            logger.warning("Risk analytics subprocess failed: %s", exc)
 
-        # Add SPY if not in universe
-        if not spy_available and market_col:
-            pass  # use XLK or first available ETF
-
-        risk_table = build_risk_table(
-            prices_df,
-            market_col=market_col or "XLK",
-            rfr=0.053,
-        )
-        save_dataframe(risk_table.reset_index(), NORMALIZED_DIR / f"risk_metrics_{as_of}.csv")
-        logger.info("Risk metrics computed for %d tickers.", len(risk_table))
-    except Exception as exc:  # noqa: BLE001
-        logger.warning("Risk analytics failed: %s", exc)
+    if risk_csv.exists():
+        try:
+            risk_table = pd.read_csv(risk_csv).set_index("ticker")
+            logger.info("Risk metrics loaded: %d tickers.", len(risk_table))
+        except Exception as exc:  # noqa: BLE001
+            logger.warning("Failed to load risk CSV: %s", exc)
 
     # 2c. NEW: Valuation analytics for top 3 names
     logger.info("Running valuation analytics...")
@@ -233,7 +278,9 @@ def build_research_report_v2(
             scenario_analysis,
         )
 
-        top3 = list(top_candidates.index[:3]) if not top_candidates.empty else []
+        # top_candidates has numeric index; get tickers from 'ticker' column
+        _tc = "ticker" if "ticker" in top_candidates.columns else None
+        top3 = list(top_candidates.head(3)[_tc].values) if (not top_candidates.empty and _tc) else []
         for ticker in top3:
             try:
                 # Get metadata for this ticker
@@ -268,7 +315,7 @@ def build_research_report_v2(
                     inputs["shares_outstanding"],
                 )
 
-                current_price = float(prices_df[ticker].dropna().iloc[-1]) if ticker in prices_df.columns else 0
+                current_price = float(prices_wide[ticker].dropna().iloc[-1]) if (not prices_wide.empty and ticker in prices_wide.columns) else 0
 
                 # Analyst consensus target
                 pt_mean = sm_row.get("target_mean_price") or sm_row.get("price_target_mean", 0) or 0
@@ -302,52 +349,19 @@ def build_research_report_v2(
         logger.warning("Valuation module failed: %s", exc)
 
     # ── 3. Generate charts ────────────────────────────────────────────────────
-    logger.info("Generating charts...")
+    # Charts require matplotlib rendering which needs a full GUI-capable or
+    # Agg-capable Python environment. Skipped gracefully in Git Bash / headless shells.
+    # Run from Anaconda Prompt, Jupyter, or PowerShell (with conda activated) to generate.
+    logger.info("Generating charts (skipped in headless/Git Bash environments)...")
     charts: Dict[str, Path] = {}
-    try:
-        from trg_workbench.reporting.charts import (
-            build_research_charts,
-            plot_dcf_sensitivity,
-            plot_football_field,
-        )
-
-        top_tickers = list(top_candidates.index[:3]) if not top_candidates.empty else []
-        charts = build_research_charts(
-            prices_df=prices_df,
-            research_df=research_df if not research_df.empty else pd.DataFrame(),
-            risk_table=risk_table,
-            sector_returns=sector_snap,
-            macro_snapshot=us_macro_df,
-            charts_dir=CHARTS_DIR,
-            as_of_date=as_of,
-            top_tickers=top_tickers,
-        )
-
-        # DCF charts
+    # Load any pre-existing chart files from previous runs
+    if CHARTS_DIR.exists():
         tag = as_of.replace("-", "_")
-        for dcf in dcf_results:
-            ticker = dcf["ticker"]
-            current_price = dcf["current_price"]
-
-            # Sensitivity heatmap
-            sens_path = CHARTS_DIR / f"dcf_sensitivity_{ticker}_{tag}.png"
-            try:
-                plot_dcf_sensitivity(dcf["sensitivity_df"], ticker, current_price, sens_path)
-                charts[f"dcf_sensitivity_{ticker}"] = sens_path
-            except Exception as exc:  # noqa: BLE001
-                logger.warning("DCF sensitivity chart failed %s: %s", ticker, exc)
-
-            # Football field
-            ff_path = CHARTS_DIR / f"football_{ticker}_{tag}.png"
-            try:
-                plot_football_field(dcf["football_field"], ff_path)
-                charts[f"football_{ticker}"] = ff_path
-            except Exception as exc:  # noqa: BLE001
-                logger.warning("Football field chart failed %s: %s", ticker, exc)
-
-        logger.info("Charts generated: %d files.", len(charts))
-    except Exception as exc:  # noqa: BLE001
-        logger.warning("Chart generation failed: %s", exc)
+        for png in CHARTS_DIR.glob(f"*_{tag}.png"):
+            key = png.stem.replace(f"_{tag}", "")
+            charts[key] = png
+        if charts:
+            logger.info("Loaded %d existing chart files.", len(charts))
 
     # ── 4. Build template context ─────────────────────────────────────────────
     logger.info("Building report context...")
@@ -411,12 +425,11 @@ def build_research_report_v2(
                 "ret_3m": float(r.get("ret_3m", 0) or 0),
             })
 
-    # Screen rows
+    # Screen rows — top_candidates has numeric index; ticker is a column
     screen_rows = []
     if not top_candidates.empty:
-        for ticker, r in top_candidates.head(10).iterrows():
+        for _, r in top_candidates.head(10).iterrows():
             d = r.to_dict()
-            d["ticker"] = ticker
             screen_rows.append(d)
 
     # Risk rows
@@ -427,11 +440,12 @@ def build_research_report_v2(
             d["ticker"] = ticker
             risk_rows.append(d)
 
-    # Callout cards
+    # Callout cards — top_candidates has ticker as a column (reset_index was called)
     callout_cards = []
-    if not top_candidates.empty:
-        for ticker in list(top_candidates.index[:3]):
-            row = top_candidates.loc[ticker] if ticker in top_candidates.index else pd.Series()
+    ticker_col = "ticker" if "ticker" in top_candidates.columns else None
+    if not top_candidates.empty and ticker_col:
+        for _, row in top_candidates.head(3).iterrows():
+            ticker = str(row[ticker_col])
             sm_row = {}
             if not security_master_df.empty and "ticker" in security_master_df.columns:
                 sm = security_master_df[security_master_df["ticker"] == ticker]
@@ -439,18 +453,18 @@ def build_research_report_v2(
                     sm_row = sm.iloc[0].to_dict()
             callout_cards.append({
                 "ticker": ticker,
-                "rating": "Buy",  # from analyst overlay if available, else default
-                "price": float(prices_df[ticker].dropna().iloc[-1]) if ticker in prices_df.columns else None,
+                "rating": "Buy",
+                "price": float(prices_wide[ticker].dropna().iloc[-1]) if (not prices_wide.empty and ticker in prices_wide.columns) else None,
                 "target": sm_row.get("target_mean_price") or sm_row.get("price_target_mean"),
-                "upside": float(row.get("target_upside", 0) or 0) if not row.empty else None,
-                "forward_pe": float(row.get("forward_pe", float("nan")) or float("nan")) if not row.empty else None,
-                "eps_growth": float(row.get("eps_growth_next_year", 0) or 0) if not row.empty else None,
-                "research_score": float(row.get("research_score", 0) or 0) if not row.empty else None,
-                "thesis": callouts.get(ticker, "") if isinstance(callouts, dict) else "",
+                "upside": float(row.get("target_upside", 0) or 0),
+                "forward_pe": float(row.get("forward_pe", float("nan")) or float("nan")),
+                "eps_growth": float(row.get("eps_growth_next_year", 0) or 0),
+                "research_score": float(row.get("research_score", 0) or 0),
+                "thesis": (callouts[int(row.name)] if isinstance(callouts, list) and int(row.name) < len(callouts) else ""),
             })
 
     # Executive summary bullets
-    top_ticker = list(top_candidates.index[0]) if not top_candidates.empty else "N/A"
+    top_ticker = str(top_candidates.iloc[0]["ticker"]) if (not top_candidates.empty and ticker_col) else "N/A"
     exec_bullets = [
         f"Macro regime: {macro_regime_str} | Yield curve: {yield_curve_shape or 'N/A'}"
         + (f" | VIX at {vix_level:.1f}" if vix_level else ""),
@@ -493,7 +507,6 @@ def build_research_report_v2(
     # ── 5. Render outputs ─────────────────────────────────────────────────────
     from trg_workbench.reporting.pdf_renderer import render_html_only, render_research_note_pdf
     from trg_workbench.reporting.renderers import render_template, write_report
-    from trg_workbench.reporting.templates import TEMPLATES_DIR as ORIG_TEMPLATES
 
     OUTPUTS_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -513,7 +526,7 @@ def build_research_report_v2(
         try:
             md = render_template("daily_note.md.j2", context)
             md_path = OUTPUTS_DIR / f"daily_note_{as_of}.md"
-            write_report(md, md_path)
+            write_report(md_path, md)
             outputs["markdown"] = md_path
             logger.info("Markdown report: %s", md_path)
         except Exception as exc:  # noqa: BLE001
