@@ -5,13 +5,12 @@
 [![Live Data](https://img.shields.io/badge/data-live%20%2F%20real-brightgreen.svg)](#data-sources)
 [![Built for Research](https://img.shields.io/badge/built%20for-equity%20research-navy.svg)](#)
 [![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](CONTRIBUTING.md)
-[![PRs Welcome](https://img.shields.io/shields/static/v1?label=PRs&message=welcome&color=brightgreen)](https://github.com/DogInfantry/sellside-research-engine/pulls)
 
 > A production-grade equity research pipeline that automates the full sell-side analyst workflow — from live data ingestion to institutional-quality research notes.
 
 Mirrors the output standards of **Goldman Sachs Tactical Research Group**, **JPMorgan Equity Research**, and **Morgan Stanley Research**. Built for equity researchers, PMs, and quants who need institutional output at scale.
 
-**This project is open to contributions.** Whether you want to add a new data source, improve valuation logic, or extend the LLM reasoning layer — see [CONTRIBUTING.md](CONTRIBUTING.md) to get started.
+**This project is open to contributions.** Whether you want to add a new data source, improve valuation logic, or build the LLM reasoning layer — see [CONTRIBUTING.md](CONTRIBUTING.md) to get started.
 
 ---
 
@@ -159,12 +158,7 @@ Covers: SEC XBRL parsing · ECB normalization · screening logic · template ren
 
 ## 🤝 Contributing
 
-Contributions are welcome from equity researchers, quants, data engineers, and Python developers. Please read [CONTRIBUTING.md](CONTRIBUTING.md) for:
-
-- Development setup and project structure
-- Pull request guidelines and branch naming conventions
-- Issue labels and how to find good first issues
-- Code standards (Black, typed Python 3.10+)
+Contributions are welcome from equity researchers, quants, data engineers, and Python developers. Please read [CONTRIBUTING.md](CONTRIBUTING.md) for setup instructions, PR guidelines, and how to find good first issues.
 
 For questions or ideas, open a [Discussion](https://github.com/DogInfantry/sellside-research-engine/discussions) or comment on an issue.
 
@@ -172,14 +166,50 @@ For questions or ideas, open a [Discussion](https://github.com/DogInfantry/sells
 
 ## Roadmap
 
-- [ ] Real-time price streaming (WebSocket)
-- [ ] Options analytics (IV surface, Greeks)
-- [ ] LLM-powered investment narrative generation
-- [ ] Sector rotation dashboard
-- [ ] Bloomberg API integration
-- [ ] Interactive Streamlit research collaboration app
+Items marked 🟢 are open issues ready to be picked up. See the [Issues tab](https://github.com/DogInfantry/sellside-research-engine/issues) for full specs and context.
 
-> Want to tackle a roadmap item? Open an issue to discuss scope before building.
+### 🧱 Engineering & Infrastructure
+- 🟢 [Add `--dry-run` flag for input validation without live API calls](https://github.com/DogInfantry/sellside-research-engine/issues/1)
+- 🟢 [GitHub Actions CI — run pytest on every PR automatically](https://github.com/DogInfantry/sellside-research-engine/issues/4)
+- 🟢 [Add `tqdm` progress bars to fetch and report-build stages](https://github.com/DogInfantry/sellside-research-engine/issues/5)
+- 🟢 [Docker + docker-compose for reproducible execution](https://github.com/DogInfantry/sellside-research-engine/issues/11)
+- [ ] Async data fetching (`asyncio` + `aiohttp`) to parallelize source calls
+- [ ] Redis-backed caching layer with TTL invalidation
+
+### 📊 Analytics & Valuation
+- 🟢 [Reverse DCF — solve for growth rate implied by current price](https://github.com/DogInfantry/sellside-research-engine/issues/6)
+- 🟢 [Piotroski F-Score and Altman Z-Score in screening model](https://github.com/DogInfantry/sellside-research-engine/issues/7)
+- [ ] Forward multiples in CCA (NTM EV/EBITDA, forward P/E)
+- [ ] LBO model stub — entry/exit with sponsor IRR
+- [ ] Monte Carlo DCF — stochastic FCF and WACC simulation
+- [ ] EV bridge — auto-compute net debt, minority interest, preferred from XBRL
+
+### 🔌 Data Sources
+- 🟢 [FRED API connector — CPI, PCE, credit spreads, yield curve](https://github.com/DogInfantry/sellside-research-engine/issues/8)
+- [ ] SEC Form 4 XBRL parser for insider transactions
+- [ ] OpenBB Platform SDK as optional aggregated source layer
+- [ ] SEDAR+ / Companies House for Canadian and UK filings
+
+### 🤖 LLM Reasoning Layer
+- 🟢 [Earnings transcript RAG pipeline — tone scoring, guidance extraction, risk flags](https://github.com/DogInfantry/sellside-research-engine/issues/9)
+- [ ] 10-K/10-Q MD&A summarization (liquidity, risk factors, outlook)
+- [ ] News catalyst detection — map headlines to catalyst calendar
+- [ ] Pluggable LLM backend (OpenAI / local Ollama / Mistral)
+
+### 📁 Reporting & Output
+- 🟢 [Interactive HTML report — replace static PNGs with Plotly charts](https://github.com/DogInfantry/sellside-research-engine/issues/10)
+- [ ] PowerPoint export (`python-pptx`) matching GS/JPM slide deck format
+- [ ] Excel DCF model export (`openpyxl`) with live formula links
+- [ ] Streamlit multi-ticker comparison dashboard
+
+### 🧪 Tests & Documentation
+- 🟢 [Unit tests for `catalyst.py`](https://github.com/DogInfantry/sellside-research-engine/issues/2)
+- 🟢 [Document `analyst_views.csv` column schema](https://github.com/DogInfantry/sellside-research-engine/issues/3)
+- [ ] Integration test suite with mock API responses
+- [ ] Jupyter notebook examples in `notebooks/`
+- [ ] Docstrings audit across all `analytics/` functions
+
+> Want to tackle a roadmap item without an open issue? Open one to discuss scope before building.
 
 ---
 
