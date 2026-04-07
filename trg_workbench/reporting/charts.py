@@ -29,6 +29,7 @@ import matplotlib.ticker as mticker
 import numpy as np
 import pandas as pd
 from matplotlib.colors import LinearSegmentedColormap
+from tqdm import tqdm
 
 warnings.filterwarnings("ignore", category=UserWarning)
 
@@ -100,7 +101,7 @@ def plot_dcf_sensitivity(
     ax.set_yticklabels(data.index, fontsize=8)
 
     # Cell annotations
-    for i in range(len(data.index)):
+    for i in tqdm(range(len(data.index)), "DCF Sensitivity Heatmap (Cell annotations)"):
         for j in range(len(data.columns)):
             val = data.values[i, j]
             if not np.isnan(val):
@@ -145,7 +146,7 @@ def plot_football_field(
     fig, ax = plt.subplots(figsize=(11, max(4, len(labels) * 1.1 + 1.5)))
     ax.set_facecolor(GS_LIGHT)
 
-    for i, (label, (lo, mid, hi)) in enumerate(methods.items()):
+    for i, (label, (lo, mid, hi)) in tqdm(enumerate(methods.items()), "Football Field Chart"):
         color = colors[i % len(colors)]
         # Range bar
         ax.barh(i, hi - lo, left=lo, height=0.5, color=color, alpha=0.25, edgecolor=color, linewidth=1.5)
@@ -257,7 +258,7 @@ def plot_peer_scatter(
     ax.scatter(non_hl[x_col], non_hl[y_col], color=GS_NAVY, alpha=0.65, s=80, zorder=4)
 
     # Labels for peers
-    for _, row in non_hl.iterrows():
+    for _, row in tqdm(non_hl.iterrows(), "Peer Comparison Scatter"):
         ax.annotate(row[label_col], (row[x_col], row[y_col]),
                     textcoords="offset points", xytext=(6, 4),
                     fontsize=7.5, color=GS_GREY)
@@ -326,7 +327,7 @@ def plot_price_chart(
     ax_price.plot(dates, close, color=GS_NAVY, linewidth=1.5, label="Close")
 
     # Moving averages
-    for window, color in zip(ma_windows, [GS_GOLD, GS_RED]):
+    for window, color in tqdm(zip(ma_windows, [GS_GOLD, GS_RED]), "Candlestick (Moving Averages)"):
         ma = close.rolling(window).mean()
         ax_price.plot(dates, ma, color=color, linewidth=1.2, linestyle="--",
                       label=f"{window}-Day MA", alpha=0.85)
@@ -435,7 +436,7 @@ def plot_correlation_heatmap(
     ax.set_xticklabels(corr_matrix.columns, rotation=45, ha="right", fontsize=7.5)
     ax.set_yticklabels(corr_matrix.index, fontsize=7.5)
 
-    for i in range(n):
+    for i in tqdm(range(n), "Correlation Heatmap"):
         for j in range(n):
             val = corr_matrix.values[i, j]
             if not np.isnan(val):
@@ -538,7 +539,7 @@ def plot_sector_heatmap(
     ax.set_xticklabels(df.columns, fontsize=9, fontweight="bold")
     ax.set_yticklabels(df.index, fontsize=8.5)
 
-    for i in range(len(df.index)):
+    for i in tqdm(range(len(df.index)), "Sector Rotation Heatmap"):
         for j in range(len(df.columns)):
             val = df.values[i, j]
             if not np.isnan(float(val)):
@@ -586,7 +587,7 @@ def plot_risk_return_scatter(
     )
     plt.colorbar(sc, ax=ax, label="Sharpe Ratio (relative)", shrink=0.8)
 
-    for ticker in df.index:
+    for ticker in tqdm(df.index, "Risk-Return Scatter"):
         hl = highlight_tickers and ticker in highlight_tickers
         ax.annotate(
             ticker,
@@ -654,7 +655,7 @@ def plot_screen_dashboard(
     _gs_spine(ax)
 
     bottom = np.zeros(len(df))
-    for col, color in zip(factor_cols, colors_used):
+    for col, color in tqdm(zip(factor_cols, colors_used), "Screen Score Dashboard (Colors)"):
         vals = df[col].fillna(0).values
         bars = ax.barh(range(len(df)), vals, left=bottom, color=color, alpha=0.85,
                        edgecolor="white", linewidth=0.5, label=col_labels.get(col, col))
@@ -662,7 +663,7 @@ def plot_screen_dashboard(
 
     # Total score label
     total = df[factor_cols].fillna(0).sum(axis=1)
-    for i, (t, idx) in enumerate(zip(total, df.index)):
+    for i, (t, idx) in tqdm(enumerate(zip(total, df.index)), "Screen Score Dashboard (Total Score Label)"):
         ax.text(t + 0.01, i, f"{t:.2f}", va="center", ha="left", fontsize=8,
                 color=GS_NAVY, fontweight="bold")
 
@@ -706,7 +707,7 @@ def plot_macro_dashboard(
     # Table-style rendering
     col_headers = ["Indicator", "Latest", "1-Day Δ", "1-Week Δ", "1-Month Δ", "Category"]
     table_data = []
-    for _, row in df.iterrows():
+    for _, row in tqdm(df.iterrows(), "Macro Dashboard"):
         unit = row.get("unit", "")
         val = float(row["value"])
         fmt = f"{val:.2f}%" if unit == "pct" else f"{val:.2f}"
@@ -742,7 +743,7 @@ def plot_macro_dashboard(
         tbl[(0, j)].set_text_props(color="white", fontweight="bold")
 
     # Style data rows
-    for i, row_data in enumerate(table_data, start=1):
+    for i, row_data in tqdm(enumerate(table_data, start=1), "Macro Dashboard (Style Data Rows)"):
         cat = row_data[-1]
         bg = GS_LIGHT if i % 2 == 0 else "white"
         for j in range(len(col_headers)):
@@ -830,7 +831,7 @@ def build_research_charts(
             pass
 
     # 6. Per-ticker charts for top 3 names
-    for ticker in (top_tickers or [])[:3]:
+    for ticker in tqdm((top_tickers or [])[:3], "Correlation heatmap (US equities only, not indices/ETFs)"):
         if ticker in prices_df.columns:
             # Price chart
             p = charts_dir / f"price_{ticker}_{tag}.png"
