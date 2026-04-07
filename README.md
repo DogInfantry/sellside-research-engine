@@ -4,10 +4,14 @@
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![Live Data](https://img.shields.io/badge/data-live%20%2F%20real-brightgreen.svg)](#data-sources)
 [![Built for Research](https://img.shields.io/badge/built%20for-equity%20research-navy.svg)](#)
+[![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](CONTRIBUTING.md)
+[![PRs Welcome](https://img.shields.io/shields/static/v1?label=PRs&message=welcome&color=brightgreen)](https://github.com/DogInfantry/sellside-research-engine/pulls)
 
 > A production-grade equity research pipeline that automates the full sell-side analyst workflow — from live data ingestion to institutional-quality research notes.
 
 Mirrors the output standards of **Goldman Sachs Tactical Research Group**, **JPMorgan Equity Research**, and **Morgan Stanley Research**. Built for equity researchers, PMs, and quants who need institutional output at scale.
+
+**This project is open to contributions.** Whether you want to add a new data source, improve valuation logic, or extend the LLM reasoning layer — see [CONTRIBUTING.md](CONTRIBUTING.md) to get started.
 
 ---
 
@@ -153,6 +157,19 @@ Covers: SEC XBRL parsing · ECB normalization · screening logic · template ren
 
 ---
 
+## 🤝 Contributing
+
+Contributions are welcome from equity researchers, quants, data engineers, and Python developers. Please read [CONTRIBUTING.md](CONTRIBUTING.md) for:
+
+- Development setup and project structure
+- Pull request guidelines and branch naming conventions
+- Issue labels and how to find good first issues
+- Code standards (Black, typed Python 3.10+)
+
+For questions or ideas, open a [Discussion](https://github.com/DogInfantry/sellside-research-engine/discussions) or comment on an issue.
+
+---
+
 ## Roadmap
 
 - [ ] Real-time price streaming (WebSocket)
@@ -161,6 +178,8 @@ Covers: SEC XBRL parsing · ECB normalization · screening logic · template ren
 - [ ] Sector rotation dashboard
 - [ ] Bloomberg API integration
 - [ ] Interactive Streamlit research collaboration app
+
+> Want to tackle a roadmap item? Open an issue to discuss scope before building.
 
 ---
 
@@ -172,6 +191,6 @@ MIT — free to use, modify, and distribute. See [LICENSE](LICENSE).
 
 ## Acknowledgments
 
-Data: SEC EDGAR · Yahoo Finance · ECB SDMX · yfinance
-Inspiration: Goldman Sachs TRG · JPMorgan Equity Research · Morgan Stanley Research
+Data: SEC EDGAR · Yahoo Finance · ECB SDMX · yfinance  
+Inspiration: Goldman Sachs TRG · JPMorgan Equity Research · Morgan Stanley Research  
 Stack: Python · matplotlib · seaborn · WeasyPrint · Jinja2 · pandas · yfinance
