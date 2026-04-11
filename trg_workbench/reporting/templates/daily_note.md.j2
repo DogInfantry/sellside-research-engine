@@ -38,6 +38,15 @@ Data as of: {{ as_of_date }}
 | {{ row.get("ticker", "") }} | {{ row.get("company_name", "") }} | {{ row.get("next_earnings_date", "") }} |
 {% endfor %}
 
+{% if dcf_results %}
+## Reverse DCF
+{% for row in dcf_results %}
+{% if row.reverse_dcf %}
+- {{ row.ticker }}: market implies {{ row.reverse_dcf.implied_growth_rate | pct }} FCF CAGR at {{ row.reverse_dcf.wacc | pct }} WACC and {{ row.reverse_dcf.terminal_growth | pct }} terminal growth.
+{% endif %}
+{% endfor %}
+
+{% endif %}
 {% if analyst_overlays %}
 ## Analyst Overlays
 {% for row in analyst_overlays %}

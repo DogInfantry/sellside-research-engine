@@ -598,6 +598,26 @@
 </div>
 {% endif %}
 
+{% if ticker_dcf.reverse_dcf %}
+<div class="metric-row">
+  <div class="metric-card">
+    <div class="mc-label">Market-Implied FCF CAGR</div>
+    <div class="mc-value">{{ ticker_dcf.reverse_dcf.implied_growth_rate | pct }}</div>
+    <div class="mc-sub">{{ ticker_dcf.reverse_dcf.projection_years }}Y projection | TGR {{ ticker_dcf.reverse_dcf.terminal_growth | pct }}</div>
+  </div>
+  <div class="metric-card">
+    <div class="mc-label">Implied Enterprise Value</div>
+    <div class="mc-value">{{ ticker_dcf.reverse_dcf.implied_ev | number }}</div>
+    <div class="mc-sub">Price: ${{ "%.2f"|format(ticker_dcf.current_price) }} | WACC {{ ticker_dcf.reverse_dcf.wacc | pct }}</div>
+  </div>
+  <div class="metric-card">
+    <div class="mc-label">WACC Sensitivity</div>
+    <div class="mc-value">{{ ticker_dcf.reverse_dcf.sensitivity.wacc_down_100bps.implied_growth_rate | pct }} / {{ ticker_dcf.reverse_dcf.sensitivity.wacc_up_100bps.implied_growth_rate | pct }}</div>
+    <div class="mc-sub">Implied growth at WACC -100bps / +100bps</div>
+  </div>
+</div>
+{% endif %}
+
 {% if charts["dcf_sensitivity_" + ticker_dcf.ticker] or charts["football_" + ticker_dcf.ticker] %}
 <div class="chart-grid">
   {% if charts["dcf_sensitivity_" + ticker_dcf.ticker] %}

@@ -5,9 +5,11 @@ football field data, bull/base/bear scenario valuations.
 """
 from __future__ import annotations
 
+from typing import Dict, List, Optional, Tuple
+
 import numpy as np
 import pandas as pd
-from typing import Dict, List, Optional, Tuple
+from scipy.optimize import brentq
 
 
 # ─── WACC estimation ──────────────────────────────────────────────────────────
@@ -120,6 +122,111 @@ def dcf_sensitivity(
     df = pd.DataFrame(results)
     df.index.name = "WACC"
     return df.round(2)
+
+
+def _enterprise_value_for_constant_growth(
+    base_fcf: float,
+    growth_rate: float,
+    wacc: float,
+    terminal_growth: float,
+    projection_years: int,
+) -> float:
+    if wacc <= terminal_growth:
+        raise ValueError("wacc must be greater than terminal_growth")
+
+    fcfs = [
+        base_fcf * (1 + growth_rate) ** year
+        for year in range(1, projection_years + 1)
+    ]
+    pv_fcfs = [
+        fcf / (1 + wacc) ** year
+        for year, fcf in enumerate(fcfs, start=1)
+    ]
+    terminal_value = fcfs[-1] * (1 + terminal_growth) / (wacc - terminal_growth)
+    pv_terminal = terminal_value / (1 + wacc) ** projection_years
+    return float(sum(pv_fcfs) + pv_terminal)
+
+
+def reverse_dcf(
+    current_price: float,
+    shares_outstanding: float,
+    net_debt: float,
+    base_fcf: float,
+    wacc: float,
+    terminal_growth: float,
+    projection_years: int = 10,
+) -> Dict:
+    """
+    Solve for the constant annual FCF growth rate implied by the current share price.
+
+    Returns a dict with the implied growth rate, target enterprise value, and
+    WACC sensitivity using +/- 100 bps around the base WACC.
+    """
+    if current_price <= 0:
+        raise ValueError("current_price must be positive")
+    if shares_outstanding <= 0:
+        raise ValueError("shares_outstanding must be positive")
+    if base_fcf <= 0:
+        raise ValueError("base_fcf must be positive")
+    if projection_years <= 0:
+        raise ValueError("projection_years must be positive")
+    if wacc <= terminal_growth:
+        raise ValueError("wacc must be greater than terminal_growth")
+
+    target_equity_value = current_price * shares_outstanding
+    implied_ev = target_equity_value + net_debt
+
+    def solve_for_wacc(discount_rate: float, *, allow_nan: bool = False) -> float:
+        if discount_rate <= terminal_growth:
+            return float("nan")
+
+        def objective(growth_rate: float) -> float:
+            return (
+                _enterprise_value_for_constant_growth(
+                    base_fcf=base_fcf,
+                    growth_rate=growth_rate,
+                    wacc=discount_rate,
+                    terminal_growth=terminal_growth,
+                    projection_years=projection_years,
+                )
+                - implied_ev
+            )
+
+        lower = -0.90
+        upper = 1.00
+        for candidate_upper in [upper, 1.50, 2.00, 3.00, 5.00]:
+            if objective(lower) * objective(candidate_upper) <= 0:
+                return float(brentq(objective, lower, candidate_upper))
+        if allow_nan:
+            return float("nan")
+        raise ValueError("could not bracket implied growth rate")
+
+    implied_growth_rate = solve_for_wacc(wacc)
+    sensitivity = {
+        "wacc_down_100bps": {
+            "wacc": round(wacc - 0.01, 4),
+            "implied_growth_rate": round(solve_for_wacc(wacc - 0.01, allow_nan=True), 4),
+        },
+        "base": {
+            "wacc": round(wacc, 4),
+            "implied_growth_rate": round(implied_growth_rate, 4),
+        },
+        "wacc_up_100bps": {
+            "wacc": round(wacc + 0.01, 4),
+            "implied_growth_rate": round(solve_for_wacc(wacc + 0.01, allow_nan=True), 4),
+        },
+    }
+
+    return {
+        "implied_growth_rate": round(implied_growth_rate, 4),
+        "implied_ev": round(implied_ev, 0),
+        "target_equity_value": round(target_equity_value, 0),
+        "current_price": current_price,
+        "wacc": wacc,
+        "terminal_growth": terminal_growth,
+        "projection_years": projection_years,
+        "sensitivity": sensitivity,
+    }
 
 
 # ─── comps / peer table ───────────────────────────────────────────────────────
