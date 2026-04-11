@@ -118,28 +118,28 @@ def main() -> int:
         description="TRG Research Workbench v2 — Sell-Side Research Engine",
     )
 
+    # 1. Create a "Shared" parser for flags that every command needs
+    shared_flags = argparse.ArgumentParser(add_help=False)
+    shared_flags.add_argument("--quiet", action="store_true", help="Suppress progress bars")
+    shared_flags.add_argument("--dry-run", action="store_true", help="Run validation only")
+    shared_flags.add_argument("--as-of", type=_validate_date, 
+                             default=datetime.today().strftime("%Y-%m-%d"))
+
     sub = parser.add_subparsers(dest="command", required=True)
 
-    parser.add_argument("--quiet", action="store_true", help="Suppress progress bars and extra output")
-
+    # 2. Add sub-parsers using the shared_flags as a parent
     # fetch-all
-    p_fetch = sub.add_parser("fetch-all")
-    p_fetch.add_argument("--as-of", type=_validate_date, default=datetime.today().strftime("%Y-%m-%d"))
-    p_fetch.add_argument("--dry-run", action="store_true", help="Run validation only")
+    p_fetch = sub.add_parser("fetch-all", parents=[shared_flags], help="Fetch all data")
     p_fetch.set_defaults(func=cmd_fetch_all)
 
     # build-report
-    p_report = sub.add_parser("build-report")
-    p_report.add_argument("--as-of", type=_validate_date, default=datetime.today().strftime("%Y-%m-%d"))
+    p_report = sub.add_parser("build-report", parents=[shared_flags], help="Build report")
     p_report.add_argument("--formats", type=str, default="html,pdf,markdown")
-    p_report.add_argument("--dry-run", action="store_true", help="Run validation only")
     p_report.set_defaults(func=cmd_build_report)
 
     # build-all
-    p_all = sub.add_parser("build-all")
-    p_all.add_argument("--as-of", type=_validate_date, default=datetime.today().strftime("%Y-%m-%d"))
+    p_all = sub.add_parser("build-all", parents=[shared_flags], help="Fetch + Build")
     p_all.add_argument("--formats", type=str, default="html,pdf,markdown")
-    p_all.add_argument("--dry-run", action="store_true", help="Run validation only")
     p_all.set_defaults(func=cmd_build_all_v2)
 
     args = parser.parse_args()
