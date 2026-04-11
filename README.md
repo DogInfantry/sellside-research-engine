@@ -142,7 +142,25 @@ VaR (95%, 1D) · CVaR · Beta · Volatility (21D/63D) · Sharpe Ratio · Sortino
 
 **Override DCF assumptions** — edit `valuation.py` (rfr, market_risk_premium, terminal_growth_rate, tax_rate)
 
-**Add analyst views** — populate `data/analyst_views.csv` with stance, conviction, thesis, catalyst, risk, client_angle
+**Add analyst views** — copy `data/analyst_views_template.csv` to `data/analyst_views.csv` and populate the discretionary overlay fields:
+
+| Column | Type | Valid Values / Example | Description |
+|--------|------|------------------------|-------------|
+| `ticker` | string | `AAPL` | Stock ticker, matched case-insensitively against the research universe. |
+| `stance` | string | `Buy`, `Hold`, `Sell`, `Overweight`, `Underweight`, `Positive`, `Negative`, `Neutral` | Analyst rating used in discretionary scoring. |
+| `conviction` | number | `1` to `5` (`5` = highest conviction) | Analyst conviction score; the screening model normalizes this by dividing by 5. |
+| `thesis` | string | `Services mix supports margin expansion` | Core investment thesis. |
+| `catalyst` | string | `June WWDC AI updates` | Near-term upside or event catalyst. |
+| `risk` | string | `China demand weakness` | Key downside risk or debate. |
+| `client_angle` | string | `High-quality mega-cap defensiveness with AI optionality` | Client-specific framing for the callout section. |
+| `management_access_note` | string | `Investor meetings requested after earnings` | Management access or meeting context for research notes. |
+
+Example:
+
+```csv
+ticker,stance,conviction,thesis,catalyst,risk,client_angle,management_access_note
+AAPL,Buy,4,"Services mix supports margin expansion","June WWDC AI updates","China demand weakness","High-quality mega-cap defensiveness with AI optionality","Investor meetings requested after earnings"
+```
 
 ---
 
