@@ -15,6 +15,9 @@ import logging
 from pathlib import Path
 from typing import Any, Dict, Optional
 
+import sys
+from tqdm import tqdm
+
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 logger = logging.getLogger(__name__)
@@ -70,6 +73,7 @@ def render_research_note_pdf(
     output_path: Path,
     template_name: str = "research_note.html.j2",
     templates_dir: Path = TEMPLATES_DIR,
+    quiet: bool = False,
 ) -> Path:
     """
     Render a research note to PDF via WeasyPrint.
@@ -87,27 +91,33 @@ def render_research_note_pdf(
     output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    html_str = render_html_report(context, template_name, templates_dir)
+    disable_prog = quiet or not sys.stdout.isatty()
 
-    try:
-        import weasyprint  # type: ignore
+    with tqdm(total=3, desc="Rendering PDF", disable=disable_prog) as pbar:
+        html_str = render_html_report(context, template_name, templates_dir)
+        pbar.update(1)
+        try:
+            import weasyprint  # type: ignore
+            pbar.update(1)
 
-        pdf_path = output_path.with_suffix(".pdf")
-        weasyprint.HTML(string=html_str, base_url=str(templates_dir)).write_pdf(str(pdf_path))
-        logger.info("PDF written: %s", pdf_path)
-        return pdf_path
+            pdf_path = output_path.with_suffix(".pdf")
+            weasyprint.HTML(string=html_str, base_url=str(templates_dir)).write_pdf(str(pdf_path))
+            logger.info("PDF written: %s", pdf_path)
+            pbar.update(1)
+            return pdf_path
 
-    except ImportError:
-        # Fallback: write as standalone HTML (open in browser or print-to-PDF)
-        html_path = output_path.with_suffix(".html")
-        html_path.write_text(html_str, encoding="utf-8")
-        logger.warning(
-            "WeasyPrint not installed — saved as HTML: %s\n"
-            "Install with: pip install weasyprint\n"
-            "Or open the HTML in Chrome and print to PDF.",
-            html_path,
-        )
-        return html_path
+        except (ImportError, OSError, Exception) as exc:
+            pbar.update(3 - pbar.n)
+            # Fallback: write as standalone HTML (open in browser or print-to-PDF)
+            html_path = output_path.with_suffix(".html")
+            html_path.write_text(html_str, encoding="utf-8")
+            logger.warning(
+                "WeasyPrint not installed — saved as HTML: %s\n"
+                "Install with: pip install weasyprint\n"
+                "Or open the HTML in Chrome and print to PDF.",
+                html_path,
+            )
+            return html_path
 
 
 def render_html_only(

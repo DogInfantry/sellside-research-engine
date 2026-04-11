@@ -16,6 +16,8 @@ import logging
 from datetime import datetime, date as _date_type
 from pathlib import Path
 from typing import Any, Dict, List, Optional
+import sys
+from tqdm import tqdm
 
 import pandas as pd
 
@@ -144,6 +146,7 @@ def fetch_data_v2(as_of: str) -> Dict[str, Any]:
 def build_research_report_v2(
     as_of: str,
     output_formats: Optional[List[str]] = None,
+    quiet: bool = False,
 ) -> Dict[str, Path]:
     """
     Build a full research report with all v2 enhancements.
@@ -156,6 +159,11 @@ def build_research_report_v2(
     Returns:
         Dict mapping format name to output file path.
     """
+    # Create the master switch
+    disable_prog = quiet or not sys.stdout.isatty()
+
+
+    
     if output_formats is None:
         output_formats = ["html", "pdf", "markdown"]
 
@@ -281,7 +289,7 @@ def build_research_report_v2(
         # top_candidates has numeric index; get tickers from 'ticker' column
         _tc = "ticker" if "ticker" in top_candidates.columns else None
         top3 = list(top_candidates.head(3)[_tc].values) if (not top_candidates.empty and _tc) else []
-        for ticker in top3:
+        for ticker in tqdm(top3, desc="Computing valuations", disable=disable_prog):
             try:
                 # Get metadata for this ticker
                 sm_row = {}
@@ -341,8 +349,13 @@ def build_research_report_v2(
                     "football_field": ff,
                     "current_price": current_price,
                 })
-                logger.info("Valuation complete for %s (Base: $%.2f)", ticker,
-                            scenarios["Base Case"]["intrinsic_value_per_share"])
+                # If the progress bar is visible, we don't want to print to the console.
+                if disable_prog:
+                    # Bar is hidden, so show the info log
+                    logger.info("Valuation complete for %s (Base: $%.2f)", ticker,scenarios["Base Case"]["intrinsic_value_per_share"])
+                else:
+                    # Bar is visible, so send this to debug (hidden from console by default)
+                    logger.debug("Valuation complete for %s (Base: $%.2f)", ticker,scenarios["Base Case"]["intrinsic_value_per_share"])    
             except Exception as exc:  # noqa: BLE001
                 logger.warning("Valuation failed for %s: %s", ticker, exc)
     except Exception as exc:  # noqa: BLE001
@@ -518,7 +531,7 @@ def build_research_report_v2(
 
     if "pdf" in output_formats:
         pdf_path = OUTPUTS_DIR / f"research_note_{as_of}.pdf"
-        p = render_research_note_pdf(context, pdf_path)
+        p = render_research_note_pdf(context, pdf_path, quiet=quiet)
         outputs["pdf"] = p
         logger.info("PDF report: %s", p)
 

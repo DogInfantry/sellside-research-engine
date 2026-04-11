@@ -42,7 +42,7 @@ def cmd_build_report(args: argparse.Namespace) -> int:
     formats = args.formats.split(",") if args.formats else ["html", "pdf", "markdown"]
     print(f"Building research report for {args.as_of} | formats: {formats}")
 
-    outputs = build_research_report_v2(args.as_of, output_formats=formats)
+    outputs = build_research_report_v2(args.as_of, output_formats=formats,quiet=args.quiet)
     if not outputs:
         print("ERROR: Report generation failed. Run fetch-all first.", file=sys.stderr)
         return 1
@@ -68,6 +68,8 @@ def main() -> int:
         description="TRG Research Workbench v2 — Sell-Side Research Engine",
     )
     sub = parser.add_subparsers(dest="command", required=True)
+
+    parser.add_argument("--quiet", action="store_true", help="Suppress progress bars and extra output")
 
     # fetch-all
     p_fetch = sub.add_parser("fetch-all", help="Fetch all data sources (market, SEC, ECB, US macro)")

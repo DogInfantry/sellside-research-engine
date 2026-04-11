@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TRG Daily Research Note — 2026-03-26 — 2026-03-26</title>
+<style>
+  /* ── Reset & Base ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Arial', 'Helvetica Neue', sans-serif;
+    font-size: 10pt;
+    color: #1a1a2e;
+    background: #ffffff;
+    line-height: 1.55;
+  }
+  a { color: #003366; text-decoration: none; }
+
+  /* ── GS Color Palette ── */
+  :root {
+    --gs-navy:   #003366;
+    --gs-gold:   #C8A951;
+    --gs-light:  #F0F4F8;
+    --gs-red:    #C0392B;
+    --gs-green:  #1A7340;
+    --gs-grey:   #6B7280;
+    --gs-border: #D1D5DB;
+    --page-pad:  2.2cm;
+  }
+
+  /* ── Cover / Header Banner ── */
+  .cover-band {
+    background: var(--gs-navy);
+    color: white;
+    padding: 18px var(--page-pad);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+  .cover-band .firm-name {
+    font-size: 8pt;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gs-gold);
+    font-weight: 700;
+  }
+  .cover-band .report-type {
+    font-size: 8pt;
+    color: rgba(255,255,255,0.65);
+    text-align: right;
+  }
+
+  .title-block {
+    background: var(--gs-navy);
+    color: white;
+    padding: 20px var(--page-pad) 24px;
+    border-bottom: 3px solid var(--gs-gold);
+  }
+  .title-block h1 {
+    font-size: 20pt;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-bottom: 4px;
+  }
+  .title-block .subtitle {
+    font-size: 10pt;
+    color: rgba(255,255,255,0.75);
+    margin-bottom: 14px;
+  }
+
+  /* ── Rating Box ── */
+  .rating-strip {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+  .rating-chip {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(200,169,81,0.5);
+    border-radius: 4px;
+    padding: 6px 14px;
+    font-size: 9pt;
+    color: white;
+  }
+  .rating-chip .label { color: var(--gs-gold); font-size: 7.5pt; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; display: block; margin-bottom: 2px; }
+  .rating-chip .value { font-weight: 700; font-size: 11pt; }
+  .rating-chip.buy   .value { color: #4ade80; }
+  .rating-chip.sell  .value { color: #f87171; }
+  .rating-chip.neutral .value { color: #fbbf24; }
+
+  /* ── Body Layout ── */
+  .body-wrap { padding: 22px var(--page-pad); }
+
+  /* ── Section Titles ── */
+  h2.section-title {
+    font-size: 10.5pt;
+    font-weight: 700;
+    color: var(--gs-navy);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    border-bottom: 2px solid var(--gs-gold);
+    padding-bottom: 4px;
+    margin: 22px 0 10px;
+  }
+  h3.sub-title {
+    font-size: 9.5pt;
+    font-weight: 700;
+    color: var(--gs-navy);
+    margin: 14px 0 6px;
+  }
+
+  /* ── Executive Summary Box ── */
+  .exec-summary {
+    background: var(--gs-light);
+    border-left: 4px solid var(--gs-navy);
+    padding: 14px 18px;
+    margin-bottom: 18px;
+    border-radius: 0 4px 4px 0;
+  }
+  .exec-summary ul { padding-left: 16px; }
+  .exec-summary li { margin-bottom: 5px; font-size: 9.5pt; line-height: 1.5; }
+
+  /* ── Thesis / Narrative paragraphs ── */
+  .narrative p { margin-bottom: 8px; font-size: 9.5pt; }
+
+  /* ── Tables ── */
+  table.research-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 8.5pt;
+    margin-bottom: 14px;
+  }
+  table.research-table thead tr {
+    background: var(--gs-navy);
+    color: white;
+  }
+  table.research-table thead th {
+    padding: 6px 8px;
+    text-align: right;
+    font-weight: 700;
+    font-size: 7.5pt;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+  }
+  table.research-table thead th:first-child { text-align: left; }
+  table.research-table tbody tr:nth-child(even) { background: var(--gs-light); }
+  table.research-table tbody tr:hover { background: #dbeafe; }
+  table.research-table tbody td {
+    padding: 5px 8px;
+    text-align: right;
+    border-bottom: 1px solid var(--gs-border);
+    white-space: nowrap;
+  }
+  table.research-table tbody td:first-child { text-align: left; font-weight: 600; color: var(--gs-navy); }
+  .pos { color: var(--gs-green); font-weight: 700; }
+  .neg { color: var(--gs-red);   font-weight: 700; }
+  .neutral-val { color: var(--gs-grey); }
+
+  /* ── Metric Cards (top stats row) ── */
+  .metric-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+  }
+  .metric-card {
+    flex: 1;
+    min-width: 130px;
+    background: var(--gs-light);
+    border: 1px solid var(--gs-border);
+    border-top: 3px solid var(--gs-navy);
+    border-radius: 4px;
+    padding: 10px 14px;
+  }
+  .metric-card .mc-label { font-size: 7pt; text-transform: uppercase; letter-spacing: 0.8px; color: var(--gs-grey); font-weight: 700; }
+  .metric-card .mc-value { font-size: 16pt; font-weight: 800; color: var(--gs-navy); margin: 3px 0; }
+  .metric-card .mc-sub   { font-size: 7.5pt; color: var(--gs-grey); }
+
+  /* ── Chart Images ── */
+  .chart-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+  .chart-grid.three-col { grid-template-columns: 1fr 1fr 1fr; }
+  .chart-grid.full-width { grid-template-columns: 1fr; }
+  .chart-box {
+    background: var(--gs-light);
+    border: 1px solid var(--gs-border);
+    border-radius: 4px;
+    padding: 8px;
+    text-align: center;
+  }
+  .chart-box img { max-width: 100%; height: auto; display: block; margin: 0 auto; border-radius: 2px; }
+  .chart-box .chart-caption { font-size: 7pt; color: var(--gs-grey); margin-top: 5px; font-style: italic; }
+
+  /* ── Callout Cards ── */
+  .callout-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .callout-card {
+    border: 1px solid var(--gs-border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .callout-card .cc-header {
+    background: var(--gs-navy);
+    color: white;
+    padding: 7px 12px;
+    font-weight: 700;
+    font-size: 9pt;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .callout-card .cc-header .cc-rating { font-size: 7.5pt; padding: 2px 7px; border-radius: 3px; font-weight: 700; }
+  .cc-buy    { background: var(--gs-green); }
+  .cc-sell   { background: var(--gs-red); }
+  .cc-neutral { background: #92400e; }
+  .callout-card .cc-body { padding: 10px 12px; font-size: 8.5pt; background: white; }
+  .callout-card .cc-body .cc-row { display: flex; justify-content: space-between; margin-bottom: 4px; }
+  .callout-card .cc-body .cc-row .cc-key { color: var(--gs-grey); font-size: 7.5pt; }
+  .callout-card .cc-thesis { font-size: 8pt; color: #374151; font-style: italic; margin-top: 6px; border-top: 1px solid var(--gs-border); padding-top: 6px; line-height: 1.45; }
+
+  /* ── Risk Section ── */
+  .risk-table-wrap { overflow-x: auto; }
+
+  /* ── Scenario Box ── */
+  .scenario-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .scenario-box { border-radius: 4px; padding: 12px 14px; border: 1px solid var(--gs-border); }
+  .scenario-box.bear { border-top: 3px solid var(--gs-red); background: #fef2f2; }
+  .scenario-box.base { border-top: 3px solid var(--gs-navy); background: var(--gs-light); }
+  .scenario-box.bull { border-top: 3px solid var(--gs-green); background: #f0fdf4; }
+  .scenario-box .s-label { font-size: 7.5pt; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; }
+  .scenario-box.bear .s-label { color: var(--gs-red); }
+  .scenario-box.base .s-label { color: var(--gs-navy); }
+  .scenario-box.bull .s-label { color: var(--gs-green); }
+  .scenario-box .s-price { font-size: 18pt; font-weight: 800; margin: 4px 0; }
+  .scenario-box .s-desc { font-size: 7.5pt; color: var(--gs-grey); line-height: 1.45; }
+
+  /* ── Footer ── */
+  .footer {
+    margin-top: 28px;
+    padding: 14px var(--page-pad);
+    background: var(--gs-light);
+    border-top: 2px solid var(--gs-navy);
+    font-size: 7pt;
+    color: var(--gs-grey);
+    line-height: 1.5;
+  }
+  .footer strong { color: var(--gs-navy); }
+
+  /* ── Page breaks for PDF ── */
+  @media print {
+    .page-break { page-break-before: always; }
+    body { font-size: 9pt; }
+  }
+  @page { margin: 2cm; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════
+     HEADER BAND
+══════════════════════════════════════════════════════════ -->
+<div class="cover-band">
+  <div>
+    <div class="firm-name">TRG Research Workbench</div>
+    <div style="color:rgba(255,255,255,0.55);font-size:7.5pt;margin-top:2px;">Equities | Global Coverage</div>
+  </div>
+  <div class="report-type">
+    Daily Research Note<br/>
+    2026-03-26
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     TITLE BLOCK
+══════════════════════════════════════════════════════════ -->
+<div class="title-block">
+  <h1>TRG Daily Research Note — 2026-03-26</h1>
+  <div class="subtitle">US Equities | Multi-Factor Screen | Risk Analytics | Macro Overlay | Valuation</div>
+
+  <div class="rating-strip">
+    <div class="rating-chip">
+      <span class="label">Macro Regime</span>
+      <span class="value">Risk-Off (Elevated Stress)</span>
+    </div>
+    <div class="rating-chip">
+      <span class="label">Yield Curve</span>
+      <span class="value">Normal</span>
+    </div>
+    <div class="rating-chip">
+      <span class="label">VIX</span>
+      <span class="value">27.4</span>
+    </div>
+    <div class="rating-chip">
+      <span class="label">Screen Leaders</span>
+      <span class="value">10 Names</span>
+    </div>
+  </div>
+</div>
+
+<div class="body-wrap">
+
+<!-- ═══════════════════════════════════════════════════════
+     EXECUTIVE SUMMARY
+══════════════════════════════════════════════════════════ -->
+<h2 class="section-title">Executive Summary</h2>
+<div class="exec-summary">
+  <ul>
+    <li>Macro regime: Risk-Off (Elevated Stress) | Yield curve: Normal | VIX at 27.4</li>
+    <li>Top screen leader: GOOGL — research score 0.711</li>
+    <li>Sector data unavailable.</li>
+    <li>Upcoming earnings catalysts: GS, BLK, JPM, BAC.</li>
+    <li>Risk analytics: 35 names screened | 4 names with Sharpe > 1.0.</li>
+  </ul>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     US MACRO SNAPSHOT
+══════════════════════════════════════════════════════════ -->
+<h2 class="section-title">US & Global Macro Snapshot</h2>
+<table class="research-table">
+  <thead><tr>
+    <th>Indicator</th><th>Latest</th><th>1-Day Δ</th><th>1-Week Δ</th><th>1-Month Δ</th><th>Category</th>
+  </tr></thead>
+  <tbody>
+  <tr>
+    <td>UST 10Y Yield</td>
+    <td>4.42%</td>
+    <td class="pos">+8.8%</td>
+    <td class="pos">+13.5%</td>
+    <td class="pos">+36.8%</td>
+    <td class="neutral-val">rates</td>
+  </tr>
+  <tr>
+    <td>UST 3M / 2Y Proxy</td>
+    <td>3.62%</td>
+    <td class="">0.0%</td>
+    <td class="pos">+0.8%</td>
+    <td class="pos">+3.2%</td>
+    <td class="neutral-val">rates</td>
+  </tr>
+  <tr>
+    <td>UST 30Y Yield</td>
+    <td>4.94%</td>
+    <td class="pos">+3.9%</td>
+    <td class="pos">+8.4%</td>
+    <td class="pos">+24.2%</td>
+    <td class="neutral-val">rates</td>
+  </tr>
+  <tr>
+    <td>VIX</td>
+    <td>27.44</td>
+    <td class="pos">+211.0%</td>
+    <td class="pos">+338.0%</td>
+    <td class="pos">+951.0%</td>
+    <td class="neutral-val">vol</td>
+  </tr>
+  <tr>
+    <td>DXY Dollar Index</td>
+    <td>99.90</td>
+    <td class="pos">+30.0%</td>
+    <td class="pos">+67.0%</td>
+    <td class="pos">+220.0%</td>
+    <td class="neutral-val">fx</td>
+  </tr>
+  <tr>
+    <td>Gold ($/oz)</td>
+    <td>4375.50</td>
+    <td class="neg">-3.8%</td>
+    <td class="neg">-4.9%</td>
+    <td class="neg">-16.0%</td>
+    <td class="neutral-val">commodities</td>
+  </tr>
+  <tr>
+    <td>WTI Crude ($/bbl)</td>
+    <td>94.48</td>
+    <td class="pos">+4.6%</td>
+    <td class="neg">-1.7%</td>
+    <td class="pos">+44.4%</td>
+    <td class="neutral-val">commodities</td>
+  </tr>
+  <tr>
+    <td>S&P 500</td>
+    <td>6477.16</td>
+    <td class="neg">-11474.0%</td>
+    <td class="neg">-12933.0%</td>
+    <td class="neg">-46897.0%</td>
+    <td class="neutral-val">equity</td>
+  </tr>
+  <tr>
+    <td>Nasdaq 100</td>
+    <td>23586.99</td>
+    <td class="neg">-57599.0%</td>
+    <td class="neg">-76828.9%</td>
+    <td class="neg">-174204.9%</td>
+    <td class="neutral-val">equity</td>
+  </tr>
+  </tbody>
+</table>
+<div class="narrative">
+  <p><strong>Yield Curve:</strong> 10Y at 4.42% | 2Y at 3.62% | 10Y–2Y Spread: <strong>+80bps</strong> (Normal). Normal yield curve slope intact — no imminent recession signal from rates market.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     ECB / EUROPE MACRO
+══════════════════════════════════════════════════════════ -->
+<h2 class="section-title">ECB Policy & European FX</h2>
+<table class="research-table">
+  <thead><tr><th>Series</th><th>Latest</th><th>1-Week Δ</th></tr></thead>
+  <tbody>
+  <tr>
+    <td>ECB Deposit Facility Rate</td>
+    <td>2.00%</td>
+    <td class="">▼ 0.00pp</td>
+  </tr>
+  <tr>
+    <td>ECB Main Refi Rate</td>
+    <td>2.15%</td>
+    <td class="">▼ 0.00pp</td>
+  </tr>
+  <tr>
+    <td>USD per EUR</td>
+    <td>1.1539</td>
+    <td class="">▼ 0.00</td>
+  </tr>
+  <tr>
+    <td>GBP per EUR</td>
+    <td>0.8651</td>
+    <td class="">▼ 0.00</td>
+  </tr>
+  </tbody>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════
+     SECTOR PERFORMANCE
+══════════════════════════════════════════════════════════ -->
+
+<!-- ═══════════════════════════════════════════════════════
+     RISK-RETURN MAP
+══════════════════════════════════════════════════════════ -->
+
+<!-- Risk Table -->
+<div class="risk-table-wrap">
+<table class="research-table">
+  <thead><tr>
+    <th>Ticker</th><th>Vol 21D</th><th>Vol 63D</th><th>Beta</th>
+    <th>Sharpe</th><th>Sortino</th><th>Max DD</th><th>VaR 95%</th><th>CVaR 95%</th><th>YTD</th><th>1Y Ret</th>
+  </tr></thead>
+  <tbody>
+  <tr>
+    <td>CAT</td>
+    <td>33.4%</td>
+    <td>35.5%</td>
+    <td>0.86</td>
+    <td class="pos">1.78</td>
+    <td class="pos">2.67</td>
+    <td class="neg">-22.4%</td>
+    <td class="neg">3.1%</td>
+    <td class="neg">4.5%</td>
+    <td class="pos">17.8%</td>
+    <td class="pos">109.0%</td>
+  </tr>
+  <tr>
+    <td>XOM</td>
+    <td>20.8%</td>
+    <td>26.0%</td>
+    <td>-0.17</td>
+    <td class="pos">1.41</td>
+    <td class="pos">1.86</td>
+    <td class="neg">-16.1%</td>
+    <td class="neg">2.5%</td>
+    <td class="neg">3.7%</td>
+    <td class="pos">35.8%</td>
+    <td class="pos">44.7%</td>
+  </tr>
+  <tr>
+    <td>^IBEX</td>
+    <td>27.3%</td>
+    <td>19.5%</td>
+    <td>0.31</td>
+    <td class="pos">1.10</td>
+    <td class="pos">1.24</td>
+    <td class="neg">-12.6%</td>
+    <td class="neg">1.5%</td>
+    <td class="neg">2.7%</td>
+    <td class="neg">-3.0%</td>
+    <td class="pos">26.3%</td>
+  </tr>
+  <tr>
+    <td>GOOGL</td>
+    <td>25.7%</td>
+    <td>22.8%</td>
+    <td>0.36</td>
+    <td class="pos">1.08</td>
+    <td class="pos">1.76</td>
+    <td class="neg">-21.8%</td>
+    <td class="neg">2.5%</td>
+    <td class="neg">3.8%</td>
+    <td class="neg">-10.8%</td>
+    <td class="pos">70.8%</td>
+  </tr>
+  <tr>
+    <td>XLE</td>
+    <td>16.5%</td>
+    <td>20.4%</td>
+    <td>-0.09</td>
+    <td class="pos">1.00</td>
+    <td class="pos">1.14</td>
+    <td class="neg">-18.8%</td>
+    <td class="neg">2.0%</td>
+    <td class="neg">3.8%</td>
+    <td class="pos">35.6%</td>
+    <td class="pos">35.4%</td>
+  </tr>
+  <tr>
+    <td>CVX</td>
+    <td>19.6%</td>
+    <td>22.9%</td>
+    <td>-0.16</td>
+    <td class="pos">0.97</td>
+    <td class="pos">1.15</td>
+    <td class="neg">-20.6%</td>
+    <td class="neg">2.2%</td>
+    <td class="neg">3.8%</td>
+    <td class="pos">34.6%</td>
+    <td class="pos">29.3%</td>
+  </tr>
+  <tr>
+    <td>GE</td>
+    <td>34.7%</td>
+    <td>35.2%</td>
+    <td>0.59</td>
+    <td class="pos">0.72</td>
+    <td class="pos">0.88</td>
+    <td class="neg">-21.4%</td>
+    <td class="neg">3.2%</td>
+    <td class="neg">5.0%</td>
+    <td class="neg">-10.9%</td>
+    <td class="pos">38.3%</td>
+  </tr>
+  <tr>
+    <td>XLU</td>
+    <td>17.9%</td>
+    <td>16.5%</td>
+    <td>0.08</td>
+    <td class="pos">0.56</td>
+    <td class="pos">0.73</td>
+    <td class="neg">-9.2%</td>
+    <td class="neg">1.4%</td>
+    <td class="neg">2.3%</td>
+    <td class="pos">5.7%</td>
+    <td class="pos">20.4%</td>
+  </tr>
+  <tr>
+    <td>^FTSE</td>
+    <td>18.9%</td>
+    <td>13.7%</td>
+    <td>0.23</td>
+    <td class="pos">0.55</td>
+    <td class="pos">0.58</td>
+    <td class="neg">-13.4%</td>
+    <td class="neg">1.1%</td>
+    <td class="neg">2.2%</td>
+    <td class="pos">0.2%</td>
+    <td class="pos">14.8%</td>
+  </tr>
+  <tr>
+    <td>XLI</td>
+    <td>18.7%</td>
+    <td>17.3%</td>
+    <td>0.41</td>
+    <td class="pos">0.52</td>
+    <td class="pos">0.68</td>
+    <td class="neg">-15.8%</td>
+    <td class="neg">1.7%</td>
+    <td class="neg">2.8%</td>
+    <td class="pos">2.4%</td>
+    <td class="pos">22.3%</td>
+  </tr>
+  <tr>
+    <td>GS</td>
+    <td>37.8%</td>
+    <td>34.0%</td>
+    <td>0.94</td>
+    <td class="pos">0.49</td>
+    <td class="pos">0.62</td>
+    <td class="neg">-30.5%</td>
+    <td class="neg">2.6%</td>
+    <td class="neg">4.9%</td>
+    <td class="neg">-9.6%</td>
+    <td class="pos">46.3%</td>
+  </tr>
+  <tr>
+    <td>MS</td>
+    <td>32.9%</td>
+    <td>32.9%</td>
+    <td>0.78</td>
+    <td class="pos">0.33</td>
+    <td class="pos">0.39</td>
+    <td class="neg">-29.0%</td>
+    <td class="neg">2.7%</td>
+    <td class="neg">4.7%</td>
+    <td class="neg">-9.8%</td>
+    <td class="pos">37.2%</td>
+  </tr>
+  <tr>
+    <td>NVDA</td>
+    <td>38.7%</td>
+    <td>34.4%</td>
+    <td>1.17</td>
+    <td class="pos">0.31</td>
+    <td class="pos">0.44</td>
+    <td class="neg">-32.7%</td>
+    <td class="neg">4.0%</td>
+    <td class="neg">5.5%</td>
+    <td class="neg">-9.3%</td>
+    <td class="pos">50.6%</td>
+  </tr>
+  <tr>
+    <td>BAC</td>
+    <td>24.6%</td>
+    <td>24.9%</td>
+    <td>0.39</td>
+    <td class="pos">0.06</td>
+    <td class="pos">0.06</td>
+    <td class="neg">-24.9%</td>
+    <td class="neg">2.8%</td>
+    <td class="neg">4.5%</td>
+    <td class="neg">-13.3%</td>
+    <td class="pos">15.2%</td>
+  </tr>
+  <tr>
+    <td>JPM</td>
+    <td>16.1%</td>
+    <td>24.2%</td>
+    <td>0.39</td>
+    <td class="pos">0.02</td>
+    <td class="pos">0.02</td>
+    <td class="neg">-24.2%</td>
+    <td class="neg">2.4%</td>
+    <td class="neg">4.0%</td>
+    <td class="neg">-10.0%</td>
+    <td class="pos">18.6%</td>
+  </tr>
+  <tr>
+    <td>XLC</td>
+    <td>14.0%</td>
+    <td>13.8%</td>
+    <td>0.25</td>
+    <td class="neg">-0.03</td>
+    <td class="neg">-0.04</td>
+    <td class="neg">-17.7%</td>
+    <td class="neg">1.5%</td>
+    <td class="neg">2.6%</td>
+    <td class="neg">-6.6%</td>
+    <td class="pos">11.2%</td>
+  </tr>
+  <tr>
+    <td>AAPL</td>
+    <td>18.3%</td>
+    <td>23.7%</td>
+    <td>0.32</td>
+    <td class="neg">-0.06</td>
+    <td class="neg">-0.08</td>
+    <td class="neg">-30.2%</td>
+    <td class="neg">3.1%</td>
+    <td class="neg">4.6%</td>
+    <td class="neg">-6.6%</td>
+    <td class="pos">14.6%</td>
+  </tr>
+  <tr>
+    <td>BLK</td>
+    <td>34.1%</td>
+    <td>31.2%</td>
+    <td>0.67</td>
+    <td class="neg">-0.16</td>
+    <td class="neg">-0.20</td>
+    <td class="neg">-22.4%</td>
+    <td class="neg">2.6%</td>
+    <td class="neg">4.7%</td>
+    <td class="neg">-10.2%</td>
+    <td class="pos">2.1%</td>
+  </tr>
+  <tr>
+    <td>XLP</td>
+    <td>14.5%</td>
+    <td>14.9%</td>
+    <td>-0.07</td>
+    <td class="neg">-0.20</td>
+    <td class="neg">-0.29</td>
+    <td class="neg">-9.7%</td>
+    <td class="neg">1.2%</td>
+    <td class="neg">1.8%</td>
+    <td class="pos">5.0%</td>
+    <td class="pos">4.4%</td>
+  </tr>
+  <tr>
+    <td>^STOXX50E</td>
+    <td>23.8%</td>
+    <td>17.6%</td>
+    <td>0.36</td>
+    <td class="neg">-0.21</td>
+    <td class="neg">-0.27</td>
+    <td class="neg">-16.6%</td>
+    <td class="neg">1.5%</td>
+    <td class="neg">2.7%</td>
+    <td class="neg">-6.0%</td>
+    <td class="pos">2.9%</td>
+  </tr>
+  <tr>
+    <td>XLV</td>
+    <td>15.3%</td>
+    <td>14.0%</td>
+    <td>0.16</td>
+    <td class="neg">-0.22</td>
+    <td class="neg">-0.30</td>
+    <td class="neg">-13.6%</td>
+    <td class="neg">1.7%</td>
+    <td class="neg">2.6%</td>
+    <td class="neg">-5.9%</td>
+    <td class="pos">2.5%</td>
+  </tr>
+  <tr>
+    <td>^GDAXI</td>
+    <td>24.7%</td>
+    <td>17.7%</td>
+    <td>0.32</td>
+    <td class="neg">-0.25</td>
+    <td class="neg">-0.33</td>
+    <td class="neg">-16.0%</td>
+    <td class="neg">1.8%</td>
+    <td class="neg">2.9%</td>
+    <td class="neg">-7.8%</td>
+    <td class="neg">-1.0%</td>
+  </tr>
+  <tr>
+    <td>XLY</td>
+    <td>20.6%</td>
+    <td>17.8%</td>
+    <td>0.49</td>
+    <td class="neg">-0.33</td>
+    <td class="neg">-0.49</td>
+    <td class="neg">-21.8%</td>
+    <td class="neg">2.3%</td>
+    <td class="neg">3.1%</td>
+    <td class="neg">-7.9%</td>
+    <td class="pos">8.0%</td>
+  </tr>
+  <tr>
+    <td>XLRE</td>
+    <td>14.9%</td>
+    <td>14.5%</td>
+    <td>0.11</td>
+    <td class="neg">-0.37</td>
+    <td class="neg">-0.47</td>
+    <td class="neg">-14.2%</td>
+    <td class="neg">1.8%</td>
+    <td class="neg">2.6%</td>
+    <td class="pos">0.4%</td>
+    <td class="pos">0.4%</td>
+  </tr>
+  <tr>
+    <td>AMZN</td>
+    <td>27.7%</td>
+    <td>29.5%</td>
+    <td>0.53</td>
+    <td class="neg">-0.39</td>
+    <td class="neg">-0.56</td>
+    <td class="neg">-26.2%</td>
+    <td class="neg">3.1%</td>
+    <td class="neg">5.0%</td>
+    <td class="neg">-8.4%</td>
+    <td class="pos">3.2%</td>
+  </tr>
+  <tr>
+    <td>XLF</td>
+    <td>13.5%</td>
+    <td>16.8%</td>
+    <td>0.33</td>
+    <td class="neg">-0.48</td>
+    <td class="neg">-0.57</td>
+    <td class="neg">-15.5%</td>
+    <td class="neg">1.9%</td>
+    <td class="neg">3.0%</td>
+    <td class="neg">-10.2%</td>
+    <td class="neg">-0.9%</td>
+  </tr>
+  <tr>
+    <td>^FCHI</td>
+    <td>20.6%</td>
+    <td>14.7%</td>
+    <td>0.16</td>
+    <td class="neg">-0.58</td>
+    <td class="neg">-0.71</td>
+    <td class="neg">-16.3%</td>
+    <td class="neg">1.6%</td>
+    <td class="neg">2.7%</td>
+    <td class="neg">-5.2%</td>
+    <td class="neg">-3.2%</td>
+  </tr>
+  <tr>
+    <td>LAZ</td>
+    <td>45.2%</td>
+    <td>40.4%</td>
+    <td>0.71</td>
+    <td class="neg">-0.58</td>
+    <td class="neg">-0.75</td>
+    <td class="neg">-38.0%</td>
+    <td class="neg">3.7%</td>
+    <td class="neg">6.6%</td>
+    <td class="neg">-16.3%</td>
+    <td class="neg">-6.9%</td>
+  </tr>
+  <tr>
+    <td>MSFT</td>
+    <td>19.4%</td>
+    <td>32.1%</td>
+    <td>0.71</td>
+    <td class="neg">-0.61</td>
+    <td class="neg">-0.79</td>
+    <td class="neg">-32.2%</td>
+    <td class="neg">2.5%</td>
+    <td class="neg">3.7%</td>
+    <td class="neg">-22.4%</td>
+    <td class="neg">-5.4%</td>
+  </tr>
+  <tr>
+    <td>META</td>
+    <td>37.4%</td>
+    <td>37.8%</td>
+    <td>0.76</td>
+    <td class="neg">-0.71</td>
+    <td class="neg">-1.03</td>
+    <td class="neg">-31.1%</td>
+    <td class="neg">3.0%</td>
+    <td class="neg">5.4%</td>
+    <td class="neg">-15.7%</td>
+    <td class="neg">-10.1%</td>
+  </tr>
+  <tr>
+    <td>PJT</td>
+    <td>32.3%</td>
+    <td>34.4%</td>
+    <td>0.60</td>
+    <td class="neg">-0.82</td>
+    <td class="neg">-1.06</td>
+    <td class="neg">-32.5%</td>
+    <td class="neg">3.0%</td>
+    <td class="neg">5.2%</td>
+    <td class="neg">-17.8%</td>
+    <td class="neg">-3.4%</td>
+  </tr>
+  <tr>
+    <td>HD</td>
+    <td>25.1%</td>
+    <td>23.7%</td>
+    <td>0.22</td>
+    <td class="neg">-0.82</td>
+    <td class="neg">-1.32</td>
+    <td class="neg">-23.2%</td>
+    <td class="neg">2.3%</td>
+    <td class="neg">3.1%</td>
+    <td class="neg">-4.4%</td>
+    <td class="neg">-7.0%</td>
+  </tr>
+  <tr>
+    <td>PG</td>
+    <td>21.6%</td>
+    <td>20.5%</td>
+    <td>-0.17</td>
+    <td class="neg">-0.90</td>
+    <td class="neg">-1.27</td>
+    <td class="neg">-20.1%</td>
+    <td class="neg">1.9%</td>
+    <td class="neg">2.8%</td>
+    <td class="pos">1.2%</td>
+    <td class="neg">-12.2%</td>
+  </tr>
+  <tr>
+    <td>JEF</td>
+    <td>71.1%</td>
+    <td>52.3%</td>
+    <td>1.29</td>
+    <td class="neg">-1.06</td>
+    <td class="neg">-1.20</td>
+    <td class="neg">-48.0%</td>
+    <td class="neg">5.2%</td>
+    <td class="neg">9.3%</td>
+    <td class="neg">-36.0%</td>
+    <td class="neg">-31.2%</td>
+  </tr>
+  <tr>
+    <td>UNH</td>
+    <td>22.7%</td>
+    <td>51.8%</td>
+    <td>0.20</td>
+    <td class="neg">-1.18</td>
+    <td class="neg">-1.13</td>
+    <td class="neg">-60.1%</td>
+    <td class="neg">3.4%</td>
+    <td class="neg">9.8%</td>
+    <td class="neg">-19.7%</td>
+    <td class="neg">-46.8%</td>
+  </tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     SCREEN LEADERS
+══════════════════════════════════════════════════════════ -->
+<h2 class="section-title">Multi-Factor Screen — Top Candidates</h2>
+<table class="research-table">
+  <thead><tr>
+    <th>Ticker</th><th>Sector</th><th>Mkt Cap</th><th>Val Score</th>
+    <th>Growth</th><th>Quality</th><th>Momentum</th><th>Forward</th>
+    <th>Research Score</th><th>Screen Rank</th>
+  </tr></thead>
+  <tbody>
+  <tr>
+    <td>GOOGL</td>
+    <td class="neutral-val">Communication Services</td>
+    <td>1635.5B</td>
+    <td>0.71</td>
+    <td>0.79</td>
+    <td>0.80</td>
+    <td>0.45</td>
+    <td>0.73</td>
+    <td class="pos"><strong>0.711</strong></td>
+    <td>1.0</td>
+  </tr>
+  <tr>
+    <td>BLK</td>
+    <td class="neutral-val">Financial Services</td>
+    <td>150.6B</td>
+    <td>0.29</td>
+    <td>0.86</td>
+    <td>0.34</td>
+    <td>0.43</td>
+    <td>0.80</td>
+    <td class="pos"><strong>0.636</strong></td>
+    <td>2.0</td>
+  </tr>
+  <tr>
+    <td>META</td>
+    <td class="neutral-val">Communication Services</td>
+    <td>1197.6B</td>
+    <td>0.48</td>
+    <td>0.90</td>
+    <td>0.68</td>
+    <td>0.19</td>
+    <td>0.67</td>
+    <td class="pos"><strong>0.616</strong></td>
+    <td>3.0</td>
+  </tr>
+  <tr>
+    <td>NVDA</td>
+    <td class="neutral-val">Technology</td>
+    <td>4161.1B</td>
+    <td>0.07</td>
+    <td>1.00</td>
+    <td>0.95</td>
+    <td>0.43</td>
+    <td>—</td>
+    <td class="pos"><strong>0.612</strong></td>
+    <td>4.0</td>
+  </tr>
+  <tr>
+    <td>AMZN</td>
+    <td class="neutral-val">Consumer Cyclical</td>
+    <td>2227.9B</td>
+    <td>0.48</td>
+    <td>0.52</td>
+    <td>0.39</td>
+    <td>0.64</td>
+    <td>0.71</td>
+    <td class="pos"><strong>0.610</strong></td>
+    <td>5.0</td>
+  </tr>
+  <tr>
+    <td>BAC</td>
+    <td class="neutral-val">Financial Services</td>
+    <td>344.7B</td>
+    <td>0.81</td>
+    <td>0.29</td>
+    <td>0.41</td>
+    <td>0.52</td>
+    <td>0.69</td>
+    <td class="pos"><strong>0.597</strong></td>
+    <td>6.0</td>
+  </tr>
+  <tr>
+    <td>JEF</td>
+    <td class="neutral-val">Financial Services</td>
+    <td>8.2B</td>
+    <td>0.71</td>
+    <td>0.95</td>
+    <td>—</td>
+    <td>0.05</td>
+    <td>—</td>
+    <td class="pos"><strong>0.571</strong></td>
+    <td>7.0</td>
+  </tr>
+  <tr>
+    <td>MSFT</td>
+    <td class="neutral-val">Technology</td>
+    <td>2717.6B</td>
+    <td>0.29</td>
+    <td>0.67</td>
+    <td>0.83</td>
+    <td>0.31</td>
+    <td>0.61</td>
+    <td class="pos"><strong>0.567</strong></td>
+    <td>8.0</td>
+  </tr>
+  <tr>
+    <td>UNH</td>
+    <td class="neutral-val">Healthcare</td>
+    <td>243.3B</td>
+    <td>0.81</td>
+    <td>0.48</td>
+    <td>0.15</td>
+    <td>0.52</td>
+    <td>0.64</td>
+    <td class="pos"><strong>0.563</strong></td>
+    <td>9.0</td>
+  </tr>
+  <tr>
+    <td>AAPL</td>
+    <td class="neutral-val">Technology</td>
+    <td>3712.7B</td>
+    <td>0.19</td>
+    <td>0.62</td>
+    <td>0.83</td>
+    <td>0.69</td>
+    <td>0.46</td>
+    <td class="pos"><strong>0.523</strong></td>
+    <td>10.0</td>
+  </tr>
+  </tbody>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════
+     STOCK CALLOUTS (top 3)
+══════════════════════════════════════════════════════════ -->
+<h2 class="section-title">Stock Highlights</h2>
+<div class="callout-grid">
+<div class="callout-card">
+  <div class="cc-header">
+    <span>GOOGL</span>
+    <span class="cc-rating cc-buy">Buy</span>
+  </div>
+  <div class="cc-body">
+    <div class="cc-row"><span class="cc-key">Price</span><span>$280.92</span></div>
+    <div class="cc-row"><span class="cc-key">Target</span><span class="pos">$—</span></div>
+    <div class="cc-row"><span class="cc-key">Upside</span><span class="pos">20.1%</span></div>
+    <div class="cc-row"><span class="cc-key">Fwd P/E</span><span>23.3x</span></div>
+    <div class="cc-row"><span class="cc-key">EPS Growth</span><span class="pos">16.5%</span></div>
+    <div class="cc-row"><span class="cc-key">Research Score</span><span><strong>0.711</strong></span></div>
+    <div class="cc-thesis">GOOGL (Alphabet Inc.) screens well inside Communication Services with 16.5% forward EPS growth, 20.1% implied target upside, and 35.7% ROE.</div>
+  </div>
+</div>
+<div class="callout-card">
+  <div class="cc-header">
+    <span>BLK</span>
+    <span class="cc-rating cc-buy">Buy</span>
+  </div>
+  <div class="cc-body">
+    <div class="cc-row"><span class="cc-key">Price</span><span>$968.46</span></div>
+    <div class="cc-row"><span class="cc-key">Target</span><span class="pos">$—</span></div>
+    <div class="cc-row"><span class="cc-key">Upside</span><span class="pos">26.4%</span></div>
+    <div class="cc-row"><span class="cc-key">Fwd P/E</span><span>16.2x</span></div>
+    <div class="cc-row"><span class="cc-key">EPS Growth</span><span class="pos">15.3%</span></div>
+    <div class="cc-row"><span class="cc-key">Research Score</span><span><strong>0.636</strong></span></div>
+    <div class="cc-thesis">BLK (BlackRock, Inc.) screens well inside Financial Services with 15.3% forward EPS growth, 26.4% implied target upside, and 10.7% ROE.</div>
+  </div>
+</div>
+<div class="callout-card">
+  <div class="cc-header">
+    <span>META</span>
+    <span class="cc-rating cc-buy">Buy</span>
+  </div>
+  <div class="cc-body">
+    <div class="cc-row"><span class="cc-key">Price</span><span>$547.54</span></div>
+    <div class="cc-row"><span class="cc-key">Target</span><span class="pos">$—</span></div>
+    <div class="cc-row"><span class="cc-key">Upside</span><span class="pos">37.6%</span></div>
+    <div class="cc-row"><span class="cc-key">Fwd P/E</span><span>17.4x</span></div>
+    <div class="cc-row"><span class="cc-key">EPS Growth</span><span class="pos">16.1%</span></div>
+    <div class="cc-row"><span class="cc-key">Research Score</span><span><strong>0.616</strong></span></div>
+    <div class="cc-thesis">META (Meta Platforms, Inc.) screens well inside Communication Services with 16.1% forward EPS growth, 37.6% implied target upside, and 30.2% ROE.</div>
+  </div>
+</div>
+</div>
+
+<!-- Per-ticker charts -->
+
+<!-- ═══════════════════════════════════════════════════════
+     DCF / VALUATION (if available)
+══════════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<h2 class="section-title">Valuation Analysis</h2>
+<h3 class="sub-title">GOOGL — DCF & Scenario Analysis</h3>
+
+<div class="scenario-grid">
+  <div class="scenario-box bear">
+    <div class="s-label">Bear Case</div>
+    <div class="s-price neg">$276.49</div>
+    <div class="s-desc">WACC: 10.4% | TGR: 1.0%</div>
+  </div>
+  <div class="scenario-box base">
+    <div class="s-label">Base Case</div>
+    <div class="s-price">$426.43</div>
+    <div class="s-desc">WACC: 9.4% | TGR: 2.5%</div>
+  </div>
+  <div class="scenario-box bull">
+    <div class="s-label">Bull Case</div>
+    <div class="s-price pos">$623.92</div>
+    <div class="s-desc">WACC: 8.9% | TGR: 3.5%</div>
+  </div>
+</div>
+
+<h3 class="sub-title">BLK — DCF & Scenario Analysis</h3>
+
+<div class="scenario-grid">
+  <div class="scenario-box bear">
+    <div class="s-label">Bear Case</div>
+    <div class="s-price neg">$486.34</div>
+    <div class="s-desc">WACC: 10.4% | TGR: 1.0%</div>
+  </div>
+  <div class="scenario-box base">
+    <div class="s-label">Base Case</div>
+    <div class="s-price">$786.13</div>
+    <div class="s-desc">WACC: 9.4% | TGR: 2.5%</div>
+  </div>
+  <div class="scenario-box bull">
+    <div class="s-label">Bull Case</div>
+    <div class="s-price pos">$1201.80</div>
+    <div class="s-desc">WACC: 8.9% | TGR: 3.5%</div>
+  </div>
+</div>
+
+<h3 class="sub-title">META — DCF & Scenario Analysis</h3>
+
+<div class="scenario-grid">
+  <div class="scenario-box bear">
+    <div class="s-label">Bear Case</div>
+    <div class="s-price neg">$379.66</div>
+    <div class="s-desc">WACC: 10.4% | TGR: 1.0%</div>
+  </div>
+  <div class="scenario-box base">
+    <div class="s-label">Base Case</div>
+    <div class="s-price">$615.76</div>
+    <div class="s-desc">WACC: 9.4% | TGR: 2.5%</div>
+  </div>
+  <div class="scenario-box bull">
+    <div class="s-label">Bull Case</div>
+    <div class="s-price pos">$944.30</div>
+    <div class="s-desc">WACC: 8.9% | TGR: 3.5%</div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     CATALYST CALENDAR
+══════════════════════════════════════════════════════════ -->
+<h2 class="section-title">Catalyst Calendar</h2>
+<table class="research-table">
+  <thead><tr><th>Ticker</th><th>Event Date</th><th>Event</th><th>EPS Est.</th><th>Revenue Est.</th></tr></thead>
+  <tbody>
+  <tr>
+    <td>GS</td>
+    <td></td>
+    <td></td>
+    <td>—</td>
+    <td>—</td>
+  </tr>
+  <tr>
+    <td>BLK</td>
+    <td></td>
+    <td></td>
+    <td>—</td>
+    <td>—</td>
+  </tr>
+  <tr>
+    <td>JPM</td>
+    <td></td>
+    <td></td>
+    <td>—</td>
+    <td>—</td>
+  </tr>
+  <tr>
+    <td>BAC</td>
+    <td></td>
+    <td></td>
+    <td>—</td>
+    <td>—</td>
+  </tr>
+  <tr>
+    <td>MS</td>
+    <td></td>
+    <td></td>
+    <td>—</td>
+    <td>—</td>
+  </tr>
+  </tbody>
+</table>
+
+<!-- ═══════════════════════════════════════════════════════
+     TACTICAL TAKEAWAYS
+══════════════════════════════════════════════════════════ -->
+<h2 class="section-title">Tactical Takeaways</h2>
+<div class="exec-summary">
+  <ul>
+    <li>US sector leadership sits with Energy, up 4.3% over the last week.</li>
+    <li>The highest-ranked screen name is GOOGL, pairing 16.5% forward EPS growth with 20.1% implied upside.</li>
+    <li>Europe remains constructive on the tape, led by IBEX 35 at 0.3% week-over-week.</li>
+  </ul>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     ANALYST OVERLAYS
+══════════════════════════════════════════════════════════ -->
+
+</div><!-- /body-wrap -->
+
+<!-- ═══════════════════════════════════════════════════════
+     FOOTER / DISCLOSURES
+══════════════════════════════════════════════════════════ -->
+<div class="footer">
+  <strong>Important Disclosures & Disclaimers</strong><br/>
+  This report is produced by TRG Research Workbench for educational and portfolio-project purposes only. It does not constitute investment advice, a solicitation, or an offer to buy or sell any security.
+  All data sourced from Yahoo Finance (unofficial API), SEC EDGAR (public filings), and ECB SDMX (public API). Data is provided "as is" without warranty of accuracy or completeness.
+  Past performance is not indicative of future results. Price targets and DCF outputs are model-based estimates derived from publicly available information and should not be relied upon for investment decisions.
+  The analyst(s) responsible for this report may hold positions in securities mentioned.
+  <br/><br/>
+  <strong>Data Sources:</strong> Yahoo Finance · SEC EDGAR XBRL API · ECB SDMX CSV API · US Treasury (via Yahoo Finance proxies)
+  &nbsp;|&nbsp; <strong>Generated:</strong> 2026-03-26 &nbsp;|&nbsp; <strong>Model Version:</strong> TRG Workbench v2.0
+</div>
+
+</body>
+</html>
