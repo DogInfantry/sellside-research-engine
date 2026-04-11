@@ -428,7 +428,7 @@ def build_research_report_v2(
     # Sector rows
     sector_rows = []
     if not sector_snap.empty:
-        for ticker, r in sector_snap.iterrows():
+        for ticker, r in tqdm(sector_snap.iterrows(), "Fetching Sector Rows"):
             sector_rows.append({
                 "ticker": ticker,
                 "sector_name": r.get("sector_name", US_SECTOR_PROXIES.get(ticker, ticker)),
@@ -448,7 +448,7 @@ def build_research_report_v2(
     # Risk rows
     risk_rows = []
     if not risk_table.empty:
-        for ticker, r in risk_table.iterrows():
+        for ticker, r in tqdm(risk_table.iterrows(), "Fetching Risk Rows"):
             d = r.to_dict()
             d["ticker"] = ticker
             risk_rows.append(d)
