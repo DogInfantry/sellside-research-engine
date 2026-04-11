@@ -10,3 +10,6 @@ tests_runtime_kpis/
 # Debug/scratch scripts
 test_*.py
 trg_workbench/_run_risk.py
+
+# Generated report outputs
+outputs/
