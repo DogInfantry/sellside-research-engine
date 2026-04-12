@@ -224,7 +224,11 @@ def build_research_report_v2(
     logger.info("Running valuation analytics...")
     dcf_results = []
     from trg_workbench.analytics.valuation import (
-        derive_dcf_inputs, dcf_sensitivity, football_field, scenario_analysis
+        derive_dcf_inputs,
+        dcf_sensitivity,
+        football_field,
+        reverse_dcf,
+        scenario_analysis,
     )
 
     _tc = "ticker" if "ticker" in top_candidates.columns else None
@@ -236,7 +240,8 @@ def build_research_report_v2(
             sec_row = fundamentals_df[fundamentals_df["ticker"] == ticker].iloc[0].to_dict() if ticker in fundamentals_df["ticker"].values else {}
             
             inputs = derive_dcf_inputs(sm_row, sec_row)
-            if inputs["base_fcf"] == 0: continue
+            if inputs["base_fcf"] == 0:
+                continue
 
             scenarios = scenario_analysis(inputs["base_fcf"], inputs["base_growth"], inputs["wacc"], inputs["net_debt"], inputs["shares_outstanding"])
             sensitivity_df = dcf_sensitivity(inputs["base_fcf"], [inputs["base_growth"] * (0.85 ** i) for i in range(5)], inputs["net_debt"], inputs["shares_outstanding"])
@@ -247,7 +252,31 @@ def build_research_report_v2(
                                 dcf_bull=scenarios["Bull Case"]["intrinsic_value_per_share"],
                                 dcf_bear=scenarios["Bear Case"]["intrinsic_value_per_share"])
 
-            dcf_results.append({"ticker": ticker, "inputs": inputs, "scenarios": scenarios, "sensitivity_df": sensitivity_df, "football_field": ff, "current_price": current_price})
+            reverse_dcf_result = None
+            if current_price > 0:
+                try:
+                    reverse_dcf_result = reverse_dcf(
+                        current_price=current_price,
+                        shares_outstanding=inputs["shares_outstanding"],
+                        net_debt=inputs["net_debt"],
+                        base_fcf=inputs["base_fcf"],
+                        wacc=inputs["wacc"],
+                        terminal_growth=scenarios["Base Case"]["tgr_used"],
+                    )
+                except ValueError as exc:
+                    logger.warning("Reverse DCF failed for %s: %s", ticker, exc)
+
+            dcf_results.append(
+                {
+                    "ticker": ticker,
+                    "inputs": inputs,
+                    "scenarios": scenarios,
+                    "sensitivity_df": sensitivity_df,
+                    "football_field": ff,
+                    "current_price": current_price,
+                    "reverse_dcf": reverse_dcf_result,
+                }
+            )
             
             if disable_prog:
                 logger.info("Valuation complete for %s (Base: $%.2f)", ticker, scenarios["Base Case"]["intrinsic_value_per_share"])
@@ -311,5 +340,12 @@ def build_research_report_v2(
     if "pdf" in output_formats:
         pdf_path = OUTPUTS_DIR / f"research_note_{as_of}.pdf"
         outputs["pdf"] = render_research_note_pdf(context, pdf_path, quiet=quiet)
+
+    if "markdown" in output_formats:
+        from trg_workbench.reporting.renderers import render_template, write_report
+
+        md_path = OUTPUTS_DIR / f"daily_note_{as_of}.md"
+        markdown = render_template("daily_note.md.j2", context)
+        outputs["markdown"] = write_report(md_path, markdown)
 
     return outputs
