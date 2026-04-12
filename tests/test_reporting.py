@@ -41,6 +41,15 @@ def test_daily_template_renders_key_sections():
                     },
                 }
             ],
+            "management_commentary": [
+                {
+                    "ticker": "GS",
+                    "tone_score": 0.72,
+                    "guidance_summary": "Management raised guidance.",
+                    "key_risks": ["FX headwinds remain."],
+                    "catalyst_flags": ["New product launch in Q3."],
+                }
+            ],
             "tactical_takeaways": ["Financials are leading this week."],
         },
     )
@@ -49,6 +58,8 @@ def test_daily_template_renders_key_sections():
     assert "US Sector Tape" in content
     assert "Goldman Sachs Group, Inc." in content
     assert "GS: market implies 12.0% FCF CAGR" in content
+    assert "Management Commentary" in content
+    assert "Management raised guidance." in content
 
 
 def test_html_template_renders_reverse_dcf_section():
@@ -74,8 +85,20 @@ def test_html_template_renders_reverse_dcf_section():
                     },
                 }
             ],
+            "management_commentary": [
+                {
+                    "ticker": "GS",
+                    "tone_score": 0.72,
+                    "analyst_qa_tone": "constructive",
+                    "source": "heuristic_transcript_parser",
+                    "guidance_summary": "Management raised guidance.",
+                    "key_risks": ["FX headwinds remain."],
+                    "catalyst_flags": ["New product launch in Q3."],
+                }
+            ],
         }
     )
 
     assert "Market-Implied FCF CAGR" in content
     assert "12.0%" in content
+    assert "Management Commentary" in content

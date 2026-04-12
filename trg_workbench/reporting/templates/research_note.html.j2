@@ -659,6 +659,37 @@
 {% endif %}
 
 <!-- ═══════════════════════════════════════════════════════
+     MANAGEMENT COMMENTARY
+══════════════════════════════════════════════════════════ -->
+{% if management_commentary %}
+<h2 class="section-title">Management Commentary</h2>
+{% for row in management_commentary %}
+<h3 class="sub-title">{{ row.ticker }} — Transcript Read-Through</h3>
+<div class="metric-row">
+  <div class="metric-card">
+    <div class="mc-label">Management Tone</div>
+    <div class="mc-value">{{ row.tone_score | pct }}</div>
+    <div class="mc-sub">0% bearish / 100% bullish</div>
+  </div>
+  <div class="metric-card">
+    <div class="mc-label">Analyst Q&A Tone</div>
+    <div class="mc-value">{{ row.analyst_qa_tone | title }}</div>
+    <div class="mc-sub">{{ row.source }}</div>
+  </div>
+</div>
+<div class="exec-summary">
+  <p><strong>Guidance:</strong> {{ row.guidance_summary }}</p>
+  {% if row.key_risks %}
+  <p><strong>Key risks:</strong> {{ row.key_risks | join("; ") }}</p>
+  {% endif %}
+  {% if row.catalyst_flags %}
+  <p><strong>Catalysts:</strong> {{ row.catalyst_flags | join("; ") }}</p>
+  {% endif %}
+</div>
+{% endfor %}
+{% endif %}
+
+<!-- ═══════════════════════════════════════════════════════
      TACTICAL TAKEAWAYS
 ══════════════════════════════════════════════════════════ -->
 {% if tactical_takeaways %}

@@ -47,6 +47,17 @@ Data as of: {{ as_of_date }}
 {% endfor %}
 
 {% endif %}
+{% if management_commentary %}
+## Management Commentary
+{% for row in management_commentary %}
+- {{ row.ticker }}: tone {{ row.tone_score | pct }}, guidance: {{ row.guidance_summary }}
+{% if row.key_risks %}  - Risks: {{ row.key_risks | join("; ") }}
+{% endif %}
+{% if row.catalyst_flags %}  - Catalysts: {{ row.catalyst_flags | join("; ") }}
+{% endif %}
+{% endfor %}
+
+{% endif %}
 {% if analyst_overlays %}
 ## Analyst Overlays
 {% for row in analyst_overlays %}
