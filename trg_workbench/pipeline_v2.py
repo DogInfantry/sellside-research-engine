@@ -13,6 +13,7 @@ New in v2:
 from __future__ import annotations
 
 import logging
+import os
 from datetime import datetime, date as _date_type
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -283,6 +284,30 @@ def build_research_report_v2(
         except Exception as exc:
             logger.warning("Valuation failed for %s: %s", ticker, exc)
 
+    # 2d. Management commentary from cached transcripts by default.
+    management_commentary: list[dict[str, object]] = []
+    if top3:
+        from trg_workbench.llm.pipeline import build_management_commentary
+
+        fetch_live_transcripts = os.getenv("TRG_FETCH_TRANSCRIPTS", "").lower() in {
+            "1",
+            "true",
+            "yes",
+        }
+        try:
+            management_commentary = build_management_commentary(
+                tickers=top3,
+                as_of_date=as_of_date,
+                fetch_live=fetch_live_transcripts,
+            )
+            if management_commentary:
+                write_json(
+                    NORMALIZED_DIR / f"management_commentary_{as_of}.json",
+                    management_commentary,
+                )
+        except Exception as exc:
+            logger.warning("Management commentary skipped: %s", exc)
+
     # ── 3. Generate charts (Target 2 Integration) ──────────────────────────
     logger.info("Generating research charts...")
     from trg_workbench.reporting.charts import build_research_charts
@@ -327,6 +352,7 @@ def build_research_report_v2(
         "sector_rows": sector_rows,
         "risk_rows": risk_rows,
         "dcf_results": dcf_results,
+        "management_commentary": management_commentary,
         "charts": charts,
         # ... (rest of context items)
     }
