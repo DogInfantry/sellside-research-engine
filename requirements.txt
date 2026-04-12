@@ -11,3 +11,4 @@ numpy>=1.26
 seaborn>=0.13
 weasyprint>=62.0
 tqdm>=4.67.3
+plotly>=5.22.0

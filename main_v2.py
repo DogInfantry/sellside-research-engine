@@ -63,6 +63,14 @@ def run_dry_run_checks(args) -> int:
         print("✗ WeasyPrint / PDF dependencies missing")
         checks_passed = False
 
+    # Plotly dependency
+    try:
+        import plotly  # noqa
+        print("✓ Plotly available")
+    except Exception:
+        print("✗ Plotly missing — run: pip install plotly>=5.22.0")
+        checks_passed = False
+
     print("\nDry run complete.")
     return 0 if checks_passed else 1
 
@@ -87,9 +95,16 @@ def cmd_build_report(args: argparse.Namespace) -> int:
     from trg_workbench.pipeline_v2 import build_research_report_v2
 
     formats = args.formats.split(",") if args.formats else ["html", "pdf", "markdown"]
-    print(f"Building research report for {args.as_of} | formats: {formats}")
+    static = getattr(args, "static", False)
 
-    outputs = build_research_report_v2(args.as_of, output_formats=formats,quiet=args.quiet)
+    print(f"Building research report for {args.as_of} | formats: {formats} | static={static}")
+
+    outputs = build_research_report_v2(
+        args.as_of,
+        output_formats=formats,
+        quiet=args.quiet,
+        static=static,
+    )
     if not outputs:
         print("ERROR: Report generation failed. Run fetch-all first.", file=sys.stderr)
         return 1
@@ -118,27 +133,46 @@ def main() -> int:
         description="TRG Research Workbench v2 — Sell-Side Research Engine",
     )
 
-    # 1. Create a "Shared" parser for flags that every command needs
+    # Shared flags for every command
     shared_flags = argparse.ArgumentParser(add_help=False)
     shared_flags.add_argument("--quiet", action="store_true", help="Suppress progress bars")
     shared_flags.add_argument("--dry-run", action="store_true", help="Run validation only")
-    shared_flags.add_argument("--as-of", type=_validate_date, 
-                             default=datetime.today().strftime("%Y-%m-%d"))
+    shared_flags.add_argument(
+        "--as-of",
+        type=_validate_date,
+        default=datetime.today().strftime("%Y-%m-%d"),
+    )
+
+    # --static flag for report commands
+    report_flags = argparse.ArgumentParser(add_help=False)
+    report_flags.add_argument(
+        "--static",
+        action="store_true",
+        default=False,
+        help="Force PNG-only charts (use for PDF/WeasyPrint output, disables Plotly interactive)",
+    )
 
     sub = parser.add_subparsers(dest="command", required=True)
 
-    # 2. Add sub-parsers using the shared_flags as a parent
     # fetch-all
     p_fetch = sub.add_parser("fetch-all", parents=[shared_flags], help="Fetch all data")
     p_fetch.set_defaults(func=cmd_fetch_all)
 
     # build-report
-    p_report = sub.add_parser("build-report", parents=[shared_flags], help="Build report")
+    p_report = sub.add_parser(
+        "build-report",
+        parents=[shared_flags, report_flags],
+        help="Build report (HTML interactive by default; use --static for PDF-safe PNG)",
+    )
     p_report.add_argument("--formats", type=str, default="html,pdf,markdown")
     p_report.set_defaults(func=cmd_build_report)
 
     # build-all
-    p_all = sub.add_parser("build-all", parents=[shared_flags], help="Fetch + Build")
+    p_all = sub.add_parser(
+        "build-all",
+        parents=[shared_flags, report_flags],
+        help="Fetch + Build",
+    )
     p_all.add_argument("--formats", type=str, default="html,pdf,markdown")
     p_all.set_defaults(func=cmd_build_all_v2)
 
