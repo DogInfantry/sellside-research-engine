@@ -14,12 +14,18 @@ Generates PNG files matching GS/JPM/MS research note visualization standards:
   10. Risk-return scatter (vol vs Sharpe)
   11. Earnings estimate waterfall (EPS revision bridge)
   12. Screen dashboard (composite scores bar chart)
+
+Interactive HTML mode (Issue #10):
+  - plot_dcf_sensitivity, plot_correlation_heatmap, plot_sector_heatmap accept
+    plotly_mode=True and return (png_path | None, html_div | None)
+  - build_research_charts() accepts static=False (default) for HTML mode
+    or static=True to force PNG-only (PDF / WeasyPrint path)
 """
 from __future__ import annotations
 
 import warnings
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Union
 
 import sys
 
@@ -71,6 +77,15 @@ def _gs_spine(ax: plt.Axes) -> None:
     ax.set_facecolor(GS_LIGHT)
 
 
+def _plotly_div(fig) -> str:
+    """Return embeddable HTML div for a Plotly figure (CDN-hosted JS, no size bloat)."""
+    try:
+        import plotly.offline as pyo
+        return pyo.plot(fig, output_type="div", include_plotlyjs="cdn")
+    except ImportError:
+        return ""
+
+
 # ─── 1. DCF Sensitivity Heatmap ───────────────────────────────────────────────
 
 def plot_dcf_sensitivity(
@@ -78,51 +93,73 @@ def plot_dcf_sensitivity(
     ticker: str,
     current_price: float,
     output_path: Path,
-) -> Path:
+    plotly_mode: bool = False,
+) -> Union[Path, Tuple[Optional[Path], Optional[str]]]:
     """
     Heatmap: rows = WACC, cols = terminal growth rate.
     Green = above current price (undervalued), Red = below (overvalued).
+
+    plotly_mode=False (default): saves PNG, returns Path  [backward-compatible]
+    plotly_mode=True:            returns (None, html_div_str)
     """
-    fig, ax = plt.subplots(figsize=FIG_SQUARE)
-
     data = sensitivity_df.copy().apply(pd.to_numeric, errors="coerce")
-    # Color: green where implied value > current_price, red where <
-    cmap = LinearSegmentedColormap.from_list("rdgn", [GS_RED, "white", GS_GREEN], N=256)
-    # Normalize centered on current_price
-    vmin = max(0, current_price * 0.5)
-    vmax = current_price * 1.5
-    im = ax.imshow(
-        data.values, cmap=cmap, aspect="auto",
-        vmin=vmin, vmax=vmax, interpolation="nearest",
-    )
 
-    # Labels
-    ax.set_xticks(range(len(data.columns)))
-    ax.set_xticklabels(data.columns, rotation=45, ha="right", fontsize=8)
-    ax.set_yticks(range(len(data.index)))
-    ax.set_yticklabels(data.index, fontsize=8)
+    if not plotly_mode:
+        fig, ax = plt.subplots(figsize=FIG_SQUARE)
+        cmap = LinearSegmentedColormap.from_list("rdgn", [GS_RED, "white", GS_GREEN], N=256)
+        vmin = max(0, current_price * 0.5)
+        vmax = current_price * 1.5
+        im = ax.imshow(
+            data.values, cmap=cmap, aspect="auto",
+            vmin=vmin, vmax=vmax, interpolation="nearest",
+        )
+        ax.set_xticks(range(len(data.columns)))
+        ax.set_xticklabels(data.columns, rotation=45, ha="right", fontsize=8)
+        ax.set_yticks(range(len(data.index)))
+        ax.set_yticklabels(data.index, fontsize=8)
+        for i in tqdm(range(len(data.index)), "DCF Sensitivity Heatmap (Cell annotations)"):
+            for j in range(len(data.columns)):
+                val = data.values[i, j]
+                if not np.isnan(val):
+                    color = "white" if abs(val - current_price) > current_price * 0.25 else GS_NAVY
+                    ax.text(j, i, f"${val:.0f}", ha="center", va="center",
+                            fontsize=7, color=color, fontweight="bold")
+        plt.colorbar(im, ax=ax, label="Implied Share Price ($)", shrink=0.8)
+        ax.set_title(f"{ticker} — DCF Sensitivity: WACC vs Terminal Growth Rate\n"
+                     f"Current Price: ${current_price:.2f}  |  Green = Undervalued, Red = Overvalued",
+                     **FONT_TITLE, pad=12)
+        ax.set_xlabel("Terminal Growth Rate", **FONT_LABEL)
+        ax.set_ylabel("WACC", **FONT_LABEL)
+        ax.axhline(-0.5, color=GS_GOLD, linewidth=0, alpha=0)
+        fig.tight_layout()
+        _save(fig, output_path)
+        return output_path
 
-    # Cell annotations
-    for i in tqdm(range(len(data.index)), "DCF Sensitivity Heatmap (Cell annotations)"):
-        for j in range(len(data.columns)):
-            val = data.values[i, j]
-            if not np.isnan(val):
-                color = "white" if abs(val - current_price) > current_price * 0.25 else GS_NAVY
-                ax.text(j, i, f"${val:.0f}", ha="center", va="center",
-                        fontsize=7, color=color, fontweight="bold")
-
-    plt.colorbar(im, ax=ax, label="Implied Share Price ($)", shrink=0.8)
-    ax.set_title(f"{ticker} — DCF Sensitivity: WACC vs Terminal Growth Rate\n"
-                 f"Current Price: ${current_price:.2f}  |  Green = Undervalued, Red = Overvalued",
-                 **FONT_TITLE, pad=12)
-    ax.set_xlabel("Terminal Growth Rate", **FONT_LABEL)
-    ax.set_ylabel("WACC", **FONT_LABEL)
-
-    # Highlight current price contour
-    ax.axhline(-0.5, color=GS_GOLD, linewidth=0, alpha=0)  # force layout
-    fig.tight_layout()
-    _save(fig, output_path)
-    return output_path
+    else:
+        import plotly.graph_objects as go
+        fig = go.Figure(data=go.Heatmap(
+            z=data.values,
+            x=list(data.columns),
+            y=list(data.index),
+            colorscale=[[0, GS_RED], [0.5, "white"], [1, GS_GREEN]],
+            zmid=current_price,
+            zmin=current_price * 0.5,
+            zmax=current_price * 1.5,
+            texttemplate="%{z:.0f}",
+            textfont={"color": "white", "size": 10},
+            hovertemplate="WACC: %{y}<br>Terminal Growth: %{x}<br>Implied Price: $%{z:.0f}<extra></extra>",
+        ))
+        fig.update_layout(
+            title=dict(text=f"{ticker} — DCF Sensitivity (hover for detail)<br>"
+                            f"<sup>Current: ${current_price:.2f} | Green=Undervalued, Red=Overvalued</sup>",
+                       font=dict(size=14, color=GS_NAVY)),
+            xaxis_title="Terminal Growth Rate",
+            yaxis_title="WACC",
+            width=820, height=620,
+            paper_bgcolor="white",
+            plot_bgcolor=GS_LIGHT,
+        )
+        return None, _plotly_div(fig)
 
 
 # ─── 2. Football Field Chart ──────────────────────────────────────────────────
@@ -150,20 +187,15 @@ def plot_football_field(
 
     for i, (label, (lo, mid, hi)) in tqdm(enumerate(methods.items()), "Football Field Chart"):
         color = colors[i % len(colors)]
-        # Range bar
         ax.barh(i, hi - lo, left=lo, height=0.5, color=color, alpha=0.25, edgecolor=color, linewidth=1.5)
-        # Midpoint marker
         ax.plot(mid, i, "D", color=color, markersize=9, zorder=5)
-        # Lo/Hi labels
         ax.text(lo - (hi - lo) * 0.04, i, f"${lo:.0f}", va="center", ha="right",
                 fontsize=8, color=color, fontweight="bold")
         ax.text(hi + (hi - lo) * 0.04, i, f"${hi:.0f}", va="center", ha="left",
                 fontsize=8, color=color, fontweight="bold")
-        # Mid label
         ax.text(mid, i + 0.32, f"${mid:.0f}", va="bottom", ha="center",
                 fontsize=7.5, color=GS_NAVY, fontweight="bold")
 
-    # Current price line
     ax.axvline(current, color=GS_RED, linewidth=2, linestyle="--", zorder=10, label=f"Current: ${current:.2f}")
     ax.text(current, len(labels) - 0.1, f" ${current:.2f}\n Current", color=GS_RED,
             fontsize=8, fontweight="bold", va="top")
@@ -206,23 +238,19 @@ def plot_factor_radar(
     fig, ax = plt.subplots(figsize=(7, 7), subplot_kw={"polar": True})
     ax.set_facecolor(GS_LIGHT)
 
-    # Grid
     ax.set_yticks([20, 40, 60, 80, 100])
     ax.set_yticklabels(["20", "40", "60", "80", "100"], color=GS_GREY, size=7)
     ax.set_rlim(0, 100)
 
-    # Benchmark (universe median) — dashed grey at 50
     bench_values = benchmark_scores if benchmark_scores else {k: 0.5 for k in labels}
     bench_vals_raw = list(bench_values.values())
     bench_vals = [max(0, min(100, v * 100)) if v <= 1 else max(0, min(100, v)) for v in bench_vals_raw]
     ax.plot(angles_plot, bench_vals + [bench_vals[0]], "--", color=GS_GREY, linewidth=1.2, alpha=0.6, label="Universe Median")
     ax.fill(angles_plot, bench_vals + [bench_vals[0]], color=GS_GREY, alpha=0.05)
 
-    # Ticker
     ax.plot(angles_plot, values_plot, "o-", color=GS_NAVY, linewidth=2.5, markersize=6, label=ticker)
     ax.fill(angles_plot, values_plot, color=GS_NAVY, alpha=0.18)
 
-    # Labels
     ax.set_thetagrids(np.degrees(angles), labels_plot, fontsize=9.5, color=GS_NAVY, fontweight="bold")
 
     ax.set_title(f"{ticker} — Factor Profile\n(Percentile vs Universe, 0–100)", **FONT_TITLE, pad=20)
@@ -255,17 +283,14 @@ def plot_peer_scatter(
     fig, ax = plt.subplots(figsize=FIG_WIDE)
     _gs_spine(ax)
 
-    # All peers
     non_hl = df[df[label_col] != highlight_ticker]
     ax.scatter(non_hl[x_col], non_hl[y_col], color=GS_NAVY, alpha=0.65, s=80, zorder=4)
 
-    # Labels for peers
     for _, row in tqdm(non_hl.iterrows(), "Peer Comparison Scatter"):
         ax.annotate(row[label_col], (row[x_col], row[y_col]),
                     textcoords="offset points", xytext=(6, 4),
                     fontsize=7.5, color=GS_GREY)
 
-    # Highlight subject
     hl = df[df[label_col] == highlight_ticker]
     if not hl.empty:
         ax.scatter(hl[x_col], hl[y_col], color=GS_GOLD, edgecolors=GS_NAVY,
@@ -274,7 +299,6 @@ def plot_peer_scatter(
                     textcoords="offset points", xytext=(8, 6),
                     fontsize=9, color=GS_NAVY, fontweight="bold")
 
-    # Trend line
     try:
         x_vals = df[x_col].values.astype(float)
         y_vals = df[y_col].values.astype(float)
@@ -325,26 +349,21 @@ def plot_price_chart(
     close = px[close_col].astype(float)
     dates = px.index if isinstance(px.index, pd.DatetimeIndex) else pd.to_datetime(px.index)
 
-    # Price line
     ax_price.plot(dates, close, color=GS_NAVY, linewidth=1.5, label="Close")
 
-    # Moving averages
     for window, color in tqdm(zip(ma_windows, [GS_GOLD, GS_RED]), "Candlestick (Moving Averages)"):
         ma = close.rolling(window).mean()
         ax_price.plot(dates, ma, color=color, linewidth=1.2, linestyle="--",
                       label=f"{window}-Day MA", alpha=0.85)
 
-    # Shaded area under price line
     ax_price.fill_between(dates, close, close.min() * 0.97, alpha=0.06, color=GS_NAVY)
 
-    # Latest price annotation
     ax_price.annotate(
         f"  ${close.iloc[-1]:.2f}",
         xy=(dates[-1], float(close.iloc[-1])),
         fontsize=9, color=GS_NAVY, fontweight="bold",
     )
 
-    # Volume
     if "Volume" in px.columns:
         vol = px["Volume"].astype(float)
         colors = [GS_GREEN if close.iloc[i] >= close.iloc[i - 1] else GS_RED
@@ -419,38 +438,63 @@ def plot_correlation_heatmap(
     corr_matrix: pd.DataFrame,
     output_path: Path,
     title: str = "Return Correlation Matrix (Spearman)",
-) -> Path:
+    plotly_mode: bool = False,
+) -> Union[Path, Tuple[Optional[Path], Optional[str]]]:
     """
     Annotated correlation heatmap with GS color scheme.
+
+    plotly_mode=False (default): saves PNG, returns Path  [backward-compatible]
+    plotly_mode=True:            returns (None, html_div_str)
     """
     if corr_matrix.empty:
+        return output_path if not plotly_mode else (None, None)
+
+    if not plotly_mode:
+        n = len(corr_matrix)
+        fig_size = max(8, n * 0.55)
+        fig, ax = plt.subplots(figsize=(fig_size, fig_size * 0.85))
+
+        cmap = LinearSegmentedColormap.from_list("rdbl", [GS_RED, "white", GS_NAVY], N=256)
+        im = ax.imshow(corr_matrix.values, cmap=cmap, vmin=-1, vmax=1, aspect="auto")
+
+        ax.set_xticks(range(n))
+        ax.set_yticks(range(n))
+        ax.set_xticklabels(corr_matrix.columns, rotation=45, ha="right", fontsize=7.5)
+        ax.set_yticklabels(corr_matrix.index, fontsize=7.5)
+
+        for i in tqdm(range(n), "Correlation Heatmap"):
+            for j in range(n):
+                val = corr_matrix.values[i, j]
+                if not np.isnan(val):
+                    txt_color = "white" if abs(val) > 0.6 else GS_NAVY
+                    ax.text(j, i, f"{val:.2f}", ha="center", va="center", fontsize=6.5,
+                            color=txt_color, fontweight="bold" if abs(val) > 0.7 else "normal")
+
+        plt.colorbar(im, ax=ax, shrink=0.8, label="Spearman ρ")
+        ax.set_title(title, **FONT_TITLE, pad=12)
+        fig.tight_layout()
+        _save(fig, output_path)
         return output_path
 
-    n = len(corr_matrix)
-    fig_size = max(8, n * 0.55)
-    fig, ax = plt.subplots(figsize=(fig_size, fig_size * 0.85))
-
-    cmap = LinearSegmentedColormap.from_list("rdbl", [GS_RED, "white", GS_NAVY], N=256)
-    im = ax.imshow(corr_matrix.values, cmap=cmap, vmin=-1, vmax=1, aspect="auto")
-
-    ax.set_xticks(range(n))
-    ax.set_yticks(range(n))
-    ax.set_xticklabels(corr_matrix.columns, rotation=45, ha="right", fontsize=7.5)
-    ax.set_yticklabels(corr_matrix.index, fontsize=7.5)
-
-    for i in tqdm(range(n), "Correlation Heatmap"):
-        for j in range(n):
-            val = corr_matrix.values[i, j]
-            if not np.isnan(val):
-                txt_color = "white" if abs(val) > 0.6 else GS_NAVY
-                ax.text(j, i, f"{val:.2f}", ha="center", va="center", fontsize=6.5,
-                        color=txt_color, fontweight="bold" if abs(val) > 0.7 else "normal")
-
-    plt.colorbar(im, ax=ax, shrink=0.8, label="Spearman ρ")
-    ax.set_title(title, **FONT_TITLE, pad=12)
-    fig.tight_layout()
-    _save(fig, output_path)
-    return output_path
+    else:
+        import plotly.graph_objects as go
+        fig = go.Figure(data=go.Heatmap(
+            z=corr_matrix.values,
+            x=list(corr_matrix.columns),
+            y=list(corr_matrix.index),
+            colorscale=[[0, GS_RED], [0.5, "white"], [1, GS_NAVY]],
+            zmin=-1, zmax=1,
+            texttemplate="%{z:.2f}",
+            textfont={"size": 9},
+            hovertemplate="%{x} / %{y}<br>ρ = %{z:.3f}<extra></extra>",
+        ))
+        fig.update_layout(
+            title=dict(text=title, font=dict(size=14, color=GS_NAVY)),
+            width=750, height=700,
+            paper_bgcolor="white",
+            plot_bgcolor=GS_LIGHT,
+        )
+        return None, _plotly_div(fig)
 
 
 # ─── 8. VaR / Return Distribution ────────────────────────────────────────────
@@ -475,13 +519,11 @@ def plot_return_distribution(
     n_bins = min(60, max(20, len(rets) // 10))
     counts, bins, patches = ax.hist(rets, bins=n_bins, color=GS_NAVY, alpha=0.6, density=True, edgecolor="white")
 
-    # Normal overlay
     mu, sigma = rets.mean(), rets.std()
     x_line = np.linspace(rets.min(), rets.max(), 300)
     from scipy.stats import norm as scipy_norm  # local import to avoid hard dep at module level
     ax.plot(x_line, scipy_norm.pdf(x_line, mu, sigma), color=GS_GOLD, linewidth=2, label="Normal Fit")
 
-    # VaR and CVaR
     var_val = np.percentile(rets, (1 - confidence) * 100)
     cvar_val = rets[rets <= var_val].mean()
 
@@ -490,7 +532,6 @@ def plot_return_distribution(
     ax.axvline(cvar_val, color="#8B0000", linewidth=2, linestyle=":",
                label=f"CVaR {confidence:.0%}: {cvar_val:.2%}")
 
-    # Shade tail
     ax.fill_betweenx(
         [0, counts.max() * 1.1],
         rets.min(), var_val,
@@ -515,45 +556,73 @@ def plot_sector_heatmap(
     sector_returns: pd.DataFrame,
     output_path: Path,
     title: str = "Sector Performance Heatmap",
-) -> Path:
+    plotly_mode: bool = False,
+) -> Union[Path, Tuple[Optional[Path], Optional[str]]]:
     """
     Heatmap: rows=sectors, cols=return periods (1d, 1w, 1m, 3m).
     Green=positive, Red=negative. Annotated with return %.
+
+    plotly_mode=False (default): saves PNG, returns Path  [backward-compatible]
+    plotly_mode=True:            returns (None, html_div_str)
     """
     if sector_returns.empty:
-        return output_path
+        return output_path if not plotly_mode else (None, None)
 
     return_cols = [c for c in ["ret_1d", "ret_1w", "ret_1m", "ret_3m"] if c in sector_returns.columns]
     if not return_cols:
-        return output_path
+        return output_path if not plotly_mode else (None, None)
 
     df = sector_returns[return_cols].copy()
     col_labels = {"ret_1d": "1-Day", "ret_1w": "1-Week", "ret_1m": "1-Month", "ret_3m": "3-Month"}
     df.columns = [col_labels.get(c, c) for c in df.columns]
 
-    fig, ax = plt.subplots(figsize=(8, max(5, len(df) * 0.7 + 1.5)))
-    cmap = LinearSegmentedColormap.from_list("rdgn", [GS_RED, "white", GS_GREEN], N=256)
+    if not plotly_mode:
+        fig, ax = plt.subplots(figsize=(8, max(5, len(df) * 0.7 + 1.5)))
+        cmap = LinearSegmentedColormap.from_list("rdgn", [GS_RED, "white", GS_GREEN], N=256)
+        im = ax.imshow(df.values.astype(float), cmap=cmap, aspect="auto", vmin=-0.08, vmax=0.08)
 
-    im = ax.imshow(df.values.astype(float), cmap=cmap, aspect="auto", vmin=-0.08, vmax=0.08)
+        ax.set_xticks(range(len(df.columns)))
+        ax.set_yticks(range(len(df.index)))
+        ax.set_xticklabels(df.columns, fontsize=9, fontweight="bold")
+        ax.set_yticklabels(df.index, fontsize=8.5)
 
-    ax.set_xticks(range(len(df.columns)))
-    ax.set_yticks(range(len(df.index)))
-    ax.set_xticklabels(df.columns, fontsize=9, fontweight="bold")
-    ax.set_yticklabels(df.index, fontsize=8.5)
+        for i in tqdm(range(len(df.index)), "Sector Rotation Heatmap"):
+            for j in range(len(df.columns)):
+                val = df.values[i, j]
+                if not np.isnan(float(val)):
+                    txt_color = "white" if abs(float(val)) > 0.05 else GS_NAVY
+                    ax.text(j, i, f"{float(val):.1%}", ha="center", va="center",
+                            fontsize=8.5, color=txt_color, fontweight="bold")
 
-    for i in tqdm(range(len(df.index)), "Sector Rotation Heatmap"):
-        for j in range(len(df.columns)):
-            val = df.values[i, j]
-            if not np.isnan(float(val)):
-                txt_color = "white" if abs(float(val)) > 0.05 else GS_NAVY
-                ax.text(j, i, f"{float(val):.1%}", ha="center", va="center",
-                        fontsize=8.5, color=txt_color, fontweight="bold")
+        plt.colorbar(im, ax=ax, label="Return", format=mticker.PercentFormatter(xmax=1), shrink=0.7)
+        ax.set_title(title, **FONT_TITLE, pad=12)
+        fig.tight_layout()
+        _save(fig, output_path)
+        return output_path
 
-    plt.colorbar(im, ax=ax, label="Return", format=mticker.PercentFormatter(xmax=1), shrink=0.7)
-    ax.set_title(title, **FONT_TITLE, pad=12)
-    fig.tight_layout()
-    _save(fig, output_path)
-    return output_path
+    else:
+        import plotly.graph_objects as go
+        z_vals = df.values.astype(float)
+        text_vals = [[f"{v:.1%}" for v in row] for row in z_vals]
+        fig = go.Figure(data=go.Heatmap(
+            z=z_vals,
+            x=list(df.columns),
+            y=list(df.index),
+            colorscale=[[0, GS_RED], [0.5, "white"], [1, GS_GREEN]],
+            zmin=-0.08, zmax=0.08,
+            text=text_vals,
+            texttemplate="%{text}",
+            textfont={"size": 11},
+            hovertemplate="%{y} | %{x}<br>Return: %{text}<extra></extra>",
+        ))
+        fig.update_layout(
+            title=dict(text=title, font=dict(size=14, color=GS_NAVY)),
+            width=700,
+            height=max(400, len(df) * 45 + 120),
+            paper_bgcolor="white",
+            plot_bgcolor=GS_LIGHT,
+        )
+        return None, _plotly_div(fig)
 
 
 # ─── 10. Risk-Return Scatter ─────────────────────────────────────────────────
@@ -601,7 +670,6 @@ def plot_risk_return_scatter(
             fontweight="bold" if hl else "normal",
         )
 
-    # Reference lines
     ax.axhline(0, color=GS_GREY, linewidth=0.8, linestyle="--", alpha=0.5)
     ax.axvline(df["vol_63d"].median(), color=GS_GREY, linewidth=0.8, linestyle=":", alpha=0.5,
                label=f"Median Vol: {df['vol_63d'].median():.1%}")
@@ -635,7 +703,7 @@ def plot_screen_dashboard(
         return output_path
 
     df = research_df.nlargest(top_n, "research_score")[factor_cols].copy()
-    df = df.sort_values(factor_cols[0])  # Sort for visual clarity
+    df = df.sort_values(factor_cols[0])
 
     factor_colors = {
         "valuation_score": GS_GOLD,
@@ -663,7 +731,6 @@ def plot_screen_dashboard(
                        edgecolor="white", linewidth=0.5, label=col_labels.get(col, col))
         bottom += vals
 
-    # Total score label
     total = df[factor_cols].fillna(0).sum(axis=1)
     for i, (t, idx) in tqdm(enumerate(zip(total, df.index)), "Screen Score Dashboard (Total Score Label)"):
         ax.text(t + 0.01, i, f"{t:.2f}", va="center", ha="left", fontsize=8,
@@ -697,7 +764,6 @@ def plot_macro_dashboard(
     cat_labels = {"rates": "Rates & Yields", "vol": "Market Stress", "fx": "FX", "commodities": "Commodities"}
     cat_colors = {"rates": GS_NAVY, "vol": GS_RED, "fx": GS_GOLD, "commodities": GS_GREEN}
 
-    # Filter to key indicators
     df = macro_snapshot[macro_snapshot["category"].isin(categories)].copy()
     n_rows = max(1, len(df))
 
@@ -706,7 +772,6 @@ def plot_macro_dashboard(
     ax.set_facecolor(GS_LIGHT)
     fig.patch.set_facecolor(GS_LIGHT)
 
-    # Table-style rendering
     col_headers = ["Indicator", "Latest", "1-Day Δ", "1-Week Δ", "1-Month Δ", "Category"]
     table_data = []
     for _, row in tqdm(df.iterrows(), "Macro Dashboard"):
@@ -739,19 +804,16 @@ def plot_macro_dashboard(
     tbl.auto_set_font_size(False)
     tbl.set_fontsize(9)
 
-    # Style header
     for j in range(len(col_headers)):
         tbl[(0, j)].set_facecolor(GS_NAVY)
         tbl[(0, j)].set_text_props(color="white", fontweight="bold")
 
-    # Style data rows
     for i, row_data in tqdm(enumerate(table_data, start=1), "Macro Dashboard (Style Data Rows)"):
         cat = row_data[-1]
         bg = GS_LIGHT if i % 2 == 0 else "white"
         for j in range(len(col_headers)):
             tbl[(i, j)].set_facecolor(bg)
             tbl[(i, j)].set_text_props(color=GS_NAVY)
-        # Color change cells
         for j_chg in [2, 3, 4]:
             chg_text = row_data[j_chg]
             color = GS_GREEN if "▲" in chg_text else GS_RED if "▼" in chg_text else GS_GREY
@@ -774,25 +836,30 @@ def build_research_charts(
     charts_dir: Path,
     as_of_date: str,
     top_tickers: Optional[List[str]] = None,
-    quiet: bool = False,  # Added to support --quiet flag
-) -> Dict[str, Path]:
+    quiet: bool = False,
+    static: bool = False,  # Issue #10: False = interactive HTML, True = PNG-only (PDF mode)
+) -> Dict[str, Union[Path, Tuple[Optional[Path], Optional[str]]]]:
     """
-    Orchestrate all chart generation. Returns dict of {chart_name: file_path}.
-    Wrapped with tqdm for professional progress tracking.
+    Orchestrate all chart generation.
+
+    Returns dict of:
+      - {chart_name: Path}               when static=True  (PNG-only, backward-compatible)
+      - {chart_name: (Path|None, str|None)}  when static=False (PNG + Plotly HTML div)
+
+    Pass static=True to force PNG-only output (e.g. for WeasyPrint PDF generation).
     """
     import sys
     from tqdm import tqdm
 
     charts_dir = Path(charts_dir)
     charts_dir.mkdir(parents=True, exist_ok=True)
-    generated: Dict[str, Path] = {}
+    generated: Dict[str, Union[Path, Tuple[Optional[Path], Optional[str]]]] = {}
 
     tag = as_of_date.replace("-", "_")
+    plotly_mode = not static
 
-    # The Master Switch (Maintainer Requirement)
     disable_prog = quiet or not sys.stdout.isatty()
 
-    # Calculate total potential tasks: 5 global charts + (3 charts * top 3 tickers)
     tickers_to_process = (top_tickers or [])[:3]
     total_tasks = 5 + (len(tickers_to_process) * 3)
 
@@ -801,13 +868,13 @@ def build_research_charts(
         if not sector_returns.empty:
             p = charts_dir / f"sector_heatmap_{tag}.png"
             try:
-                plot_sector_heatmap(sector_returns, p)
-                generated["sector_heatmap"] = p
+                result = plot_sector_heatmap(sector_returns, p, plotly_mode=plotly_mode)
+                generated["sector_heatmap"] = result
             except Exception:
                 pass
         pbar.update(1)
 
-        # 2. Screen score dashboard
+        # 2. Screen score dashboard (PNG only — stacked bar, no Plotly upgrade yet)
         if not research_df.empty:
             p = charts_dir / f"screen_dashboard_{tag}.png"
             try:
@@ -817,7 +884,7 @@ def build_research_charts(
                 pass
         pbar.update(1)
 
-        # 3. Risk-return scatter
+        # 3. Risk-return scatter (PNG only)
         if not risk_table.empty:
             p = charts_dir / f"risk_return_{tag}.png"
             try:
@@ -834,13 +901,13 @@ def build_research_charts(
             try:
                 corr = correlation_matrix(prices_df[us_eq_cols])
                 p = charts_dir / f"correlation_heatmap_{tag}.png"
-                plot_correlation_heatmap(corr, p)
-                generated["correlation_heatmap"] = p
+                result = plot_correlation_heatmap(corr, p, plotly_mode=plotly_mode)
+                generated["correlation_heatmap"] = result
             except Exception:
                 pass
         pbar.update(1)
 
-        # 5. Macro dashboard
+        # 5. Macro dashboard (PNG only)
         if not macro_snapshot.empty:
             p = charts_dir / f"macro_dashboard_{tag}.png"
             try:
@@ -871,7 +938,7 @@ def build_research_charts(
                     pass
                 pbar.update(1)
 
-                # Factor radar
+                # Factor radar + DCF sensitivity (uses plotly_mode for DCF)
                 p = charts_dir / f"radar_{ticker}_{tag}.png"
                 try:
                     if not research_df.empty and ticker in research_df.index:
@@ -879,14 +946,14 @@ def build_research_charts(
                                                     "momentum_score", "forward_score"]
                                         if c in research_df.columns]
                         if factor_cols:
-                            # ... (radar chart logic as before) ...
+                            scores = research_df.loc[ticker, factor_cols].to_dict()
+                            universe_median = research_df[factor_cols].median().to_dict()
                             plot_factor_radar(scores, ticker, p, universe_median)
                             generated[f"radar_{ticker}"] = p
                 except Exception:
                     pass
                 pbar.update(1)
             else:
-                # Skip 3 steps if ticker missing to keep bar synced
                 pbar.update(3)
 
     return generated
