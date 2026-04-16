@@ -232,50 +232,70 @@ For questions or ideas, open a [Discussion](https://github.com/DogInfantry/sells
 
 ## Roadmap
 
-Items marked 🟢 are open issues ready to be picked up. See the [Issues tab](https://github.com/DogInfantry/sellside-research-engine/issues) for full specs and context.
+Items marked 🟢 are open issues ready to be picked up. See the [Issues tab](https://github.com/DogInfantry/sellside-research-engine/issues) for full specs and acceptance criteria.
 
-### 🧱 Engineering & Infrastructure
-- ✅ [Add `--dry-run` flag for input validation without live API calls](https://github.com/DogInfantry/sellside-research-engine/issues/1) — **shipped in v1.3.0**
-- ✅ [Add `tqdm` progress bars to fetch and report-build stages](https://github.com/DogInfantry/sellside-research-engine/issues/5) — **shipped in v1.3.0**
+---
+
+### 🏁 Milestone: v1.4 — Depth & Credibility
+
+> Make the research note defensible. These close the largest credibility gaps between a sophisticated demo and an institutional-grade engine.
+
+#### Fundamentals & Filings
+- 🟢 [10-K/10-Q Filings Intelligence — MD&A parser, risk-factor change detection, segment extraction](https://github.com/DogInfantry/sellside-research-engine/issues/19)
+- 🟢 [Estimate & revision layer — consensus revision tracking, surprise history, target-price drift](https://github.com/DogInfantry/sellside-research-engine/issues/20)
+- 🟢 [Insider / Form 4 parser — management buy/sell signals from SEC filings](https://github.com/DogInfantry/sellside-research-engine/issues/25)
+- 🟢 [FRED API connector — CPI, PCE, credit spreads, yield curve](https://github.com/DogInfantry/sellside-research-engine/issues/8)
+
+#### Valuation Engine
+- 🟢 [Monte Carlo DCF + EV bridge — scenario engine with sector-specific assumption packs](https://github.com/DogInfantry/sellside-research-engine/issues/23)
+- 🟢 [Peer dashboard & CCA upgrade — historical multiples, percentile bands, peer re-rating analysis](https://github.com/DogInfantry/sellside-research-engine/issues/24)
+- 🟢 [Piotroski F-Score and Altman Z-Score in screening model](https://github.com/DogInfantry/sellside-research-engine/issues/7)
+
+#### Output & Auditability
+- 🟢 [Executive summary page — 6-field note header (rating, target, variant view, thesis, risks, catalyst)](https://github.com/DogInfantry/sellside-research-engine/issues/21)
+- 🟢 [Audit trail panel — source, timestamp, and assumption provenance for every key claim](https://github.com/DogInfantry/sellside-research-engine/issues/22)
+- 🟢 ["What changed since last note" delta blocks — versioned thesis, target, estimate, and risk diffs](https://github.com/DogInfantry/sellside-research-engine/issues/26)
+- 🟢 [Interactive HTML report — replace static PNGs with Plotly charts](https://github.com/DogInfantry/sellside-research-engine/issues/10)
+
+---
+
+### 🏗️ Milestone: v1.5 — Infrastructure & Packaging
+
+> Make the repo look built, not hacked. These don't add features — they make every existing feature credible to a technical reviewer.
+
 - 🟢 [GitHub Actions CI — run pytest on every PR automatically](https://github.com/DogInfantry/sellside-research-engine/issues/4)
 - 🟢 [Docker + docker-compose for reproducible execution](https://github.com/DogInfantry/sellside-research-engine/issues/11)
-- [ ] Async data fetching (`asyncio` + `aiohttp`) to parallelize source calls
-- [ ] Redis-backed caching layer with TTL invalidation
+- 🟢 [config.yaml — replace direct Python file editing for watchlists, weights, and output preferences](https://github.com/DogInfantry/sellside-research-engine/issues/27)
+- 🟢 [Integration tests with mocked APIs — fixture-based test coverage for SEC, Yahoo, FRED](https://github.com/DogInfantry/sellside-research-engine/issues/28)
+- 🟢 [Sample notebooks + pre-rendered demo artifacts — zero-friction portfolio preview](https://github.com/DogInfantry/sellside-research-engine/issues/29)
+- 🟢 [Unit tests for `catalyst.py`](https://github.com/DogInfantry/sellside-research-engine/issues/2)
 
-### 📊 Analytics & Valuation
-- ✅ [Reverse DCF — solve for growth rate implied by current price](https://github.com/DogInfantry/sellside-research-engine/issues/6) — **shipped in v1.3.0**
-- 🟢 [Piotroski F-Score and Altman Z-Score in screening model](https://github.com/DogInfantry/sellside-research-engine/issues/7)
+---
+
+### 🔭 Backlog (no issue yet)
+
+#### Analytics
 - [ ] Forward multiples in CCA (NTM EV/EBITDA, forward P/E)
 - [ ] LBO model stub — entry/exit with sponsor IRR
-- [ ] Monte Carlo DCF — stochastic FCF and WACC simulation
-- [ ] EV bridge — auto-compute net debt, minority interest, preferred from XBRL
+- [ ] Event study module — abnormal returns around earnings and macro catalysts
+- [ ] Ranking explainability layer — factor attribution and sensitivity for screener output
 
-### 🔌 Data Sources
-- 🟢 [FRED API connector — CPI, PCE, credit spreads, yield curve](https://github.com/DogInfantry/sellside-research-engine/issues/8)
-- [ ] SEC Form 4 XBRL parser for insider transactions
+#### Data Sources
 - [ ] OpenBB Platform SDK as optional aggregated source layer
 - [ ] SEDAR+ / Companies House for Canadian and UK filings
-
-### 🤖 LLM Reasoning Layer
-- ✅ [Earnings transcript RAG pipeline — tone scoring, guidance extraction, risk flags](https://github.com/DogInfantry/sellside-research-engine/issues/9) — **shipped in v1.3.0**
-- [ ] 10-K/10-Q MD&A summarization (liquidity, risk factors, outlook)
 - [ ] News catalyst detection — map headlines to catalyst calendar
-- [ ] Pluggable LLM backend (OpenAI / local Ollama / Mistral)
 
-### 📁 Reporting & Output
-- 🟢 [Interactive HTML report — replace static PNGs with Plotly charts](https://github.com/DogInfantry/sellside-research-engine/issues/10)
+#### Reporting
 - [ ] PowerPoint export (`python-pptx`) matching GS/JPM slide deck format
 - [ ] Excel DCF model export (`openpyxl`) with live formula links
 - [ ] Streamlit multi-ticker comparison dashboard
 
-### 🧪 Tests & Documentation
-- ✅ [Document `analyst_views.csv` column schema](https://github.com/DogInfantry/sellside-research-engine/issues/3) — **shipped in v1.2.0**
-- 🟢 [Unit tests for `catalyst.py`](https://github.com/DogInfantry/sellside-research-engine/issues/2)
-- [ ] Integration test suite with mock API responses
-- [ ] Jupyter notebook examples in `notebooks/`
-- [ ] Docstrings audit across all `analytics/` functions
+#### Engineering
+- [ ] Async data fetching (`asyncio` + `aiohttp`) to parallelise source calls
+- [ ] Redis-backed caching layer with TTL invalidation
+- [ ] Pluggable LLM backend (OpenAI / local Ollama / Mistral)
 
-> Want to tackle a roadmap item without an open issue? Open one to discuss scope before building.
+> Want to tackle a backlog item? Open an issue to discuss scope before building.
 
 ---
 
