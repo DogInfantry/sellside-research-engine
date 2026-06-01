@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Sellside Research Engine — Institutional Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.26.0/plotly.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#C9A84C;--green:#4CAF50;--red:#E57373;--amber:#FFB300;
+  --bg:#0d0e11;--card:#13151a;--hover:#1a1d24;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.04);
+  --t1:#e8e6e0;--t2:#7a7a7a;--t3:#4a4a4a;
+}
+body{background:var(--bg);color:var(--t1);font-family:'JetBrains Mono','Fira Code','Courier New',monospace;-webkit-font-smoothing:antialiased;min-height:100vh}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:#2a2a2a;border-radius:2px}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* TOPBAR */
+.topbar{border-bottom:1px solid var(--border)}
+.brand-row{display:flex;align-items:center;justify-content:space-between;padding:10px 24px;border-bottom:1px solid var(--border2)}
+.brand{font-size:13px;font-weight:600;letter-spacing:3px}
+.brand span{color:var(--gold)}
+.status-row{display:flex;gap:16px;font-size:10px;color:var(--t3);letter-spacing:1px;align-items:center}
+.live-dot{width:5px;height:5px;border-radius:50%;background:var(--green);display:inline-block;margin-right:5px;animation:blink 2s infinite}
+.ticker-strip{display:flex;overflow-x:auto;padding:0 24px}
+.tick-btn{display:flex;flex-direction:column;padding:10px 20px;background:transparent;border:none;border-bottom:2px solid transparent;cursor:pointer;text-align:left;min-width:110px;transition:all .15s;font-family:inherit}
+.tick-btn.active{background:rgba(201,168,76,0.06);border-bottom-color:var(--gold)}
+.tick-sym{font-size:10px;letter-spacing:1.5px;color:var(--t2);font-weight:600;margin-bottom:2px}
+.tick-btn.active .tick-sym{color:var(--gold)}
+.tick-price{font-size:14px;font-weight:500;color:var(--t1)}
+.tick-chg{font-size:10px}
+
+/* LAYOUT */
+.page{padding:0}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:16px 24px}
+.row2{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:10px;padding:0 24px;margin-bottom:10px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:10px;padding:0 24px;margin-bottom:10px}
+.row4{padding:0 24px;margin-bottom:10px}
+.row5{display:grid;grid-template-columns:1.6fr 1fr 1.2fr;gap:10px;padding:0 24px;margin-bottom:32px}
+
+/* CARD */
+.card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px 16px}
+.card-title{font-size:9px;letter-spacing:2px;color:var(--t3);text-transform:uppercase;margin-bottom:12px}
+
+/* KPI */
+.kpi-val{font-size:20px;font-weight:500;margin-bottom:4px}
+.kpi-sub{font-size:10px;color:var(--t2);line-height:1.4}
+.pos{color:var(--green)}.neg{color:var(--red)}.gold{color:var(--gold)}
+
+/* PILLS */
+.pill{padding:2px 10px;border-radius:3px;font-size:10px;letter-spacing:1px;font-weight:600;display:inline-block}
+.pill-buy{background:rgba(76,175,80,.12);color:var(--green);border:1px solid rgba(76,175,80,.3)}
+.pill-hold{background:rgba(255,179,0,.12);color:var(--amber);border:1px solid rgba(255,179,0,.3)}
+.pill-sell{background:rgba(229,115,115,.12);color:var(--red);border:1px solid rgba(229,115,115,.3)}
+
+/* SCREENER TABLE */
+.screener-wrap{padding:0 24px;margin-bottom:10px}
+.sec-label{font-size:9px;letter-spacing:2px;color:var(--t3);text-transform:uppercase;margin-bottom:8px}
+table{width:100%;border-collapse:collapse;font-size:11px}
+th{padding:8px 12px;color:var(--t3);text-align:left;font-weight:500;font-size:9px;letter-spacing:1px;border-bottom:1px solid var(--border)}
+td{padding:8px 12px;border-bottom:1px solid var(--border2)}
+tr:hover td{background:rgba(255,255,255,0.015);cursor:pointer}
+tr.active-row td{background:rgba(201,168,76,0.05)}
+
+/* SIGNAL BOX */
+.signal-box{border-left:2px solid var(--gold);padding:7px 10px;background:rgba(255,255,255,0.02);border-radius:0 4px 4px 0;margin-bottom:8px;font-size:11px;color:var(--t2);line-height:1.6}
+.signal-box.risk{border-left-color:var(--red)}
+.signal-label{font-size:8px;letter-spacing:1.5px;color:var(--gold);margin-bottom:3px;text-transform:uppercase}
+.signal-box.risk .signal-label{color:var(--red)}
+.tag{font-size:10px;padding:2px 8px;border-radius:3px;display:inline-block;margin:2px}
+
+/* FOOTER */
+.footer{border-top:1px solid var(--border2);padding:12px 24px;display:flex;justify-content:space-between;font-size:9px;color:var(--t3);letter-spacing:1px}
+
+/* LOADING */
+#loader{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:999}
+.loader-dots{display:flex;gap:6px}
+.loader-dot{width:6px;height:6px;border-radius:50%;background:var(--gold)}
+.loader-dot:nth-child(1){animation:blink 1.2s 0s infinite}
+.loader-dot:nth-child(2){animation:blink 1.2s .2s infinite}
+.loader-dot:nth-child(3){animation:blink 1.2s .4s infinite}
+
+/* RISK GRID */
+.risk-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.risk-cell{background:var(--bg);border-radius:4px;padding:8px 10px;border:1px solid var(--border2)}
+.risk-label{font-size:9px;color:var(--t3);letter-spacing:1px;margin-bottom:3px}
+.risk-val{font-size:14px;font-weight:500}
+
+/* CORR TABLE */
+.corr-cell{padding:4px 6px;text-align:center;border-radius:3px;font-size:10px}
+
+/* MACRO */
+.macro-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border2);font-size:11px}
+
+/* CATALYST */
+.cat-row{display:flex;gap:10px;align-items:flex-start;padding:6px 0;border-bottom:1px solid var(--border2)}
+.cat-date{font-size:9px;color:var(--gold);min-width:50px;letter-spacing:.5px}
+.cat-ticker{font-size:9px;color:var(--t2);font-weight:600;min-width:38px}
+.cat-event{font-size:10px;color:var(--t2);flex:1;line-height:1.4}
+
+/* TONE BAR */
+.tone-bar-wrap{height:3px;background:rgba(255,255,255,0.06);border-radius:2px;position:relative;margin-bottom:4px}
+.tone-bar-fill{position:absolute;left:0;height:100%;border-radius:2px;transition:width .4s}
+.tone-mid{position:absolute;left:50%;top:-2px;width:1px;height:7px;background:rgba(255,255,255,.15)}
+
+/* BAR CELL */
+.bar-cell{display:flex;align-items:center;gap:7px}
+.bar-bg{width:48px;height:4px;background:rgba(255,255,255,0.06);border-radius:2px;flex-shrink:0}
+.bar-fill{height:100%;border-radius:2px}
+</style>
+</head>
+<body>
+
+<div id="loader">
+  <div class="brand" style="font-size:13px">SELL<span>SIDE</span> RESEARCH ENGINE</div>
+  <div class="loader-dots">
+    <div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div>
+  </div>
+  <div style="font-size:10px;color:var(--t3);letter-spacing:2px">INITIALISING DASHBOARD...</div>
+</div>
+
+<div id="app" style="display:none">
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="brand-row">
+    <div class="brand">SELL<span>SIDE</span> RESEARCH ENGINE <span style="font-size:10px;color:var(--t3);letter-spacing:1px;margin-left:8px">v1.3.0</span></div>
+    <div class="status-row">
+      <span><span class="live-dot"></span>SEC EDGAR</span>
+      <span style="color:#2a2a2a">|</span>
+      <span>YAHOO FINANCE</span>
+      <span style="color:#2a2a2a">|</span>
+      <span>OPENAI NLP</span>
+      <span style="color:#2a2a2a">|</span>
+      <span id="asof" style="color:var(--t2)"></span>
+    </div>
+  </div>
+  <div class="ticker-strip" id="tickerStrip"></div>
+</div>
+
+<!-- KPI ROW -->
+<div class="kpi-grid" id="kpiGrid"></div>
+
+<!-- ROW 2: Price + Football + Reverse DCF -->
+<div class="row2">
+  <div class="card">
+    <div class="card-title">PRICE — 6 MONTH</div>
+    <div style="position:relative;height:200px" id="priceChartWrap"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">DCF VALUATION — FOOTBALL FIELD</div>
+    <div style="position:relative;height:200px" id="footballWrap"></div>
+  </div>
+  <div class="card" id="rdcfCard">
+    <div class="card-title">REVERSE DCF — IMPLIED GROWTH SENSITIVITY</div>
+    <div id="rdcfContent"></div>
+  </div>
+</div>
+
+<!-- ROW 3: Radar + Risk + Commentary -->
+<div class="row3">
+  <div class="card">
+    <div class="card-title">MULTI-FACTOR COMPOSITE</div>
+    <div style="position:relative;height:220px" id="radarWrap"></div>
+    <div id="factorList" style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:8px"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">RISK METRICS</div>
+    <div class="risk-grid" id="riskGrid"></div>
+    <div id="volRegime" style="margin-top:10px;padding:8px 10px;background:var(--bg);border-radius:4px;border:1px solid var(--border2)"></div>
+  </div>
+  <div class="card" id="commentaryCard">
+    <div class="card-title">MGMT COMMENTARY — NLP SIGNALS</div>
+    <div id="commentaryContent"></div>
+  </div>
+</div>
+
+<!-- SCREENER TABLE -->
+<div class="screener-wrap">
+  <div class="sec-label">SCREENER — WATCHLIST RANKING</div>
+  <div class="card" style="padding:0;overflow:hidden">
+    <table id="screenerTable">
+      <thead><tr>
+        <th>TICKER</th><th>COMPOSITE</th><th>VAL</th><th>GROWTH</th><th>QUALITY</th>
+        <th>MOM</th><th>CONSENSUS</th><th>PRICE</th><th>TARGET</th><th>UPSIDE</th>
+        <th>P/E</th><th>REV GRW</th><th>RATING</th>
+      </tr></thead>
+      <tbody id="screenerBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ROW 5: Correlation + Macro + Catalysts -->
+<div class="row5">
+  <div class="card">
+    <div class="card-title">CORRELATION MATRIX</div>
+    <div id="corrContent"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">MACRO SNAPSHOT</div>
+    <div id="macroContent"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">CATALYST CALENDAR</div>
+    <div id="catalystContent"></div>
+  </div>
+</div>
+
+<div class="footer">
+  <span>SELLSIDE RESEARCH ENGINE — <span class="gold">DogInfantry</span> — github.com/DogInfantry/sellside-research-engine</span>
+  <span id="genAt"></span>
+</div>
+
+</div><!-- #app -->
+
+<script>
+// ─── DATA ────────────────────────────────────────────────────────────────────
+const DATA = {
+  generated_at: new Date().toISOString(),
+  as_of: "2026-05-31",
+  macro: {
+    ust_10y:4.52, ust_2y:4.89, ust_30y:4.71, vix:14.2,
+    dxy:104.3, wti:78.4, eurusd:1.084, spread_2s10s:-0.37
+  },
+  tickers: {
+    AAPL:{ name:"Apple Inc.", sector:"Technology", price:213.45, price_change:1.23, price_change_pct:0.58,
+      market_cap_b:3280, rating:"BUY", price_target:235, composite_score:78,
+      dcf:{bear:168,base:228,bull:289,wacc:9.2,terminal_growth:2.5,fcf_yield:3.8},
+      reverse_dcf:{implied_growth:8.4,consensus_growth:11.2,stretched:false,
+        sensitivity:[
+          {wacc:7,tg:1.5,implied:6.1},{wacc:8,tg:1.5,implied:7.3},{wacc:9,tg:1.5,implied:8.4},{wacc:10,tg:1.5,implied:9.6},
+          {wacc:7,tg:2.0,implied:5.8},{wacc:8,tg:2.0,implied:7.0},{wacc:9,tg:2.0,implied:8.1},{wacc:10,tg:2.0,implied:9.3},
+          {wacc:7,tg:2.5,implied:5.5},{wacc:8,tg:2.5,implied:6.7},{wacc:9,tg:2.5,implied:7.8},{wacc:10,tg:2.5,implied:9.0},
+          {wacc:7,tg:3.0,implied:5.2},{wacc:8,tg:3.0,implied:6.4},{wacc:9,tg:3.0,implied:7.5},{wacc:10,tg:3.0,implied:8.7}
+        ]},
+      factors:{valuation:62,growth:78,quality:88,momentum:71,consensus:82},
+      risk:{var_95:-1.82,cvar:-2.41,beta:1.12,sharpe:1.34,sortino:1.89,max_drawdown:-14.2,vol_21d:18.4,vol_63d:17.1},
+      price_history:[
+        {date:"2025-12-01",price:189.2},{date:"2025-12-15",price:194.5},{date:"2026-01-01",price:191.8},
+        {date:"2026-01-15",price:198.3},{date:"2026-02-01",price:202.1},{date:"2026-02-15",price:205.7},
+        {date:"2026-03-01",price:199.4},{date:"2026-03-15",price:207.2},{date:"2026-04-01",price:210.5},
+        {date:"2026-04-15",price:208.9},{date:"2026-05-01",price:211.3},{date:"2026-05-15",price:213.45}
+      ],
+      commentary:{tone:"POSITIVE",guidance:"Q3 revenue guided +6–8% YoY; gross margins 44–45%. Services segment expected to cross $110B ARR by FY end.",
+        themes:["Services margin expansion","India market traction","AI integration roadmap","iPhone 17 cycle"],
+        risk_flags:["China demand softness","EU DMA compliance costs"],tone_score:0.72},
+      financials:{revenue_ttm_b:391,revenue_growth_yoy:6.1,net_margin:26.4,roe:147.2,debt_equity:1.52,pe_ttm:28.4,eps_next_yr:7.18}
+    },
+    MSFT:{ name:"Microsoft Corp.", sector:"Technology", price:418.72, price_change:3.11, price_change_pct:0.75,
+      market_cap_b:3110, rating:"BUY", price_target:460, composite_score:84,
+      dcf:{bear:365,base:445,bull:520,wacc:8.8,terminal_growth:2.8,fcf_yield:2.9},
+      reverse_dcf:{implied_growth:12.1,consensus_growth:14.8,stretched:false,
+        sensitivity:[
+          {wacc:7,tg:1.5,implied:10.2},{wacc:8,tg:1.5,implied:11.4},{wacc:9,tg:1.5,implied:12.5},{wacc:10,tg:1.5,implied:13.7},
+          {wacc:7,tg:2.0,implied:9.9},{wacc:8,tg:2.0,implied:11.1},{wacc:9,tg:2.0,implied:12.2},{wacc:10,tg:2.0,implied:13.4},
+          {wacc:7,tg:2.5,implied:9.6},{wacc:8,tg:2.5,implied:10.8},{wacc:9,tg:2.5,implied:11.9},{wacc:10,tg:2.5,implied:13.1},
+          {wacc:7,tg:3.0,implied:9.3},{wacc:8,tg:3.0,implied:10.5},{wacc:9,tg:3.0,implied:11.6},{wacc:10,tg:3.0,implied:12.8}
+        ]},
+      factors:{valuation:55,growth:85,quality:91,momentum:80,consensus:88},
+      risk:{var_95:-1.65,cvar:-2.21,beta:0.97,sharpe:1.56,sortino:2.14,max_drawdown:-11.8,vol_21d:15.9,vol_63d:16.4},
+      price_history:[
+        {date:"2025-12-01",price:371.2},{date:"2025-12-15",price:378.5},{date:"2026-01-01",price:382.1},
+        {date:"2026-01-15",price:389.4},{date:"2026-02-01",price:395.2},{date:"2026-02-15",price:401.8},
+        {date:"2026-03-01",price:398.3},{date:"2026-03-15",price:407.6},{date:"2026-04-01",price:412.1},
+        {date:"2026-04-15",price:409.8},{date:"2026-05-01",price:415.4},{date:"2026-05-15",price:418.72}
+      ],
+      commentary:{tone:"POSITIVE",guidance:"Cloud segment guided +21% CC; operating leverage expanding. Copilot seat attach rate accelerating across M365 commercial.",
+        themes:["Azure AI seat growth","Copilot ARPU uplift","Gaming integration","Enterprise AI deals"],
+        risk_flags:["Enterprise deal elongation","OpenAI partnership dependency"],tone_score:0.81},
+      financials:{revenue_ttm_b:245.1,revenue_growth_yoy:16.2,net_margin:35.8,roe:38.4,debt_equity:0.34,pe_ttm:32.1,eps_next_yr:15.21}
+    },
+    GOOGL:{ name:"Alphabet Inc.", sector:"Technology", price:178.33, price_change:-0.89, price_change_pct:-0.50,
+      market_cap_b:2180, rating:"BUY", price_target:205, composite_score:71,
+      dcf:{bear:145,base:192,bull:248,wacc:9.5,terminal_growth:2.2,fcf_yield:4.1},
+      reverse_dcf:{implied_growth:7.2,consensus_growth:10.5,stretched:false,
+        sensitivity:[
+          {wacc:7,tg:1.5,implied:5.4},{wacc:8,tg:1.5,implied:6.5},{wacc:9,tg:1.5,implied:7.6},{wacc:10,tg:1.5,implied:8.8},
+          {wacc:7,tg:2.0,implied:5.1},{wacc:8,tg:2.0,implied:6.2},{wacc:9,tg:2.0,implied:7.3},{wacc:10,tg:2.0,implied:8.5},
+          {wacc:7,tg:2.5,implied:4.8},{wacc:8,tg:2.5,implied:5.9},{wacc:9,tg:2.5,implied:7.0},{wacc:10,tg:2.5,implied:8.2},
+          {wacc:7,tg:3.0,implied:4.5},{wacc:8,tg:3.0,implied:5.6},{wacc:9,tg:3.0,implied:6.7},{wacc:10,tg:3.0,implied:7.9}
+        ]},
+      factors:{valuation:70,growth:72,quality:85,momentum:58,consensus:75},
+      risk:{var_95:-1.94,cvar:-2.55,beta:1.08,sharpe:1.21,sortino:1.67,max_drawdown:-16.1,vol_21d:20.2,vol_63d:19.8},
+      price_history:[
+        {date:"2025-12-01",price:162.4},{date:"2025-12-15",price:165.8},{date:"2026-01-01",price:168.2},
+        {date:"2026-01-15",price:171.5},{date:"2026-02-01",price:174.3},{date:"2026-02-15",price:176.9},
+        {date:"2026-03-01",price:172.1},{date:"2026-03-15",price:175.4},{date:"2026-04-01",price:177.8},
+        {date:"2026-04-15",price:176.2},{date:"2026-05-01",price:179.1},{date:"2026-05-15",price:178.33}
+      ],
+      commentary:{tone:"NEUTRAL",guidance:"Search revenue +12% YoY; GCP guided +28%. AI Overviews expanding to 1.5B users but query monetization dynamics still evolving.",
+        themes:["Search monetization holding","GCP accelerating","YouTube CTV growth","Gemini integration"],
+        risk_flags:["AI Overviews query impact","DOJ antitrust risk","TikTok competitive pressure"],tone_score:0.55},
+      financials:{revenue_ttm_b:350,revenue_growth_yoy:12.0,net_margin:28.6,roe:29.1,debt_equity:0.08,pe_ttm:21.4,eps_next_yr:9.52}
+    },
+    AMZN:{ name:"Amazon.com Inc.", sector:"Technology", price:195.60, price_change:2.44, price_change_pct:1.26,
+      market_cap_b:2050, rating:"BUY", price_target:230, composite_score:82,
+      dcf:{bear:162,base:218,bull:275,wacc:9.8,terminal_growth:3.0,fcf_yield:2.4},
+      reverse_dcf:{implied_growth:14.8,consensus_growth:16.2,stretched:false,
+        sensitivity:[
+          {wacc:7,tg:1.5,implied:12.8},{wacc:8,tg:1.5,implied:13.9},{wacc:9,tg:1.5,implied:15.1},{wacc:10,tg:1.5,implied:16.2},
+          {wacc:7,tg:2.0,implied:12.5},{wacc:8,tg:2.0,implied:13.6},{wacc:9,tg:2.0,implied:14.8},{wacc:10,tg:2.0,implied:15.9},
+          {wacc:7,tg:2.5,implied:12.2},{wacc:8,tg:2.5,implied:13.3},{wacc:9,tg:2.5,implied:14.5},{wacc:10,tg:2.5,implied:15.6},
+          {wacc:7,tg:3.0,implied:11.9},{wacc:8,tg:3.0,implied:13.0},{wacc:9,tg:3.0,implied:14.2},{wacc:10,tg:3.0,implied:15.3}
+        ]},
+      factors:{valuation:48,growth:91,quality:79,momentum:87,consensus:90},
+      risk:{var_95:-2.11,cvar:-2.89,beta:1.22,sharpe:1.44,sortino:1.98,max_drawdown:-18.3,vol_21d:22.1,vol_63d:21.4},
+      price_history:[
+        {date:"2025-12-01",price:171.2},{date:"2025-12-15",price:175.8},{date:"2026-01-01",price:178.4},
+        {date:"2026-01-15",price:182.1},{date:"2026-02-01",price:185.9},{date:"2026-02-15",price:188.4},
+        {date:"2026-03-01",price:184.2},{date:"2026-03-15",price:189.7},{date:"2026-04-01",price:192.4},
+        {date:"2026-04-15",price:193.1},{date:"2026-05-01",price:194.8},{date:"2026-05-15",price:195.60}
+      ],
+      commentary:{tone:"POSITIVE",guidance:"AWS Q3 guided $26–27B; operating income $13–17.5B. Advertising segment approaching $60B run rate.",
+        themes:["AWS re-acceleration","Advertising margin flywheel","Project Kuiper","AI infra capex"],
+        risk_flags:["Retail margin pressure","Elevated capex cycle"],tone_score:0.76},
+      financials:{revenue_ttm_b:620.1,revenue_growth_yoy:11.4,net_margin:8.9,roe:22.4,debt_equity:0.44,pe_ttm:38.2,eps_next_yr:6.21}
+    },
+    META:{ name:"Meta Platforms Inc.", sector:"Technology", price:522.18, price_change:-4.21, price_change_pct:-0.80,
+      market_cap_b:1320, rating:"HOLD", price_target:580, composite_score:67,
+      dcf:{bear:440,base:548,bull:660,wacc:10.2,terminal_growth:2.8,fcf_yield:3.1},
+      reverse_dcf:{implied_growth:16.2,consensus_growth:14.1,stretched:true,
+        sensitivity:[
+          {wacc:7,tg:1.5,implied:14.2},{wacc:8,tg:1.5,implied:15.4},{wacc:9,tg:1.5,implied:16.5},{wacc:10,tg:1.5,implied:17.7},
+          {wacc:7,tg:2.0,implied:13.9},{wacc:8,tg:2.0,implied:15.1},{wacc:9,tg:2.0,implied:16.2},{wacc:10,tg:2.0,implied:17.4},
+          {wacc:7,tg:2.5,implied:13.6},{wacc:8,tg:2.5,implied:14.8},{wacc:9,tg:2.5,implied:15.9},{wacc:10,tg:2.5,implied:17.1},
+          {wacc:7,tg:3.0,implied:13.3},{wacc:8,tg:3.0,implied:14.5},{wacc:9,tg:3.0,implied:15.6},{wacc:10,tg:3.0,implied:16.8}
+        ]},
+      factors:{valuation:44,growth:88,quality:82,momentum:62,consensus:78},
+      risk:{var_95:-2.28,cvar:-3.12,beta:1.31,sharpe:1.18,sortino:1.61,max_drawdown:-19.7,vol_21d:24.8,vol_63d:23.2},
+      price_history:[
+        {date:"2025-12-01",price:461.2},{date:"2025-12-15",price:471.8},{date:"2026-01-01",price:480.4},
+        {date:"2026-01-15",price:490.1},{date:"2026-02-01",price:498.8},{date:"2026-02-15",price:508.2},
+        {date:"2026-03-01",price:502.6},{date:"2026-03-15",price:512.4},{date:"2026-04-01",price:518.9},
+        {date:"2026-04-15",price:515.2},{date:"2026-05-01",price:520.4},{date:"2026-05-15",price:522.18}
+      ],
+      commentary:{tone:"CAUTIOUS",guidance:"Q3 revenue $38.5–41B; total expenses $96–99B FY. Reality Labs losses continuing at ~$5B/quarter.",
+        themes:["Ad market resilience","Llama open-source strategy","Ray-Ban smart glasses","Threads monetisation"],
+        risk_flags:["Reality Labs burn rate","Regulatory EU risk","Elevated capex $38–40B"],tone_score:0.42},
+      financials:{revenue_ttm_b:164.5,revenue_growth_yoy:19.4,net_margin:38.2,roe:32.6,debt_equity:0.12,pe_ttm:24.8,eps_next_yr:24.44}
+    }
+  },
+  correlation_matrix:{
+    tickers:["AAPL","MSFT","GOOGL","AMZN","META"],
+    values:[
+      [1.00,0.72,0.68,0.61,0.58],[0.72,1.00,0.74,0.65,0.63],
+      [0.68,0.74,1.00,0.62,0.60],[0.61,0.65,0.62,1.00,0.71],
+      [0.58,0.63,0.60,0.71,1.00]
+    ]
+  },
+  catalysts:[
+    {date:"2026-06-09",ticker:"AAPL",event:"WWDC — AI roadmap reveal",type:"EVENT",conviction:"HIGH"},
+    {date:"2026-06-18",ticker:"MSFT",event:"Build developer conference",type:"EVENT",conviction:"MED"},
+    {date:"2026-07-22",ticker:"GOOGL",event:"Q2 2026 earnings",type:"EARNINGS",conviction:"HIGH"},
+    {date:"2026-07-25",ticker:"AMZN",event:"Q2 2026 earnings",type:"EARNINGS",conviction:"HIGH"},
+    {date:"2026-07-30",ticker:"META",event:"Q2 2026 earnings",type:"EARNINGS",conviction:"HIGH"},
+    {date:"2026-08-01",ticker:"AAPL",event:"Q3 FY2026 earnings",type:"EARNINGS",conviction:"HIGH"}
+  ]
+};
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let active = 'AAPL';
+let priceChart = null, footballChart = null, radarChart = null;
+
+// ─── UTILS ───────────────────────────────────────────────────────────────────
+const f = (n,d=2) => Number(n).toFixed(d);
+const pct = n => (n>=0?'+':'')+f(n,1)+'%';
+const dollar = n => '$'+Number(n).toFixed(2);
+const scoreColor = v => v>=80?'#4CAF50':v>=65?'#C9A84C':'#E57373';
+const toneColor = t => t==='POSITIVE'?'#4CAF50':t==='CAUTIOUS'?'#E57373':'#FFB300';
+
+// ─── TICKER STRIP ────────────────────────────────────────────────────────────
+function buildStrip() {
+  document.getElementById('tickerStrip').innerHTML =
+    Object.entries(DATA.tickers).map(([t,d]) => `
+      <button class="tick-btn${t===active?' active':''}" onclick="setActive('${t}')">
+        <span class="tick-sym">${t}</span>
+        <span class="tick-price">${dollar(d.price)}</span>
+        <span class="tick-chg ${d.price_change>=0?'pos':'neg'}">${d.price_change>=0?'+':''}${f(d.price_change)} (${pct(d.price_change_pct)})</span>
+      </button>`).join('');
+  document.getElementById('asof').textContent = 'AS OF '+new Date(DATA.as_of).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}).toUpperCase();
+  document.getElementById('genAt').textContent = 'GENERATED: '+new Date().toUTCString();
+}
+
+// ─── KPI CARDS ───────────────────────────────────────────────────────────────
+function buildKPIs() {
+  const d = DATA.tickers[active];
+  const upside = (d.price_target - d.price)/d.price*100;
+  const rdcf = d.reverse_dcf;
+  document.getElementById('kpiGrid').innerHTML = [
+    {label:'CURRENT PRICE', val:dollar(d.price),
+      sub:`<span class="${d.price_change>=0?'pos':'neg'}">${d.price_change>=0?'+':''}${f(d.price_change)} (${pct(d.price_change_pct)}) today</span>`},
+    {label:'DCF INTRINSIC VALUE', val:dollar(d.dcf.base),
+      sub:`<span class="${upside>=0?'pos':'neg'}">${pct(upside)} to target ${dollar(d.price_target)}</span>`},
+    {label:'REVERSE DCF — IMPLIED GROWTH', val:`<span style="color:${rdcf.stretched?'#E57373':'#4CAF50'}">${f(rdcf.implied_growth,1)}%</span>`,
+      sub:`Consensus: ${f(rdcf.consensus_growth,1)}% — <span style="color:${rdcf.stretched?'#E57373':'#4CAF50'};font-weight:600">${rdcf.stretched?'STRETCHED':'DISCOUNT'}</span>`},
+    {label:'ANALYST RATING', val:`<span class="pill pill-${d.rating.toLowerCase()}">${d.rating}</span>`,
+      sub:`Composite: <span class="gold">${d.composite_score}</span>/100`},
+    {label:'MARKET CAP', val:`$${d.market_cap_b.toLocaleString()}B`, sub:`<span style="color:var(--t2)">${d.sector}</span>`},
+    {label:'P/E (TTM)', val:`${f(d.financials.pe_ttm)}×`, sub:`EPS NTM: $${f(d.financials.eps_next_yr)}`},
+    {label:'NET MARGIN', val:`${f(d.financials.net_margin)}%`, sub:`Rev growth: <span class="pos">+${f(d.financials.revenue_growth_yoy,1)}%</span>`},
+    {label:'FCF YIELD', val:`${f(d.dcf.fcf_yield)}%`, sub:`WACC: ${f(d.dcf.wacc)}%`}
+  ].map(c=>`<div class="card"><div class="card-title">${c.label}</div><div class="kpi-val">${c.val}</div><div class="kpi-sub">${c.sub}</div></div>`).join('');
+}
+
+// ─── PRICE CHART (Plotly) ────────────────────────────────────────────────────
+function buildPriceChart() {
+  const d = DATA.tickers[active];
+  const wrap = document.getElementById('priceChartWrap');
+  wrap.innerHTML = '<div id="priceChart" style="width:100%;height:100%"></div>';
+  const dates = d.price_history.map(h=>h.date);
+  const prices = d.price_history.map(h=>h.price);
+  Plotly.newPlot('priceChart',[
+    {x:dates,y:prices,type:'scatter',mode:'lines',name:'Price',
+     line:{color:'#C9A84C',width:2},fill:'tozeroy',fillcolor:'rgba(201,168,76,0.05)'},
+    {x:[dates[0],dates[dates.length-1]],y:[d.price_target,d.price_target],type:'scatter',mode:'lines',
+     name:'Target',line:{color:'#4CAF50',width:1,dash:'dot'},showlegend:true},
+    {x:[dates[0],dates[dates.length-1]],y:[d.dcf.base,d.dcf.base],type:'scatter',mode:'lines',
+     name:'DCF Base',line:{color:'rgba(255,255,255,0.2)',width:1,dash:'dash'},showlegend:true}
+  ],{
+    paper_bgcolor:'transparent',plot_bgcolor:'transparent',
+    margin:{t:4,r:8,b:30,l:44},
+    xaxis:{showgrid:false,tickfont:{color:'#4a4a4a',size:9,family:'monospace'},tickformat:'%b %d',nticks:5},
+    yaxis:{showgrid:true,gridcolor:'rgba(255,255,255,0.04)',tickfont:{color:'#4a4a4a',size:9,family:'monospace'},tickprefix:'$'},
+    legend:{font:{color:'#7a7a7a',size:9,family:'monospace'},bgcolor:'transparent',orientation:'h',y:-0.25},
+    hovermode:'x unified',
+    hoverlabel:{bgcolor:'#1a1d24',bordercolor:'rgba(255,255,255,0.1)',font:{color:'#e8e6e0',size:11,family:'monospace'}}
+  },{displayModeBar:false,responsive:true});
+}
+
+// ─── FOOTBALL FIELD (Chart.js horizontal bar) ────────────────────────────────
+function buildFootball() {
+  const d = DATA.tickers[active];
+  const wrap = document.getElementById('footballWrap');
+  wrap.innerHTML = '<canvas id="footballChart"></canvas>';
+  if(footballChart){footballChart.destroy();footballChart=null;}
+  const ctx = document.getElementById('footballChart').getContext('2d');
+  footballChart = new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:['BEAR','BASE','BULL'],
+      datasets:[{
+        data:[d.dcf.bear,d.dcf.base,d.dcf.bull],
+        backgroundColor:['rgba(229,115,115,0.7)','rgba(201,168,76,0.7)','rgba(76,175,80,0.7)'],
+        borderColor:['#E57373','#C9A84C','#4CAF50'],
+        borderWidth:1,borderRadius:3
+      }]
+    },
+    options:{
+      indexAxis:'y',responsive:true,maintainAspectRatio:false,
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{label:ctx=>' $'+ctx.raw.toFixed(0)},
+          bodyFont:{family:'monospace',size:11},backgroundColor:'#1a1d24',borderColor:'rgba(255,255,255,0.1)',borderWidth:1}
+      },
+      scales:{
+        x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4a4a4a',font:{size:9,family:'monospace'},callback:v=>'$'+v},
+           min:Math.min(d.dcf.bear*0.88,d.price*0.88)},
+        y:{grid:{display:false},ticks:{color:'#7a7a7a',font:{size:10,family:'monospace'}}}
+      }
+    }
+  });
+  // Add current price annotation manually
+  const priceLabel = document.createElement('div');
+  priceLabel.style.cssText = `position:absolute;bottom:28px;font-size:9px;color:#C9A84C;letter-spacing:1px`;
+  priceLabel.innerHTML = `— Current $${d.price.toFixed(0)}`;
+  wrap.appendChild(priceLabel);
+}
+
+// ─── REVERSE DCF HEATMAP ─────────────────────────────────────────────────────
+function buildRDCF() {
+  const d = DATA.tickers[active];
+  const {sensitivity,implied_growth,consensus_growth,stretched} = d.reverse_dcf;
+  const waccs=[7,8,9,10],tgs=[1.5,2.0,2.5,3.0];
+  const getV=(w,t)=>(sensitivity.find(s=>s.wacc===w&&s.tg===t)||{implied:0}).implied;
+  function cellStyle(v){
+    const diff=v-consensus_growth;
+    if(diff>3)return{bg:'rgba(229,115,115,0.35)',col:'#E57373'};
+    if(diff>1)return{bg:'rgba(229,115,115,0.18)',col:'#ef9a9a'};
+    if(diff>-1)return{bg:'rgba(255,179,0,0.15)',col:'#FFB300'};
+    if(diff>-3)return{bg:'rgba(76,175,80,0.18)',col:'#81c784'};
+    return{bg:'rgba(76,175,80,0.30)',col:'#4CAF50'};
+  }
+  let html=`<div style="font-size:10px;color:var(--t2);margin-bottom:10px">
+    Implied: <span style="color:${stretched?'#E57373':'#4CAF50'};font-weight:600">${f(implied_growth,1)}%</span>
+    vs consensus ${f(consensus_growth,1)}% →
+    <span style="color:${stretched?'#E57373':'#4CAF50'};font-weight:600">${stretched?'STRETCHED':'UNDERPRICED'}</span>
+  </div>
+  <table style="width:100%;border-collapse:separate;border-spacing:2px;font-size:10px">
+  <tr><th style="padding:3px 6px;color:var(--t3);font-size:9px;font-weight:500;text-align:left">TG＼WACC</th>
+  ${waccs.map(w=>`<th style="padding:3px 6px;color:var(--t2);text-align:center;font-weight:500">${w}%</th>`).join('')}</tr>`;
+  tgs.forEach(tg=>{
+    html+=`<tr><td style="padding:3px 6px;color:#C9A84C;font-size:9px">${tg}%</td>`;
+    waccs.forEach(w=>{
+      const v=getV(w,tg);const s=cellStyle(v);
+      html+=`<td style="padding:5px 7px;background:${s.bg};color:${s.col};text-align:center;border-radius:3px;font-weight:500">${f(v,1)}</td>`;
+    });
+    html+=`</tr>`;
+  });
+  html+=`</table><div style="margin-top:8px;font-size:9px;color:var(--t3)">Red = implied > consensus → stretched valuation</div>`;
+  document.getElementById('rdcfContent').innerHTML=html;
+}
+
+// ─── FACTOR RADAR (Chart.js) ─────────────────────────────────────────────────
+function buildRadar() {
+  const f_ = DATA.tickers[active].factors;
+  const wrap = document.getElementById('radarWrap');
+  wrap.innerHTML = '<canvas id="radarChart"></canvas>';
+  if(radarChart){radarChart.destroy();radarChart=null;}
+  const ctx = document.getElementById('radarChart').getContext('2d');
+  radarChart = new Chart(ctx,{
+    type:'radar',
+    data:{
+      labels:['VALUATION','GROWTH','QUALITY','MOMENTUM','CONSENSUS'],
+      datasets:[{label:active,data:[f_.valuation,f_.growth,f_.quality,f_.momentum,f_.consensus],
+        borderColor:'#C9A84C',backgroundColor:'rgba(201,168,76,0.1)',
+        pointBackgroundColor:'#C9A84C',borderWidth:1.5,pointRadius:3}]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{bodyFont:{family:'monospace',size:11},backgroundColor:'#1a1d24',borderColor:'rgba(255,255,255,0.1)',borderWidth:1}},
+      scales:{r:{min:0,max:100,grid:{color:'rgba(255,255,255,0.06)'},
+        pointLabels:{color:'#7a7a7a',font:{size:9,family:'monospace'}},ticks:{display:false}}}
+    }
+  });
+  const factors_ = DATA.tickers[active].factors;
+  document.getElementById('factorList').innerHTML =
+    Object.entries(factors_).map(([k,v])=>`
+      <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--border2)">
+        <span style="font-size:9px;color:var(--t3);letter-spacing:1px">${k.toUpperCase()}</span>
+        <span style="font-size:10px;font-weight:600;color:${scoreColor(v)}">${v}</span>
+      </div>`).join('');
+}
+
+// ─── RISK PANEL ───────────────────────────────────────────────────────────────
+function buildRisk() {
+  const r = DATA.tickers[active].risk;
+  const riskColor=(k,v)=>{
+    if(['var_95','cvar','max_drawdown'].includes(k))return'#E57373';
+    if(k==='beta')return v>1.2?'#E57373':v>1.0?'#FFB300':'#4CAF50';
+    if(['sharpe','sortino'].includes(k))return v>1.5?'#4CAF50':v>1.0?'#FFB300':'#E57373';
+    return'#7a7a7a';
+  };
+  const metrics=[
+    ['var_95','VaR 95% (1D)',`${f(r.var_95)}%`],['cvar','CVaR (ES)',`${f(r.cvar)}%`],
+    ['beta','Beta',f(r.beta)],['sharpe','Sharpe Ratio',f(r.sharpe)],
+    ['sortino','Sortino Ratio',f(r.sortino)],['max_drawdown','Max Drawdown',`${f(r.max_drawdown)}%`],
+    ['vol_21d','Volatility 21D',`${f(r.vol_21d)}%`],['vol_63d','Volatility 63D',`${f(r.vol_63d)}%`]
+  ];
+  document.getElementById('riskGrid').innerHTML = metrics.map(([k,label,val])=>`
+    <div class="risk-cell"><div class="risk-label">${label}</div>
+    <div class="risk-val" style="color:${riskColor(k,parseFloat(val))}">${val}</div></div>`).join('');
+  const ratio=r.vol_21d/r.vol_63d;
+  const trend=ratio>1.05?'RISING':ratio<0.95?'FALLING':'STABLE';
+  const tc=ratio>1.05?'#E57373':ratio<0.95?'#4CAF50':'#FFB300';
+  document.getElementById('volRegime').innerHTML=`
+    <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+      <span style="font-size:9px;color:var(--t3);letter-spacing:1px">VOL REGIME</span>
+      <span style="font-size:10px;font-weight:600;color:${tc}">${trend}</span>
+    </div>
+    <div style="height:4px;background:rgba(255,255,255,.06);border-radius:2px">
+      <div style="width:${Math.min((r.vol_21d/40)*100,100)}%;height:100%;background:${tc};opacity:.7;border-radius:2px"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:9px;color:var(--t3)">
+      <span>21D: ${f(r.vol_21d)}%</span><span>63D: ${f(r.vol_63d)}%</span>
+    </div>`;
+}
+
+// ─── COMMENTARY ───────────────────────────────────────────────────────────────
+function buildCommentary() {
+  const c = DATA.tickers[active].commentary;
+  const tc = toneColor(c.tone);
+  document.getElementById('commentaryContent').innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <span style="font-size:9px;color:var(--t3)">TONE SCORE</span>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:13px;font-weight:600;color:${tc}">${c.tone_score.toFixed(2)}</span>
+        <span class="pill" style="background:${tc}1a;color:${tc};border:1px solid ${tc}4d">${c.tone}</span>
+      </div>
+    </div>
+    <div class="tone-bar-wrap">
+      <div class="tone-bar-fill" style="width:${c.tone_score*100}%;background:${tc};opacity:.7"></div>
+      <div class="tone-mid"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:8px;color:var(--t3);margin-bottom:12px;margin-top:3px">
+      <span>BEARISH</span><span>NEUTRAL</span><span>BULLISH</span>
+    </div>
+    <div class="signal-box"><div class="signal-label">GUIDANCE</div>${c.guidance}</div>
+    <div class="signal-box">
+      <div class="signal-label">KEY THEMES</div>
+      ${c.themes.map(t=>`<span class="tag" style="background:rgba(76,175,80,.08);color:#81c784;border:1px solid rgba(76,175,80,.2)">${t}</span>`).join('')}
+    </div>
+    <div class="signal-box risk">
+      <div class="signal-label">RISK FLAGS</div>
+      ${c.risk_flags.map(f=>`<span class="tag" style="background:rgba(229,115,115,.08);color:#ef9a9a;border:1px solid rgba(229,115,115,.2)">${f}</span>`).join('')}
+    </div>`;
+}
+
+// ─── SCREENER TABLE ───────────────────────────────────────────────────────────
+function buildScreener() {
+  const rows = Object.entries(DATA.tickers)
+    .map(([t,d])=>({t,...d,upside:(d.price_target-d.price)/d.price*100}))
+    .sort((a,b)=>b.composite_score-a.composite_score);
+  document.getElementById('screenerBody').innerHTML = rows.map(r=>`
+    <tr class="${r.t===active?'active-row':''}" onclick="setActive('${r.t}')">
+      <td style="font-weight:600;color:${r.t===active?'#C9A84C':'var(--t1)'}">${r.t}${r.t===active?'<span style="font-size:8px;color:#C9A84C;margin-left:6px;opacity:.7">▶</span>':''}</td>
+      <td><div class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:${r.composite_score}%;background:${scoreColor(r.composite_score)}"></div></div>
+        <span style="color:${scoreColor(r.composite_score)};font-weight:600">${r.composite_score}</span></div></td>
+      <td style="color:var(--t2)">${r.factors.valuation}</td>
+      <td style="color:var(--t2)">${r.factors.growth}</td>
+      <td style="color:var(--t2)">${r.factors.quality}</td>
+      <td style="color:var(--t2)">${r.factors.momentum}</td>
+      <td style="color:var(--t2)">${r.factors.consensus}</td>
+      <td>${dollar(r.price)}</td>
+      <td class="gold">${dollar(r.price_target)}</td>
+      <td class="${r.upside>=0?'pos':'neg'}" style="font-weight:600">${pct(r.upside)}</td>
+      <td style="color:var(--t2)">${f(r.financials.pe_ttm)}×</td>
+      <td class="${r.financials.revenue_growth_yoy>=10?'pos':''}">+${f(r.financials.revenue_growth_yoy,1)}%</td>
+      <td><span class="pill pill-${r.rating.toLowerCase()}">${r.rating}</span></td>
+    </tr>`).join('');
+}
+
+// ─── CORRELATION MATRIX ───────────────────────────────────────────────────────
+function buildCorr() {
+  const {tickers,values} = DATA.correlation_matrix;
+  const cellStyle=v=>{
+    if(v===1.0)return{bg:'rgba(201,168,76,0.25)',col:'#C9A84C'};
+    if(v>=0.8)return{bg:'rgba(229,115,115,0.35)',col:'#E57373'};
+    if(v>=0.65)return{bg:'rgba(229,115,115,0.18)',col:'#ef9a9a'};
+    if(v>=0.5)return{bg:'rgba(255,179,0,0.12)',col:'#FFB300'};
+    return{bg:'rgba(76,175,80,0.15)',col:'#81c784'};
+  };
+  let html=`<table style="width:100%;border-collapse:separate;border-spacing:2px;font-size:10px">
+    <tr><th></th>${tickers.map(t=>`<th style="padding:3px 5px;color:var(--t2);font-weight:500;font-size:9px">${t}</th>`).join('')}</tr>`;
+  tickers.forEach((rt,i)=>{
+    html+=`<tr><td style="padding:3px 5px;color:#C9A84C;font-size:9px;letter-spacing:1px">${rt}</td>`;
+    values[i].forEach((v,j)=>{const s=cellStyle(v);html+=`<td class="corr-cell" style="background:${s.bg};color:${s.col};font-weight:${v===1.0?600:400}">${v.toFixed(2)}</td>`;});
+    html+=`</tr>`;
+  });
+  html+=`</table><div style="margin-top:8px;display:flex;gap:10px;flex-wrap:wrap">
+    ${[['rgba(229,115,115,0.35)','#E57373','≥0.80 high corr'],['rgba(255,179,0,0.12)','#FFB300','0.50–0.65'],['rgba(76,175,80,0.15)','#81c784','<0.50 low']].map(([bg,col,label])=>
+    `<span style="display:flex;align-items:center;gap:4px;font-size:9px;color:var(--t3)"><span style="width:8px;height:8px;border-radius:2px;background:${bg};border:1px solid ${col};display:inline-block"></span>${label}</span>`).join('')}
+  </div>`;
+  document.getElementById('corrContent').innerHTML=html;
+}
+
+// ─── MACRO ────────────────────────────────────────────────────────────────────
+function buildMacro() {
+  const m=DATA.macro;
+  const rows=[
+    ['10Y UST',`${m.ust_10y.toFixed(2)}%`,'+2bps',true],['2Y UST',`${m.ust_2y.toFixed(2)}%`,'+1bps',true],
+    ['2s/10s',`${m.spread_2s10s.toFixed(2)}%`,'-3bps',false],['VIX',m.vix.toFixed(1),'-0.8',false],
+    ['DXY',m.dxy.toFixed(1),'-0.2',false],['WTI',`$${m.wti.toFixed(1)}`,'+0.6',true],
+    ['EUR/USD',m.eurusd.toFixed(3),'+0.001',true]
+  ];
+  document.getElementById('macroContent').innerHTML=rows.map(([label,val,chg,up])=>{
+    const isRisk=['VIX','DXY'].includes(label);
+    const col=isRisk?(up?'#E57373':'#4CAF50'):(up?'#4CAF50':'#E57373');
+    return `<div class="macro-row"><span style="font-size:9px;color:var(--t2);letter-spacing:1px">${label}</span>
+    <span>${val} <span style="color:${col};font-size:10px">${chg}</span></span></div>`;
+  }).join('');
+}
+
+// ─── CATALYSTS ────────────────────────────────────────────────────────────────
+function buildCatalysts() {
+  const typeColor=t=>t==='EARNINGS'?{bg:'rgba(76,175,80,.12)',col:'#4CAF50'}:{bg:'rgba(201,168,76,.12)',col:'#C9A84C'};
+  const convColor=c=>c==='HIGH'?'#4CAF50':c==='MED'?'#FFB300':'#7a7a7a';
+  document.getElementById('catalystContent').innerHTML=DATA.catalysts.map(c=>{
+    const {bg,col}=typeColor(c.type);
+    const d=new Date(c.date).toLocaleDateString('en-US',{month:'short',day:'numeric'}).toUpperCase();
+    return `<div class="cat-row">
+      <span class="cat-date">${d}</span><span class="cat-ticker">${c.ticker}</span>
+      <span class="cat-event">${c.event}</span>
+      <div style="display:flex;flex-direction:column;gap:2px;align-items:flex-end">
+        <span style="font-size:8px;padding:1px 6px;border-radius:2px;background:${bg};color:${col}">${c.type}</span>
+        <span style="font-size:8px;color:${convColor(c.conviction)}">${c.conviction}</span>
+      </div></div>`;
+  }).join('');
+}
+
+// ─── RENDER ALL ───────────────────────────────────────────────────────────────
+function renderAll() {
+  buildStrip();
+  buildKPIs();
+  buildPriceChart();
+  buildFootball();
+  buildRDCF();
+  buildRadar();
+  buildRisk();
+  buildCommentary();
+  buildScreener();
+  buildCorr();
+  buildMacro();
+  buildCatalysts();
+}
+
+function setActive(t) {
+  active=t;
+  renderAll();
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+window.addEventListener('load',()=>{
+  setTimeout(()=>{
+    document.getElementById('loader').style.display='none';
+    document.getElementById('app').style.display='block';
+    renderAll();
+  },800);
+});
+</script>
+</body>
+</html>
