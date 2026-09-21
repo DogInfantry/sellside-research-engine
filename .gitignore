@@ -1,1 +1,5 @@
-Nothing needs to be added to the .gitignore file since only Python source files (.py) were modified and no build artifacts, dependencies, or temporary files were detected in the changes.
+```
+# Data cache and normalized data files
+data/cache/
+data/normalized/
+```
