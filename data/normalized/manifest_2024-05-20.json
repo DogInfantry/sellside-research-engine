@@ -1,0 +1,45 @@
+{
+  "as_of_date": "2024-05-20",
+  "generated_at": "2026-09-21T08:32:30+00:00",
+  "datasets": {
+    "fundamentals": {
+      "path": "data/normalized/sec_fundamentals_2024-05-20.csv",
+      "source": "Yahoo Finance fallback",
+      "rows": 21,
+      "issues": [
+        {
+          "ticker": "ALL",
+          "issue": "SEC request failed for https://www.sec.gov/files/company_tickers.json"
+        },
+        {
+          "ticker": "ALL",
+          "issue": "SEC fundamentals unavailable; fell back to Yahoo Finance fundamental fields."
+        }
+      ]
+    },
+    "prices": {
+      "path": "data/normalized/market_prices_2024-05-20.csv",
+      "source": "Yahoo Finance",
+      "rows": 9942,
+      "issues": []
+    },
+    "metadata": {
+      "path": "data/normalized/security_master_2024-05-20.csv",
+      "source": "Yahoo Finance",
+      "rows": 36,
+      "issues": []
+    },
+    "macro": {
+      "path": "data/normalized/ecb_macro_2024-05-20.csv",
+      "source": "ECB",
+      "rows": 1260,
+      "issues": []
+    }
+  },
+  "coverage": {
+    "us_equities": 21,
+    "sector_proxies": 10,
+    "europe_indices": 5,
+    "macro_series": 4
+  }
+}
