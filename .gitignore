@@ -1,15 +1,1 @@
-.pytest_cache/
-__pycache__/
-*.pyc
-data/cache/
-data/logs/
-data/normalized/
-*.jsonl
-tests_runtime_kpis/
-
-# Debug/scratch scripts
-test_*.py
-trg_workbench/_run_risk.py
-
-# Generated report outputs
-outputs/
+Nothing needs to be added to the .gitignore file since only Python source files (.py) were modified and no build artifacts, dependencies, or temporary files were detected in the changes.

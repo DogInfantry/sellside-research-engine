@@ -95,15 +95,13 @@ def cmd_build_report(args: argparse.Namespace) -> int:
     from trg_workbench.pipeline_v2 import build_research_report_v2
 
     formats = args.formats.split(",") if args.formats else ["html", "pdf", "markdown"]
-    static = getattr(args, "static", False)
 
-    print(f"Building research report for {args.as_of} | formats: {formats} | static={static}")
+    print(f"Building research report for {args.as_of} | formats: {formats}")
 
     outputs = build_research_report_v2(
         args.as_of,
         output_formats=formats,
         quiet=args.quiet,
-        static=static,
     )
     if not outputs:
         print("ERROR: Report generation failed. Run fetch-all first.", file=sys.stderr)
@@ -143,15 +141,6 @@ def main() -> int:
         default=datetime.today().strftime("%Y-%m-%d"),
     )
 
-    # --static flag for report commands
-    report_flags = argparse.ArgumentParser(add_help=False)
-    report_flags.add_argument(
-        "--static",
-        action="store_true",
-        default=False,
-        help="Force PNG-only charts (use for PDF/WeasyPrint output, disables Plotly interactive)",
-    )
-
     sub = parser.add_subparsers(dest="command", required=True)
 
     # fetch-all
@@ -161,8 +150,8 @@ def main() -> int:
     # build-report
     p_report = sub.add_parser(
         "build-report",
-        parents=[shared_flags, report_flags],
-        help="Build report (HTML interactive by default; use --static for PDF-safe PNG)",
+        parents=[shared_flags],
+        help="Build report (HTML, PDF, Markdown)",
     )
     p_report.add_argument("--formats", type=str, default="html,pdf,markdown")
     p_report.set_defaults(func=cmd_build_report)
@@ -170,7 +159,7 @@ def main() -> int:
     # build-all
     p_all = sub.add_parser(
         "build-all",
-        parents=[shared_flags, report_flags],
+        parents=[shared_flags],
         help="Fetch + Build",
     )
     p_all.add_argument("--formats", type=str, default="html,pdf,markdown")

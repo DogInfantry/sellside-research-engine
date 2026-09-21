@@ -51,11 +51,11 @@ def _fetch_pipeline_data(as_of: str) -> Optional[Dict[str, Any]]:
 def _transform_to_dashboard_format(pipeline_data: Dict[str, Any], as_of: str) -> Dict[str, Any]:
     """Transform pipeline data into the format expected by index.html."""
     from trg_workbench.analytics.screening import build_research_dataset, top_screen_candidates
-    from trg_workbench.analytics.risk import compute_all_risk_metrics
+    from trg_workbench.analytics.risk import build_risk_table
     from trg_workbench.analytics.valuation import (
         derive_dcf_inputs, dcf_sensitivity, football_field, reverse_dcf, scenario_analysis
     )
-    from trg_workbench.llm.reasoner import extract_management_commentary
+    from trg_workbench.llm.reasoner import analyze_transcript
     import pandas as pd
     from trg_workbench.config import DEFAULT_US_TICKERS, US_SECTOR_PROXIES
     
@@ -64,8 +64,8 @@ def _transform_to_dashboard_format(pipeline_data: Dict[str, Any], as_of: str) ->
     fundamentals_df = pd.read_csv(f"data/normalized/sec_fundamentals_{as_of}.csv")
     security_master_df = pd.read_csv(f"data/normalized/security_master_{as_of}.csv")
     
-    # Pivot prices wide
-    prices_wide = prices_df.pivot_table(index="date", columns="ticker", values="Close")
+    # Pivot prices wide (column name is 'close' lowercase)
+    prices_wide = prices_df.pivot_table(index="date", columns="ticker", values="close")
     prices_wide.index = pd.to_datetime(prices_wide.index)
     prices_wide = prices_wide.sort_index()
     
@@ -79,7 +79,7 @@ def _transform_to_dashboard_format(pipeline_data: Dict[str, Any], as_of: str) ->
     # Compute risk metrics if not exists
     risk_path = Path(f"data/normalized/risk_metrics_{as_of}.csv")
     if not risk_path.exists():
-        risk_df = compute_all_risk_metrics(prices_wide, window_short=21, window_long=63)
+        risk_df = build_risk_table(prices_wide, market_col="SPY")
         risk_df.to_csv(risk_path)
     else:
         risk_df = pd.read_csv(risk_path).set_index("ticker")
