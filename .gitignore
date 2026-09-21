@@ -1,15 +1,5 @@
-.pytest_cache/
-__pycache__/
-*.pyc
+```
+# Data cache and normalized data files
 data/cache/
-data/logs/
 data/normalized/
-*.jsonl
-tests_runtime_kpis/
-
-# Debug/scratch scripts
-test_*.py
-trg_workbench/_run_risk.py
-
-# Generated report outputs
-outputs/
+```
