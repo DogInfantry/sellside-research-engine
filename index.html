@@ -245,7 +245,7 @@ function buildStrip() {
         <span class="tick-price">${dollar(d.price)}</span>
         <span class="tick-chg ${d.price_change>=0?'pos':'neg'}">${d.price_change>=0?'+':''}${f(d.price_change)} (${pct(d.price_change_pct)})</span>
       </button>`).join('');
-  document.getElementById('asof').textContent = 'AS OF '+new Date(DATA.as_of).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}).toUpperCase();
+  document.getElementById('asof').textContent = 'AS OF '+new Date(DATA.as_of+'T12:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}).toUpperCase();
   document.getElementById('genAt').textContent = 'GENERATED: '+new Date(DATA.generated_at).toUTCString();
 }
 
@@ -537,7 +537,7 @@ function buildCatalysts() {
   if(!DATA.catalysts.length){document.getElementById('catalystContent').innerHTML='<div class="cat-row"><span class="cat-event">n/a: no upcoming earnings dates</span></div>';return;}
   document.getElementById('catalystContent').innerHTML=DATA.catalysts.map(c=>{
     const {bg,col}=typeColor(c.type);
-    const d=new Date(c.date).toLocaleDateString('en-US',{month:'short',day:'numeric'}).toUpperCase();
+    const d=new Date(c.date+'T12:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}).toUpperCase();
     return `<div class="cat-row">
       <span class="cat-date">${d}</span><span class="cat-ticker">${c.ticker}</span>
       <span class="cat-event">${c.event}</span>
