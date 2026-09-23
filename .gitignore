@@ -8,8 +8,12 @@ data/normalized/
 tests_runtime_kpis/
 
 # Debug/scratch scripts
-test_*.py
+/test_*.py
 trg_workbench/_run_risk.py
 
 # Generated report outputs
 outputs/
+
+# Local env
+.env*
+.venv/
