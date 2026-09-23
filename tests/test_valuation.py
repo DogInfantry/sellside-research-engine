@@ -1,6 +1,6 @@
 import pytest
 
-from trg_workbench.analytics.valuation import dcf_valuation, reverse_dcf
+from trg_workbench.analytics.valuation import dcf_valuation, derive_dcf_inputs, estimate_wacc, reverse_dcf
 
 
 def test_reverse_dcf_recovers_known_growth_rate():
@@ -44,3 +44,16 @@ def test_reverse_dcf_rejects_invalid_inputs():
             wacc=0.03,
             terminal_growth=0.03,
         )
+
+
+def test_derive_dcf_inputs_reads_snake_case_security_master():
+    sm_row = {"market_cap": 500.0, "total_debt": 80.0, "total_cash": 30.0, "beta": 1.4,
+              "net_income_to_common": 50.0, "revenue_growth": 0.1, "shares_outstanding": 10.0}
+    inputs = derive_dcf_inputs(sm_row, {"net_income": float("nan")})  # NaN as read from CSV
+
+    assert inputs["net_debt"] == 50.0
+    assert inputs["market_cap"] == 500.0
+    assert inputs["wacc"] == estimate_wacc(beta=1.4)
+    assert inputs["base_fcf"] == pytest.approx(40.0)
+    assert inputs["shares_outstanding"] == 10.0
+    assert derive_dcf_inputs({**sm_row, "sector": "Financial Services"}, {})["net_debt"] == 0
