@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Project notes for AI coding sessions. Keep this file current: update Current State and Next Steps when work lands.
+Shared project notes for anyone (human or AI assistant) working in this repo. Keep it to durable facts: architecture, file map, gotchas.
 
 ## Project
 Sell-side research engine: a Python pipeline that fetches market, SEC and macro data, screens stocks, runs DCF / reverse DCF / risk analytics, and writes research notes. A static dashboard (`index.html`) is deployed on Vercel at https://sellside-research-engine.vercel.app and reads `dashboard_data.json`.
@@ -30,35 +30,18 @@ python main_v2.py build-report --as-of D  -> outputs/research_note_D.html (gitig
 | `trg_workbench/analytics/summaries.py` | `build_catalyst_calendar` and report summaries |
 | `trg_workbench/llm/` | Transcript fetch + heuristic commentary (`build_management_commentary`) |
 | `trg_workbench/reporting/` | Charts, HTML/PDF/Markdown renderers, Jinja templates |
-| `trg_workbench/sources/` | Market (yfinance), SEC, ECB, US macro clients |
+| `trg_workbench/sources/` | Market (yfinance; also writes debt, cash, beta to the security master), SEC, ECB, US macro clients |
 | `export_dashboard_data.py` | Builds `dashboard_data.json` from normalized data |
 | `index.html` | Dashboard (single file, JSON loaded at runtime) |
 | `vercel.json` | Static build of `index.html` + `dashboard_data.json`, filesystem first, then SPA fallback |
 | `tests/` | pytest suite (`pytest -q`), incl. `test_export_dashboard.py` |
-
-## Current State (2026-09-23)
-- Prod is live on real data, refreshed by the bot on weekdays.
-- 2026-09-21: an AI agent (qwen.ai[bot]) merged PRs #47/#48 that broke prod (JSON routed to HTML, `NaN` in JSON, export script with wrong keys and swapped args, committed cache junk). Reverted in #49, rebuilt properly in #50.
-- Open PRs: #51 (dates parse as local noon, fixes off-by-one for US viewers), #52 (`derive_dcf_inputs` reads snake_case security-master columns, so net_debt and market_cap are no longer 0 in the DCF).
-
-## Next Steps
-1. Review and merge #51 and #52; check the Vercel preview first.
-2. Optional: add a `SEC_USER_AGENT` repo secret with a contact address for SEC requests.
-3. Beta shows n/a: SPY is not in the price universe (`trg_workbench/config.py`).
-4. Management commentary shows n/a: no cached earnings transcripts (`TRG_FETCH_TRANSCRIPTS=1` fetches live).
-5. Plotly interactive charts (issue #10) were never wired end to end; build-report forces `static=True` as a stopgap.
 
 ## Gotchas
 - Keep the legacy `builds` in `vercel.json`. Without it Vercel may auto-detect `requirements.txt` / `main.py` as a Python app. Any new static file the page fetches must be added to `builds`.
 - Export writes JSON with `allow_nan=False`. Missing values become `null` and render as `n/a`. Never fill gaps with invented numbers or placeholder text.
 - `data/`, `outputs/`, `.venv/`, `.env*` are gitignored. A few old sample outputs are tracked; do not add new generated files.
 - `.gitignore` has `/test_*.py` (root scratch scripts only); real tests live in `tests/`.
-- On the dev PC the default Python is 3.14; use a 3.12 venv (`py -3.12 -m venv .venv`). CI uses 3.12.
-- `derive_dcf_inputs` expects specific column names; check `data/normalized/*` headers before trusting DCF inputs.
-- JS: `new Date('YYYY-MM-DD')` is UTC midnight; parse date-only strings as local time.
-- AI agents and bots: open a PR and check the Vercel preview before merging. Do not merge straight to `main`.
-
-## Conventions
-- Commit and push only as the DogInfantry GitHub identity (repo-local `git config`). No AI co-author trailers or "generated with" footers.
-- No em dashes in commits, PRs, docs or UI copy.
-- Shortest working diff; reuse existing helpers before adding new code; one runnable check for non-trivial logic.
+- Use Python 3.12 (CI does); newer versions may not satisfy `requirements.txt`. Local venv goes in `.venv/`.
+- `derive_dcf_inputs` reads snake_case security-master columns (camelCase kept as fallback). Financial Services names get `net_debt = 0` on purpose: bank debt and cash are operating balances.
+- JS: `new Date('YYYY-MM-DD')` is UTC midnight; `index.html` appends `T12:00` so dates do not shift a day in US timezones.
+- Open a PR for every change and check its Vercel preview before merging, including changes made by bots or AI agents.
