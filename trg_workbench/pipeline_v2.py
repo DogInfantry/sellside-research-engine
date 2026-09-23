@@ -144,6 +144,63 @@ def fetch_data_v2(as_of: str) -> Dict[str, Any]:
     }
 
 
+def value_ticker(
+    ticker: str,
+    security_master_df: pd.DataFrame,
+    fundamentals_df: pd.DataFrame,
+    prices_wide: pd.DataFrame,
+) -> Optional[Dict[str, Any]]:
+    """DCF scenarios, sensitivity, football field and reverse DCF for one ticker.
+    Returns None when there is no FCF proxy. Shared by the report and the dashboard export."""
+    from trg_workbench.analytics.valuation import (
+        derive_dcf_inputs,
+        dcf_sensitivity,
+        football_field,
+        reverse_dcf,
+        scenario_analysis,
+    )
+
+    sm_row = security_master_df[security_master_df["ticker"] == ticker].iloc[0].to_dict() if ticker in security_master_df["ticker"].values else {}
+    sec_row = fundamentals_df[fundamentals_df["ticker"] == ticker].iloc[0].to_dict() if ticker in fundamentals_df["ticker"].values else {}
+
+    inputs = derive_dcf_inputs(sm_row, sec_row)
+    if inputs["base_fcf"] == 0:
+        return None
+
+    scenarios = scenario_analysis(inputs["base_fcf"], inputs["base_growth"], inputs["wacc"], inputs["net_debt"], inputs["shares_outstanding"])
+    sensitivity_df = dcf_sensitivity(inputs["base_fcf"], [inputs["base_growth"] * (0.85 ** i) for i in range(5)], inputs["net_debt"], inputs["shares_outstanding"])
+    current_price = float(prices_wide[ticker].dropna().iloc[-1]) if ticker in prices_wide.columns else 0
+
+    ff = football_field(ticker=ticker, current_price=current_price,
+                        dcf_base=scenarios["Base Case"]["intrinsic_value_per_share"],
+                        dcf_bull=scenarios["Bull Case"]["intrinsic_value_per_share"],
+                        dcf_bear=scenarios["Bear Case"]["intrinsic_value_per_share"])
+
+    reverse_dcf_result = None
+    if current_price > 0:
+        try:
+            reverse_dcf_result = reverse_dcf(
+                current_price=current_price,
+                shares_outstanding=inputs["shares_outstanding"],
+                net_debt=inputs["net_debt"],
+                base_fcf=inputs["base_fcf"],
+                wacc=inputs["wacc"],
+                terminal_growth=scenarios["Base Case"]["tgr_used"],
+            )
+        except ValueError as exc:
+            logger.warning("Reverse DCF failed for %s: %s", ticker, exc)
+
+    return {
+        "ticker": ticker,
+        "inputs": inputs,
+        "scenarios": scenarios,
+        "sensitivity_df": sensitivity_df,
+        "football_field": ff,
+        "current_price": current_price,
+        "reverse_dcf": reverse_dcf_result,
+    }
+
+
 # ─── v2 report builder ────────────────────────────────────────────────────────
 
 def build_research_report_v2(
@@ -224,63 +281,18 @@ def build_research_report_v2(
     # 2c. Valuation analytics for top 3 names
     logger.info("Running valuation analytics...")
     dcf_results = []
-    from trg_workbench.analytics.valuation import (
-        derive_dcf_inputs,
-        dcf_sensitivity,
-        football_field,
-        reverse_dcf,
-        scenario_analysis,
-    )
 
     _tc = "ticker" if "ticker" in top_candidates.columns else None
     top3 = list(top_candidates.head(3)[_tc].values) if (not top_candidates.empty and _tc) else []
-    
+
     for ticker in tqdm(top3, desc="Computing valuations", disable=disable_prog):
         try:
-            sm_row = security_master_df[security_master_df["ticker"] == ticker].iloc[0].to_dict() if ticker in security_master_df["ticker"].values else {}
-            sec_row = fundamentals_df[fundamentals_df["ticker"] == ticker].iloc[0].to_dict() if ticker in fundamentals_df["ticker"].values else {}
-            
-            inputs = derive_dcf_inputs(sm_row, sec_row)
-            if inputs["base_fcf"] == 0:
+            result = value_ticker(ticker, security_master_df, fundamentals_df, prices_wide)
+            if result is None:
                 continue
-
-            scenarios = scenario_analysis(inputs["base_fcf"], inputs["base_growth"], inputs["wacc"], inputs["net_debt"], inputs["shares_outstanding"])
-            sensitivity_df = dcf_sensitivity(inputs["base_fcf"], [inputs["base_growth"] * (0.85 ** i) for i in range(5)], inputs["net_debt"], inputs["shares_outstanding"])
-            current_price = float(prices_wide[ticker].dropna().iloc[-1]) if ticker in prices_wide.columns else 0
-
-            ff = football_field(ticker=ticker, current_price=current_price, 
-                                dcf_base=scenarios["Base Case"]["intrinsic_value_per_share"],
-                                dcf_bull=scenarios["Bull Case"]["intrinsic_value_per_share"],
-                                dcf_bear=scenarios["Bear Case"]["intrinsic_value_per_share"])
-
-            reverse_dcf_result = None
-            if current_price > 0:
-                try:
-                    reverse_dcf_result = reverse_dcf(
-                        current_price=current_price,
-                        shares_outstanding=inputs["shares_outstanding"],
-                        net_debt=inputs["net_debt"],
-                        base_fcf=inputs["base_fcf"],
-                        wacc=inputs["wacc"],
-                        terminal_growth=scenarios["Base Case"]["tgr_used"],
-                    )
-                except ValueError as exc:
-                    logger.warning("Reverse DCF failed for %s: %s", ticker, exc)
-
-            dcf_results.append(
-                {
-                    "ticker": ticker,
-                    "inputs": inputs,
-                    "scenarios": scenarios,
-                    "sensitivity_df": sensitivity_df,
-                    "football_field": ff,
-                    "current_price": current_price,
-                    "reverse_dcf": reverse_dcf_result,
-                }
-            )
-            
+            dcf_results.append(result)
             if disable_prog:
-                logger.info("Valuation complete for %s (Base: $%.2f)", ticker, scenarios["Base Case"]["intrinsic_value_per_share"])
+                logger.info("Valuation complete for %s (Base: $%.2f)", ticker, result["scenarios"]["Base Case"]["intrinsic_value_per_share"])
         except Exception as exc:
             logger.warning("Valuation failed for %s: %s", ticker, exc)
 
