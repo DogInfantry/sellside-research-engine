@@ -77,6 +77,7 @@ class MarketDataClient:
                 "analyst_buy_ratio",
                 "next_earnings_date",
                 "total_debt",
+                "revenue_growth_next_year",
             }
             if required_columns.issubset(cached.columns):
                 return cached
@@ -123,7 +124,8 @@ class MarketDataClient:
                     "return_on_equity": info.get("returnOnEquity"),
                     "total_revenue": info.get("totalRevenue"),
                     "net_income_to_common": info.get("netIncomeToCommon"),
-                    "shares_outstanding": info.get("sharesOutstanding"),
+                    # implied count covers all share classes (GOOGL A+B+C); sharesOutstanding is one class
+                    "shares_outstanding": info.get("impliedSharesOutstanding") or info.get("sharesOutstanding"),
                     "market_cap": info.get("marketCap"),
                     "total_debt": info.get("totalDebt"),
                     "total_cash": info.get("totalCash"),
@@ -189,6 +191,10 @@ class MarketDataClient:
             payload[f"eps_avg_{suffix}"] = row.get("avg")
             payload[f"eps_growth_{suffix}"] = row.get("growth")
             payload[f"eps_analysts_{suffix}"] = row.get("numberOfAnalysts")
+        try:
+            payload["revenue_growth_next_year"] = ticker_obj.get_revenue_estimate().loc["+1y", "growth"]
+        except Exception:  # noqa: BLE001  missing estimate stays n/a
+            pass
         return payload
 
     @staticmethod

@@ -35,7 +35,7 @@ from trg_workbench.pipeline_v2 import (
     value_ticker,
 )
 
-WACCS = [7, 8, 9, 10]
+WACC_STEPS = [-2, -1, 0, 1, 2]  # pct points around each ticker's own WACC
 TGS = [1.5, 2.0, 2.5, 3.0]
 FACTORS = {"valuation": "valuation_score", "growth": "growth_score", "quality": "quality_score",
            "momentum": "momentum_score", "consensus": "forward_score"}
@@ -68,8 +68,7 @@ def ticker_block(row: pd.Series, px: pd.Series, val: dict | None, risk: pd.Serie
     rating = "N/A" if upside is None else "BUY" if upside > 0.10 else "SELL" if upside < -0.10 else "HOLD"
 
     dcf = dict.fromkeys(["bear", "base", "bull", "wacc", "terminal_growth", "fcf_yield"])
-    rdcf = {"implied_growth": None, "consensus_growth": num(row.get("forward_eps_growth"), 100, 1),
-            "stretched": False, "sensitivity": []}
+    rdcf = {"implied_growth": None, "consensus_growth": None, "stretched": False, "sensitivity": []}
     if val:
         sc, inputs = val["scenarios"], val["inputs"]
         dcf = {
@@ -82,9 +81,12 @@ def ticker_block(row: pd.Series, px: pd.Series, val: dict | None, risk: pd.Serie
         }
         if val["reverse_dcf"]:
             rdcf["implied_growth"] = num(val["reverse_dcf"]["implied_growth_rate"], 100, 1)
+        # same consensus revenue growth the DCF uses; n/a when there is no estimate
+        rdcf["consensus_growth"] = num(inputs.get("consensus_growth"), 100, 1)
+        waccs = [round(dcf["wacc"] + s, 1) for s in WACC_STEPS]
         rdcf["sensitivity"] = [
             {"wacc": w, "tg": tg, "implied": num(implied_growth(price, inputs, w / 100, tg / 100), 100, 1)}
-            for tg in TGS for w in WACCS
+            for tg in TGS for w in waccs
         ]
         if rdcf["implied_growth"] is not None and rdcf["consensus_growth"] is not None:
             rdcf["stretched"] = rdcf["implied_growth"] > rdcf["consensus_growth"]

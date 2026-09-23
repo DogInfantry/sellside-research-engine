@@ -23,7 +23,15 @@ def test_ticker_block_has_real_dcf_and_strict_json():
 
     assert block["dcf"]["base"] > 0
     assert -90 < block["reverse_dcf"]["implied_growth"] < 100
-    assert len(block["reverse_dcf"]["sensitivity"]) == 16
+    assert len(block["reverse_dcf"]["sensitivity"]) == 20
+    assert block["dcf"]["wacc"] in {s["wacc"] for s in block["reverse_dcf"]["sensitivity"]}  # grid centered on own WACC
     assert block["factors"]["valuation"] is None  # NaN becomes null, not a fake number
     assert block["rating"] == "BUY"
     json.dumps(block, allow_nan=False)  # raises if any NaN/inf leaks into the JSON
+
+
+def test_value_ticker_skips_banks():
+    sm = pd.DataFrame([{"ticker": "BNK", "industry": "Banks - Diversified",
+                        "net_income_to_common": 1e9, "shares_outstanding": 1e8}])
+    fundamentals = pd.DataFrame([{"ticker": "BNK", "net_income": 1e9, "shares_outstanding": 1e8}])
+    assert value_ticker("BNK", sm, fundamentals, pd.DataFrame({"BNK": [10.0, 11.0]})) is None
