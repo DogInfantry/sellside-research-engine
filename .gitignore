@@ -1,41 +1,15 @@
-```
-# Python compiled files
+.pytest_cache/
 __pycache__/
 *.pyc
-*.pyo
-*.pyd
-
-# Data cache and temporary data files
 data/cache/
-data/normalized/
-
-# Logs
-*.log
 data/logs/
+data/normalized/
+*.jsonl
+tests_runtime_kpis/
 
-# Environment files
-.env
-.env.local
-*.env.*
+# Debug/scratch scripts
+test_*.py
+trg_workbench/_run_risk.py
 
-# Dependencies
-.venv/
-venv/
-node_modules/
-
-# IDE and editor files
-.vscode/
-.idea/
-*.swp
-*.swo
-*.tmp
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# Build artifacts
-build/
-dist/
-target/
-```
+# Generated report outputs
+outputs/
