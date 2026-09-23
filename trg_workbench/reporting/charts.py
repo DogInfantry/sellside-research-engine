@@ -941,12 +941,12 @@ def build_research_charts(
                 # Factor radar + DCF sensitivity (uses plotly_mode for DCF)
                 p = charts_dir / f"radar_{ticker}_{tag}.png"
                 try:
-                    if not research_df.empty and ticker in research_df.index:
+                    if not research_df.empty and ticker in research_df["ticker"].values:
                         factor_cols = [c for c in ["valuation_score", "growth_score", "quality_score",
                                                     "momentum_score", "forward_score"]
                                         if c in research_df.columns]
                         if factor_cols:
-                            scores = research_df.loc[ticker, factor_cols].to_dict()
+                            scores = research_df.loc[research_df["ticker"] == ticker, factor_cols].iloc[0].to_dict()
                             universe_median = research_df[factor_cols].median().to_dict()
                             plot_factor_radar(scores, ticker, p, universe_median)
                             generated[f"radar_{ticker}"] = p

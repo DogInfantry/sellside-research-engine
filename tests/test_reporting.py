@@ -1,5 +1,31 @@
+import pandas as pd
+
+from trg_workbench.reporting.charts import build_research_charts
 from trg_workbench.reporting.pdf_renderer import render_html_report
 from trg_workbench.reporting.renderers import render_template
+
+
+def test_factor_radar_renders_for_research_df_with_ticker_column(tmp_path):
+    # build_research_dataset returns a RangeIndex with tickers in a column
+    research_df = pd.DataFrame(
+        {
+            "ticker": ["AAA", "BBB", "CCC"],
+            "valuation_score": [0.9, 0.5, 0.1],
+            "growth_score": [0.8, 0.4, 0.2],
+            "quality_score": [0.7, 0.6, 0.3],
+        }
+    )
+    prices = pd.DataFrame(
+        {"AAA": [100.0 + i for i in range(70)]},
+        index=pd.bdate_range("2026-01-01", periods=70),
+    )
+
+    charts = build_research_charts(
+        prices, research_df, pd.DataFrame(), pd.DataFrame(), pd.DataFrame(),
+        tmp_path, "2026-04-08", top_tickers=["AAA"], quiet=True, static=True,
+    )
+
+    assert "radar_AAA" in charts
 
 
 def test_daily_template_renders_key_sections():
