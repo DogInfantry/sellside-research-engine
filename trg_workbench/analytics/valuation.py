@@ -370,16 +370,23 @@ def derive_dcf_inputs(ticker_meta: Dict, sec_data: Dict) -> Dict:
     Uses net income as FCF proxy (× 0.80 capex haircut).
     Falls back gracefully where data is missing.
     """
-    net_income = sec_data.get("net_income") or ticker_meta.get("netIncomeToCommon", 0)
-    revenue_growth = sec_data.get("revenue_growth") or ticker_meta.get("revenueGrowth", 0.05)
-    shares = sec_data.get("shares_outstanding") or ticker_meta.get("sharesOutstanding", 1)
-    market_cap = ticker_meta.get("marketCap", 0)
-    total_debt = ticker_meta.get("totalDebt", 0)
-    total_cash = ticker_meta.get("totalCash", 0)
-    beta_val = ticker_meta.get("beta", 1.0) or 1.0
+    def pick(d: Dict, *keys, default=None):
+        # security master is snake_case; camelCase kept for raw yfinance info. Skips None/NaN.
+        return next((d[k] for k in keys if d.get(k) is not None and not pd.isna(d[k])), default)
+
+    net_income = pick(sec_data, "net_income") or pick(ticker_meta, "net_income_to_common", "netIncomeToCommon", default=0)
+    revenue_growth = pick(sec_data, "revenue_growth") or pick(ticker_meta, "revenue_growth", "revenueGrowth", default=0.05)
+    shares = pick(sec_data, "shares_outstanding") or pick(ticker_meta, "shares_outstanding", "sharesOutstanding", default=1)
+    market_cap = pick(ticker_meta, "market_cap", "marketCap", default=0)
+    total_debt = pick(ticker_meta, "total_debt", "totalDebt", default=0)
+    total_cash = pick(ticker_meta, "total_cash", "totalCash", default=0)
+    beta_val = pick(ticker_meta, "beta", default=1.0) or 1.0
 
     base_fcf = (net_income or 0) * 0.80
     net_debt = (total_debt or 0) - (total_cash or 0)
+    # ponytail: bank debt/cash is operating balance sheet (JEF cash > 6x mcap), so no bridge for financials; also zeroes BLK/LAZ small corporate net debt
+    if ticker_meta.get("sector") == "Financial Services":
+        net_debt = 0
     wacc = estimate_wacc(beta=beta_val)
 
     return {

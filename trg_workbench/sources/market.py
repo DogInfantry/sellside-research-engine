@@ -76,6 +76,7 @@ class MarketDataClient:
                 "target_upside",
                 "analyst_buy_ratio",
                 "next_earnings_date",
+                "total_debt",
             }
             if required_columns.issubset(cached.columns):
                 return cached
@@ -124,6 +125,9 @@ class MarketDataClient:
                     "net_income_to_common": info.get("netIncomeToCommon"),
                     "shares_outstanding": info.get("sharesOutstanding"),
                     "market_cap": info.get("marketCap"),
+                    "total_debt": info.get("totalDebt"),
+                    "total_cash": info.get("totalCash"),
+                    "beta": info.get("beta"),
                     "trailing_pe": info.get("trailingPE"),
                     "forward_pe": info.get("forwardPE"),
                     "instrument_group": instrument_group,
