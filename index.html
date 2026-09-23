@@ -220,34 +220,148 @@ tr.active-row td{background:rgba(201,168,76,0.05)}
 </div><!-- #app -->
 
 <script>
-// ─── DATA LOADING ──────────────────────────────────────────────────────────────
-let DATA = null;
-let DATA_LOADED = false;
-let LOAD_ERROR = null;
-
-// Load dashboard data from JSON file
-async function loadDashboardData() {
-  try {
-    const response = await fetch('dashboard_data.json');
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+// ─── DATA ────────────────────────────────────────────────────────────────────
+const DATA = {
+  generated_at: new Date().toISOString(),
+  as_of: "2026-05-31",
+  macro: {
+    ust_10y:4.52, ust_2y:4.89, ust_30y:4.71, vix:14.2,
+    dxy:104.3, wti:78.4, eurusd:1.084, spread_2s10s:-0.37
+  },
+  tickers: {
+    AAPL:{ name:"Apple Inc.", sector:"Technology", price:213.45, price_change:1.23, price_change_pct:0.58,
+      market_cap_b:3280, rating:"BUY", price_target:235, composite_score:78,
+      dcf:{bear:168,base:228,bull:289,wacc:9.2,terminal_growth:2.5,fcf_yield:3.8},
+      reverse_dcf:{implied_growth:8.4,consensus_growth:11.2,stretched:false,
+        sensitivity:[
+          {wacc:7,tg:1.5,implied:6.1},{wacc:8,tg:1.5,implied:7.3},{wacc:9,tg:1.5,implied:8.4},{wacc:10,tg:1.5,implied:9.6},
+          {wacc:7,tg:2.0,implied:5.8},{wacc:8,tg:2.0,implied:7.0},{wacc:9,tg:2.0,implied:8.1},{wacc:10,tg:2.0,implied:9.3},
+          {wacc:7,tg:2.5,implied:5.5},{wacc:8,tg:2.5,implied:6.7},{wacc:9,tg:2.5,implied:7.8},{wacc:10,tg:2.5,implied:9.0},
+          {wacc:7,tg:3.0,implied:5.2},{wacc:8,tg:3.0,implied:6.4},{wacc:9,tg:3.0,implied:7.5},{wacc:10,tg:3.0,implied:8.7}
+        ]},
+      factors:{valuation:62,growth:78,quality:88,momentum:71,consensus:82},
+      risk:{var_95:-1.82,cvar:-2.41,beta:1.12,sharpe:1.34,sortino:1.89,max_drawdown:-14.2,vol_21d:18.4,vol_63d:17.1},
+      price_history:[
+        {date:"2025-12-01",price:189.2},{date:"2025-12-15",price:194.5},{date:"2026-01-01",price:191.8},
+        {date:"2026-01-15",price:198.3},{date:"2026-02-01",price:202.1},{date:"2026-02-15",price:205.7},
+        {date:"2026-03-01",price:199.4},{date:"2026-03-15",price:207.2},{date:"2026-04-01",price:210.5},
+        {date:"2026-04-15",price:208.9},{date:"2026-05-01",price:211.3},{date:"2026-05-15",price:213.45}
+      ],
+      commentary:{tone:"POSITIVE",guidance:"Q3 revenue guided +6–8% YoY; gross margins 44–45%. Services segment expected to cross $110B ARR by FY end.",
+        themes:["Services margin expansion","India market traction","AI integration roadmap","iPhone 17 cycle"],
+        risk_flags:["China demand softness","EU DMA compliance costs"],tone_score:0.72},
+      financials:{revenue_ttm_b:391,revenue_growth_yoy:6.1,net_margin:26.4,roe:147.2,debt_equity:1.52,pe_ttm:28.4,eps_next_yr:7.18}
+    },
+    MSFT:{ name:"Microsoft Corp.", sector:"Technology", price:418.72, price_change:3.11, price_change_pct:0.75,
+      market_cap_b:3110, rating:"BUY", price_target:460, composite_score:84,
+      dcf:{bear:365,base:445,bull:520,wacc:8.8,terminal_growth:2.8,fcf_yield:2.9},
+      reverse_dcf:{implied_growth:12.1,consensus_growth:14.8,stretched:false,
+        sensitivity:[
+          {wacc:7,tg:1.5,implied:10.2},{wacc:8,tg:1.5,implied:11.4},{wacc:9,tg:1.5,implied:12.5},{wacc:10,tg:1.5,implied:13.7},
+          {wacc:7,tg:2.0,implied:9.9},{wacc:8,tg:2.0,implied:11.1},{wacc:9,tg:2.0,implied:12.2},{wacc:10,tg:2.0,implied:13.4},
+          {wacc:7,tg:2.5,implied:9.6},{wacc:8,tg:2.5,implied:10.8},{wacc:9,tg:2.5,implied:11.9},{wacc:10,tg:2.5,implied:13.1},
+          {wacc:7,tg:3.0,implied:9.3},{wacc:8,tg:3.0,implied:10.5},{wacc:9,tg:3.0,implied:11.6},{wacc:10,tg:3.0,implied:12.8}
+        ]},
+      factors:{valuation:55,growth:85,quality:91,momentum:80,consensus:88},
+      risk:{var_95:-1.65,cvar:-2.21,beta:0.97,sharpe:1.56,sortino:2.14,max_drawdown:-11.8,vol_21d:15.9,vol_63d:16.4},
+      price_history:[
+        {date:"2025-12-01",price:371.2},{date:"2025-12-15",price:378.5},{date:"2026-01-01",price:382.1},
+        {date:"2026-01-15",price:389.4},{date:"2026-02-01",price:395.2},{date:"2026-02-15",price:401.8},
+        {date:"2026-03-01",price:398.3},{date:"2026-03-15",price:407.6},{date:"2026-04-01",price:412.1},
+        {date:"2026-04-15",price:409.8},{date:"2026-05-01",price:415.4},{date:"2026-05-15",price:418.72}
+      ],
+      commentary:{tone:"POSITIVE",guidance:"Cloud segment guided +21% CC; operating leverage expanding. Copilot seat attach rate accelerating across M365 commercial.",
+        themes:["Azure AI seat growth","Copilot ARPU uplift","Gaming integration","Enterprise AI deals"],
+        risk_flags:["Enterprise deal elongation","OpenAI partnership dependency"],tone_score:0.81},
+      financials:{revenue_ttm_b:245.1,revenue_growth_yoy:16.2,net_margin:35.8,roe:38.4,debt_equity:0.34,pe_ttm:32.1,eps_next_yr:15.21}
+    },
+    GOOGL:{ name:"Alphabet Inc.", sector:"Technology", price:178.33, price_change:-0.89, price_change_pct:-0.50,
+      market_cap_b:2180, rating:"BUY", price_target:205, composite_score:71,
+      dcf:{bear:145,base:192,bull:248,wacc:9.5,terminal_growth:2.2,fcf_yield:4.1},
+      reverse_dcf:{implied_growth:7.2,consensus_growth:10.5,stretched:false,
+        sensitivity:[
+          {wacc:7,tg:1.5,implied:5.4},{wacc:8,tg:1.5,implied:6.5},{wacc:9,tg:1.5,implied:7.6},{wacc:10,tg:1.5,implied:8.8},
+          {wacc:7,tg:2.0,implied:5.1},{wacc:8,tg:2.0,implied:6.2},{wacc:9,tg:2.0,implied:7.3},{wacc:10,tg:2.0,implied:8.5},
+          {wacc:7,tg:2.5,implied:4.8},{wacc:8,tg:2.5,implied:5.9},{wacc:9,tg:2.5,implied:7.0},{wacc:10,tg:2.5,implied:8.2},
+          {wacc:7,tg:3.0,implied:4.5},{wacc:8,tg:3.0,implied:5.6},{wacc:9,tg:3.0,implied:6.7},{wacc:10,tg:3.0,implied:7.9}
+        ]},
+      factors:{valuation:70,growth:72,quality:85,momentum:58,consensus:75},
+      risk:{var_95:-1.94,cvar:-2.55,beta:1.08,sharpe:1.21,sortino:1.67,max_drawdown:-16.1,vol_21d:20.2,vol_63d:19.8},
+      price_history:[
+        {date:"2025-12-01",price:162.4},{date:"2025-12-15",price:165.8},{date:"2026-01-01",price:168.2},
+        {date:"2026-01-15",price:171.5},{date:"2026-02-01",price:174.3},{date:"2026-02-15",price:176.9},
+        {date:"2026-03-01",price:172.1},{date:"2026-03-15",price:175.4},{date:"2026-04-01",price:177.8},
+        {date:"2026-04-15",price:176.2},{date:"2026-05-01",price:179.1},{date:"2026-05-15",price:178.33}
+      ],
+      commentary:{tone:"NEUTRAL",guidance:"Search revenue +12% YoY; GCP guided +28%. AI Overviews expanding to 1.5B users but query monetization dynamics still evolving.",
+        themes:["Search monetization holding","GCP accelerating","YouTube CTV growth","Gemini integration"],
+        risk_flags:["AI Overviews query impact","DOJ antitrust risk","TikTok competitive pressure"],tone_score:0.55},
+      financials:{revenue_ttm_b:350,revenue_growth_yoy:12.0,net_margin:28.6,roe:29.1,debt_equity:0.08,pe_ttm:21.4,eps_next_yr:9.52}
+    },
+    AMZN:{ name:"Amazon.com Inc.", sector:"Technology", price:195.60, price_change:2.44, price_change_pct:1.26,
+      market_cap_b:2050, rating:"BUY", price_target:230, composite_score:82,
+      dcf:{bear:162,base:218,bull:275,wacc:9.8,terminal_growth:3.0,fcf_yield:2.4},
+      reverse_dcf:{implied_growth:14.8,consensus_growth:16.2,stretched:false,
+        sensitivity:[
+          {wacc:7,tg:1.5,implied:12.8},{wacc:8,tg:1.5,implied:13.9},{wacc:9,tg:1.5,implied:15.1},{wacc:10,tg:1.5,implied:16.2},
+          {wacc:7,tg:2.0,implied:12.5},{wacc:8,tg:2.0,implied:13.6},{wacc:9,tg:2.0,implied:14.8},{wacc:10,tg:2.0,implied:15.9},
+          {wacc:7,tg:2.5,implied:12.2},{wacc:8,tg:2.5,implied:13.3},{wacc:9,tg:2.5,implied:14.5},{wacc:10,tg:2.5,implied:15.6},
+          {wacc:7,tg:3.0,implied:11.9},{wacc:8,tg:3.0,implied:13.0},{wacc:9,tg:3.0,implied:14.2},{wacc:10,tg:3.0,implied:15.3}
+        ]},
+      factors:{valuation:48,growth:91,quality:79,momentum:87,consensus:90},
+      risk:{var_95:-2.11,cvar:-2.89,beta:1.22,sharpe:1.44,sortino:1.98,max_drawdown:-18.3,vol_21d:22.1,vol_63d:21.4},
+      price_history:[
+        {date:"2025-12-01",price:171.2},{date:"2025-12-15",price:175.8},{date:"2026-01-01",price:178.4},
+        {date:"2026-01-15",price:182.1},{date:"2026-02-01",price:185.9},{date:"2026-02-15",price:188.4},
+        {date:"2026-03-01",price:184.2},{date:"2026-03-15",price:189.7},{date:"2026-04-01",price:192.4},
+        {date:"2026-04-15",price:193.1},{date:"2026-05-01",price:194.8},{date:"2026-05-15",price:195.60}
+      ],
+      commentary:{tone:"POSITIVE",guidance:"AWS Q3 guided $26–27B; operating income $13–17.5B. Advertising segment approaching $60B run rate.",
+        themes:["AWS re-acceleration","Advertising margin flywheel","Project Kuiper","AI infra capex"],
+        risk_flags:["Retail margin pressure","Elevated capex cycle"],tone_score:0.76},
+      financials:{revenue_ttm_b:620.1,revenue_growth_yoy:11.4,net_margin:8.9,roe:22.4,debt_equity:0.44,pe_ttm:38.2,eps_next_yr:6.21}
+    },
+    META:{ name:"Meta Platforms Inc.", sector:"Technology", price:522.18, price_change:-4.21, price_change_pct:-0.80,
+      market_cap_b:1320, rating:"HOLD", price_target:580, composite_score:67,
+      dcf:{bear:440,base:548,bull:660,wacc:10.2,terminal_growth:2.8,fcf_yield:3.1},
+      reverse_dcf:{implied_growth:16.2,consensus_growth:14.1,stretched:true,
+        sensitivity:[
+          {wacc:7,tg:1.5,implied:14.2},{wacc:8,tg:1.5,implied:15.4},{wacc:9,tg:1.5,implied:16.5},{wacc:10,tg:1.5,implied:17.7},
+          {wacc:7,tg:2.0,implied:13.9},{wacc:8,tg:2.0,implied:15.1},{wacc:9,tg:2.0,implied:16.2},{wacc:10,tg:2.0,implied:17.4},
+          {wacc:7,tg:2.5,implied:13.6},{wacc:8,tg:2.5,implied:14.8},{wacc:9,tg:2.5,implied:15.9},{wacc:10,tg:2.5,implied:17.1},
+          {wacc:7,tg:3.0,implied:13.3},{wacc:8,tg:3.0,implied:14.5},{wacc:9,tg:3.0,implied:15.6},{wacc:10,tg:3.0,implied:16.8}
+        ]},
+      factors:{valuation:44,growth:88,quality:82,momentum:62,consensus:78},
+      risk:{var_95:-2.28,cvar:-3.12,beta:1.31,sharpe:1.18,sortino:1.61,max_drawdown:-19.7,vol_21d:24.8,vol_63d:23.2},
+      price_history:[
+        {date:"2025-12-01",price:461.2},{date:"2025-12-15",price:471.8},{date:"2026-01-01",price:480.4},
+        {date:"2026-01-15",price:490.1},{date:"2026-02-01",price:498.8},{date:"2026-02-15",price:508.2},
+        {date:"2026-03-01",price:502.6},{date:"2026-03-15",price:512.4},{date:"2026-04-01",price:518.9},
+        {date:"2026-04-15",price:515.2},{date:"2026-05-01",price:520.4},{date:"2026-05-15",price:522.18}
+      ],
+      commentary:{tone:"CAUTIOUS",guidance:"Q3 revenue $38.5–41B; total expenses $96–99B FY. Reality Labs losses continuing at ~$5B/quarter.",
+        themes:["Ad market resilience","Llama open-source strategy","Ray-Ban smart glasses","Threads monetisation"],
+        risk_flags:["Reality Labs burn rate","Regulatory EU risk","Elevated capex $38–40B"],tone_score:0.42},
+      financials:{revenue_ttm_b:164.5,revenue_growth_yoy:19.4,net_margin:38.2,roe:32.6,debt_equity:0.12,pe_ttm:24.8,eps_next_yr:24.44}
     }
-    DATA = await response.json();
-    DATA_LOADED = true;
-    console.log('[Dashboard] Data loaded:', DATA.as_of, 'tickers:', Object.keys(DATA.tickers).length);
-  } catch (error) {
-    LOAD_ERROR = error.message;
-    console.error('[Dashboard] Failed to load data:', error);
-    document.getElementById('loader').innerHTML = `
-      <div style="text-align:center;color:#E57373">
-        <h2 style="margin-bottom:16px;font-size:18px">Failed to Load Dashboard Data</h2>
-        <p style="font-size:12px;margin-bottom:8px">${error.message}</p>
-        <p style="font-size:11px;color:var(--t3)">Make sure to run: python export_dashboard_data.py</p>
-        <p style="font-size:11px;color:var(--t3)">Then commit and push dashboard_data.json to trigger Vercel deploy</p>
-      </div>
-    `;
-  }
-}
+  },
+  correlation_matrix:{
+    tickers:["AAPL","MSFT","GOOGL","AMZN","META"],
+    values:[
+      [1.00,0.72,0.68,0.61,0.58],[0.72,1.00,0.74,0.65,0.63],
+      [0.68,0.74,1.00,0.62,0.60],[0.61,0.65,0.62,1.00,0.71],
+      [0.58,0.63,0.60,0.71,1.00]
+    ]
+  },
+  catalysts:[
+    {date:"2026-06-09",ticker:"AAPL",event:"WWDC — AI roadmap reveal",type:"EVENT",conviction:"HIGH"},
+    {date:"2026-06-18",ticker:"MSFT",event:"Build developer conference",type:"EVENT",conviction:"MED"},
+    {date:"2026-07-22",ticker:"GOOGL",event:"Q2 2026 earnings",type:"EARNINGS",conviction:"HIGH"},
+    {date:"2026-07-25",ticker:"AMZN",event:"Q2 2026 earnings",type:"EARNINGS",conviction:"HIGH"},
+    {date:"2026-07-30",ticker:"META",event:"Q2 2026 earnings",type:"EARNINGS",conviction:"HIGH"},
+    {date:"2026-08-01",ticker:"AAPL",event:"Q3 FY2026 earnings",type:"EARNINGS",conviction:"HIGH"}
+  ]
+};
 
 // ─── STATE ───────────────────────────────────────────────────────────────────
 let active = 'AAPL';
@@ -591,29 +705,12 @@ function setActive(t) {
 }
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
-window.addEventListener('load', async () => {
-  // Load dashboard data first
-  await loadDashboardData();
-  
-  if (DATA_LOADED && DATA) {
-    // Set active ticker to first available if AAPL doesn't exist
-    const firstTicker = Object.keys(DATA.tickers)[0];
-    if (firstTicker && !DATA.tickers[active]) {
-      active = firstTicker;
-    }
-    
-    setTimeout(() => {
-      document.getElementById('loader').style.display = 'none';
-      document.getElementById('app').style.display = 'block';
-      renderAll();
-    }, 800);
-  } else if (!LOAD_ERROR) {
-    // Still loading
-    setTimeout(() => {
-      document.getElementById('loader').innerHTML = '<div class="loader-dots"><div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div></div><p style="font-size:12px;color:var(--t3);margin-top:16px">Loading dashboard data...</p>';
-    }, 800);
-  }
-  // If LOAD_ERROR exists, error message already shown in loadDashboardData()
+window.addEventListener('load',()=>{
+  setTimeout(()=>{
+    document.getElementById('loader').style.display='none';
+    document.getElementById('app').style.display='block';
+    renderAll();
+  },800);
 });
 </script>
 </body>

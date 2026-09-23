@@ -322,8 +322,7 @@ def build_research_report_v2(
         charts_dir=CHARTS_DIR,
         as_of_date=as_of,
         top_tickers=top3,
-        quiet=quiet,
-        static=True  # Force PNG-only for now to avoid Plotly HTML div issues
+        quiet=quiet
     )
     charts = {k: str(v) for k, v in charts_dict.items()}
 
