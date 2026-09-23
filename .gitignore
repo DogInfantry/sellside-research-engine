@@ -1,41 +1,5 @@
 ```
-# Python compiled files
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-
-# Data cache and temporary data files
+# Data cache and normalized data files
 data/cache/
 data/normalized/
-
-# Logs
-*.log
-data/logs/
-
-# Environment files
-.env
-.env.local
-*.env.*
-
-# Dependencies
-.venv/
-venv/
-node_modules/
-
-# IDE and editor files
-.vscode/
-.idea/
-*.swp
-*.swo
-*.tmp
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# Build artifacts
-build/
-dist/
-target/
 ```

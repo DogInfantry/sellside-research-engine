@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-09-21T08:32:32.795377Z",
-  "as_of": "2024-05-20",
+  "generated_at": "2026-09-21T04:44:05.585661Z",
+  "as_of": "2024-05-31",
   "macro": {
     "ust_10y": 4.5,
     "ust_2y": 4.8,
@@ -12,15 +12,245 @@
     "spread_2s10s": -0.3
   },
   "tickers": {
+    "UNH": {
+      "name": "UNH",
+      "sector": "Healthcare",
+      "price": 468.62,
+      "price_change": 12.98,
+      "price_change_pct": 2.85,
+      "market_cap_b": 0,
+      "rating": "HOLD",
+      "price_target": 469.0,
+      "composite_score": 52,
+      "dcf": {
+        "bear": 0,
+        "base": 0,
+        "bull": 0,
+        "wacc": 0,
+        "terminal_growth": 0,
+        "fcf_yield": 0
+      },
+      "reverse_dcf": {
+        "implied_growth": 0,
+        "consensus_growth": 0,
+        "stretched": false,
+        "sensitivity": []
+      },
+      "factors": {
+        "valuation": 50,
+        "growth": 50,
+        "quality": 48,
+        "momentum": 45,
+        "consensus": 75
+      },
+      "risk": {
+        "var_95": 0.0,
+        "cvar": 0.0,
+        "beta": NaN,
+        "sharpe": -0.14,
+        "sortino": -0.18,
+        "max_drawdown": -19.99,
+        "vol_21d": 0.0,
+        "vol_63d": 0.0
+      },
+      "price_history": [
+        {
+          "date": "2024-05-15",
+          "price": 489.6
+        },
+        {
+          "date": "2024-05-16",
+          "price": 493.12
+        },
+        {
+          "date": "2024-05-17",
+          "price": 496.3
+        },
+        {
+          "date": "2024-05-20",
+          "price": 489.3
+        },
+        {
+          "date": "2024-05-21",
+          "price": 495.28
+        },
+        {
+          "date": "2024-05-22",
+          "price": 493.2
+        },
+        {
+          "date": "2024-05-23",
+          "price": 488.92
+        },
+        {
+          "date": "2024-05-24",
+          "price": 480.73
+        },
+        {
+          "date": "2024-05-28",
+          "price": 476.48
+        },
+        {
+          "date": "2024-05-29",
+          "price": 458.55
+        },
+        {
+          "date": "2024-05-30",
+          "price": 455.64
+        },
+        {
+          "date": "2024-05-31",
+          "price": 468.62
+        }
+      ],
+      "commentary": {
+        "tone": "NEUTRAL",
+        "guidance": "UNH continues to show resilient performance in current market conditions.",
+        "themes": [
+          "Operational efficiency",
+          "Market share gains",
+          "Digital transformation"
+        ],
+        "risk_flags": [
+          "Macro headwinds",
+          "Competitive pressure"
+        ],
+        "tone_score": 0.55
+      },
+      "financials": {
+        "revenue_ttm_b": 0.0,
+        "revenue_growth_yoy": 0,
+        "net_margin": 3.1,
+        "roe": 14.2,
+        "debt_equity": 0,
+        "pe_ttm": 0,
+        "eps_next_yr": 0
+      }
+    },
+    "PG": {
+      "name": "PG",
+      "sector": "Consumer Defensive",
+      "price": 154.97,
+      "price_change": 1.85,
+      "price_change_pct": 1.21,
+      "market_cap_b": 0,
+      "rating": "HOLD",
+      "price_target": 155.0,
+      "composite_score": 61,
+      "dcf": {
+        "bear": 0,
+        "base": 0,
+        "bull": 0,
+        "wacc": 0,
+        "terminal_growth": 0,
+        "fcf_yield": 0
+      },
+      "reverse_dcf": {
+        "implied_growth": 0,
+        "consensus_growth": 0,
+        "stretched": false,
+        "sensitivity": []
+      },
+      "factors": {
+        "valuation": 50,
+        "growth": 50,
+        "quality": 80,
+        "momentum": 48,
+        "consensus": 75
+      },
+      "risk": {
+        "var_95": 0.0,
+        "cvar": 0.0,
+        "beta": NaN,
+        "sharpe": 0.12,
+        "sortino": 0.17,
+        "max_drawdown": -8.99,
+        "vol_21d": 0.0,
+        "vol_63d": 0.0
+      },
+      "price_history": [
+        {
+          "date": "2024-05-15",
+          "price": 156.82
+        },
+        {
+          "date": "2024-05-16",
+          "price": 158.09
+        },
+        {
+          "date": "2024-05-17",
+          "price": 157.89
+        },
+        {
+          "date": "2024-05-20",
+          "price": 157.57
+        },
+        {
+          "date": "2024-05-21",
+          "price": 158.55
+        },
+        {
+          "date": "2024-05-22",
+          "price": 158.05
+        },
+        {
+          "date": "2024-05-23",
+          "price": 155.86
+        },
+        {
+          "date": "2024-05-24",
+          "price": 155.71
+        },
+        {
+          "date": "2024-05-28",
+          "price": 153.62
+        },
+        {
+          "date": "2024-05-29",
+          "price": 152.24
+        },
+        {
+          "date": "2024-05-30",
+          "price": 153.12
+        },
+        {
+          "date": "2024-05-31",
+          "price": 154.97
+        }
+      ],
+      "commentary": {
+        "tone": "NEUTRAL",
+        "guidance": "PG continues to show resilient performance in current market conditions.",
+        "themes": [
+          "Operational efficiency",
+          "Market share gains",
+          "Digital transformation"
+        ],
+        "risk_flags": [
+          "Macro headwinds",
+          "Competitive pressure"
+        ],
+        "tone_score": 0.55
+      },
+      "financials": {
+        "revenue_ttm_b": 0.0,
+        "revenue_growth_yoy": 0,
+        "net_margin": 18.4,
+        "roe": 30.3,
+        "debt_equity": 0,
+        "pe_ttm": 0,
+        "eps_next_yr": 0
+      }
+    },
     "AAPL": {
       "name": "AAPL",
       "sector": "Technology",
-      "price": 189.24,
-      "price_change": 1.16,
-      "price_change_pct": 0.62,
+      "price": 190.43,
+      "price_change": 0.95,
+      "price_change_pct": 0.5,
       "market_cap_b": 0,
       "rating": "HOLD",
-      "price_target": 189.0,
+      "price_target": 190.0,
       "composite_score": 66,
       "dcf": {
         "bear": 0,
@@ -40,52 +270,20 @@
         "valuation": 50,
         "growth": 50,
         "quality": 100,
-        "momentum": 54,
+        "momentum": 51,
         "consensus": 75
       },
       "risk": {
         "var_95": 0.0,
         "cvar": 0.0,
         "beta": NaN,
-        "sharpe": 0.43,
-        "sortino": 0.65,
+        "sharpe": 0.37,
+        "sortino": 0.55,
         "max_drawdown": -16.61,
         "vol_21d": 0.0,
         "vol_63d": 0.0
       },
       "price_history": [
-        {
-          "date": "2024-05-03",
-          "price": 181.4
-        },
-        {
-          "date": "2024-05-06",
-          "price": 179.75
-        },
-        {
-          "date": "2024-05-07",
-          "price": 180.43
-        },
-        {
-          "date": "2024-05-08",
-          "price": 180.77
-        },
-        {
-          "date": "2024-05-09",
-          "price": 182.58
-        },
-        {
-          "date": "2024-05-10",
-          "price": 181.32
-        },
-        {
-          "date": "2024-05-13",
-          "price": 184.52
-        },
-        {
-          "date": "2024-05-14",
-          "price": 185.66
-        },
         {
           "date": "2024-05-15",
           "price": 187.93
@@ -101,6 +299,38 @@
         {
           "date": "2024-05-20",
           "price": 189.24
+        },
+        {
+          "date": "2024-05-21",
+          "price": 190.53
+        },
+        {
+          "date": "2024-05-22",
+          "price": 189.1
+        },
+        {
+          "date": "2024-05-23",
+          "price": 185.12
+        },
+        {
+          "date": "2024-05-24",
+          "price": 188.19
+        },
+        {
+          "date": "2024-05-28",
+          "price": 188.2
+        },
+        {
+          "date": "2024-05-29",
+          "price": 188.49
+        },
+        {
+          "date": "2024-05-30",
+          "price": 189.48
+        },
+        {
+          "date": "2024-05-31",
+          "price": 190.43
         }
       ],
       "commentary": {
@@ -127,15 +357,15 @@
         "eps_next_yr": 0
       }
     },
-    "JEF": {
-      "name": "JEF",
+    "BLK": {
+      "name": "BLK",
       "sector": "Financial Services",
-      "price": 44.31,
-      "price_change": -0.23,
-      "price_change_pct": -0.52,
+      "price": 731.45,
+      "price_change": 9.63,
+      "price_change_pct": 1.33,
       "market_cap_b": 0,
       "rating": "HOLD",
-      "price_target": 44.0,
+      "price_target": 731.0,
       "composite_score": 51,
       "dcf": {
         "bear": 0,
@@ -154,513 +384,21 @@
       "factors": {
         "valuation": 50,
         "growth": 50,
-        "quality": 36,
-        "momentum": 55,
-        "consensus": 75
-      },
-      "risk": {
-        "var_95": 0.0,
-        "cvar": 0.0,
-        "beta": NaN,
-        "sharpe": 1.48,
-        "sortino": 2.46,
-        "max_drawdown": -18.08,
-        "vol_21d": 0.0,
-        "vol_63d": 0.0
-      },
-      "price_history": [
-        {
-          "date": "2024-05-03",
-          "price": 41.96
-        },
-        {
-          "date": "2024-05-06",
-          "price": 42.69
-        },
-        {
-          "date": "2024-05-07",
-          "price": 42.7
-        },
-        {
-          "date": "2024-05-08",
-          "price": 42.87
-        },
-        {
-          "date": "2024-05-09",
-          "price": 42.96
-        },
-        {
-          "date": "2024-05-10",
-          "price": 43.49
-        },
-        {
-          "date": "2024-05-13",
-          "price": 43.03
-        },
-        {
-          "date": "2024-05-14",
-          "price": 43.19
-        },
-        {
-          "date": "2024-05-15",
-          "price": 44.21
-        },
-        {
-          "date": "2024-05-16",
-          "price": 44.22
-        },
-        {
-          "date": "2024-05-17",
-          "price": 44.54
-        },
-        {
-          "date": "2024-05-20",
-          "price": 44.31
-        }
-      ],
-      "commentary": {
-        "tone": "NEUTRAL",
-        "guidance": "JEF continues to show resilient performance in current market conditions.",
-        "themes": [
-          "Operational efficiency",
-          "Market share gains",
-          "Digital transformation"
-        ],
-        "risk_flags": [
-          "Macro headwinds",
-          "Competitive pressure"
-        ],
-        "tone_score": 0.55
-      },
-      "financials": {
-        "revenue_ttm_b": 0.0,
-        "revenue_growth_yoy": 0,
-        "net_margin": 10.8,
-        "roe": 8.3,
-        "debt_equity": 0,
-        "pe_ttm": 0,
-        "eps_next_yr": 0
-      }
-    },
-    "CVX": {
-      "name": "CVX",
-      "sector": "Energy",
-      "price": 146.66,
-      "price_change": -1.4,
-      "price_change_pct": -0.95,
-      "market_cap_b": 0,
-      "rating": "HOLD",
-      "price_target": 147.0,
-      "composite_score": 52,
-      "dcf": {
-        "bear": 0,
-        "base": 0,
-        "bull": 0,
-        "wacc": 0,
-        "terminal_growth": 0,
-        "fcf_yield": 0
-      },
-      "reverse_dcf": {
-        "implied_growth": 0,
-        "consensus_growth": 0,
-        "stretched": false,
-        "sensitivity": []
-      },
-      "factors": {
-        "valuation": 50,
-        "growth": 50,
         "quality": 44,
-        "momentum": 51,
+        "momentum": 44,
         "consensus": 75
       },
       "risk": {
         "var_95": 0.0,
         "cvar": 0.0,
         "beta": NaN,
-        "sharpe": -0.29,
-        "sortino": -0.38,
-        "max_drawdown": -17.01,
-        "vol_21d": 0.0,
-        "vol_63d": 0.0
-      },
-      "price_history": [
-        {
-          "date": "2024-05-03",
-          "price": 144.4
-        },
-        {
-          "date": "2024-05-06",
-          "price": 146.24
-        },
-        {
-          "date": "2024-05-07",
-          "price": 146.58
-        },
-        {
-          "date": "2024-05-08",
-          "price": 146.46
-        },
-        {
-          "date": "2024-05-09",
-          "price": 149.08
-        },
-        {
-          "date": "2024-05-10",
-          "price": 149.41
-        },
-        {
-          "date": "2024-05-13",
-          "price": 148.25
-        },
-        {
-          "date": "2024-05-14",
-          "price": 147.42
-        },
-        {
-          "date": "2024-05-15",
-          "price": 146.92
-        },
-        {
-          "date": "2024-05-16",
-          "price": 146.62
-        },
-        {
-          "date": "2024-05-17",
-          "price": 148.06
-        },
-        {
-          "date": "2024-05-20",
-          "price": 146.66
-        }
-      ],
-      "commentary": {
-        "tone": "NEUTRAL",
-        "guidance": "CVX continues to show resilient performance in current market conditions.",
-        "themes": [
-          "Operational efficiency",
-          "Market share gains",
-          "Digital transformation"
-        ],
-        "risk_flags": [
-          "Macro headwinds",
-          "Competitive pressure"
-        ],
-        "tone_score": 0.55
-      },
-      "financials": {
-        "revenue_ttm_b": 0.0,
-        "revenue_growth_yoy": 0,
-        "net_margin": 9.8,
-        "roe": 12.2,
-        "debt_equity": 0,
-        "pe_ttm": 0,
-        "eps_next_yr": 0
-      }
-    },
-    "PJT": {
-      "name": "PJT",
-      "sector": "Financial Services",
-      "price": 101.61,
-      "price_change": 2.09,
-      "price_change_pct": 2.1,
-      "market_cap_b": 0,
-      "rating": "HOLD",
-      "price_target": 102.0,
-      "composite_score": 65,
-      "dcf": {
-        "bear": 0,
-        "base": 0,
-        "bull": 0,
-        "wacc": 0,
-        "terminal_growth": 0,
-        "fcf_yield": 0
-      },
-      "reverse_dcf": {
-        "implied_growth": 0,
-        "consensus_growth": 0,
-        "stretched": false,
-        "sensitivity": []
-      },
-      "factors": {
-        "valuation": 50,
-        "growth": 50,
-        "quality": 95,
-        "momentum": 53,
-        "consensus": 75
-      },
-      "risk": {
-        "var_95": 0.0,
-        "cvar": 0.0,
-        "beta": NaN,
-        "sharpe": 1.01,
-        "sortino": 1.54,
-        "max_drawdown": -17.9,
-        "vol_21d": 0.0,
-        "vol_63d": 0.0
-      },
-      "price_history": [
-        {
-          "date": "2024-05-03",
-          "price": 97.86
-        },
-        {
-          "date": "2024-05-06",
-          "price": 97.69
-        },
-        {
-          "date": "2024-05-07",
-          "price": 97.76
-        },
-        {
-          "date": "2024-05-08",
-          "price": 97.67
-        },
-        {
-          "date": "2024-05-09",
-          "price": 98.59
-        },
-        {
-          "date": "2024-05-10",
-          "price": 99.56
-        },
-        {
-          "date": "2024-05-13",
-          "price": 99.3
-        },
-        {
-          "date": "2024-05-14",
-          "price": 99.55
-        },
-        {
-          "date": "2024-05-15",
-          "price": 98.98
-        },
-        {
-          "date": "2024-05-16",
-          "price": 97.91
-        },
-        {
-          "date": "2024-05-17",
-          "price": 99.52
-        },
-        {
-          "date": "2024-05-20",
-          "price": 101.61
-        }
-      ],
-      "commentary": {
-        "tone": "NEUTRAL",
-        "guidance": "PJT continues to show resilient performance in current market conditions.",
-        "themes": [
-          "Operational efficiency",
-          "Market share gains",
-          "Digital transformation"
-        ],
-        "risk_flags": [
-          "Macro headwinds",
-          "Competitive pressure"
-        ],
-        "tone_score": 0.55
-      },
-      "financials": {
-        "revenue_ttm_b": 0.0,
-        "revenue_growth_yoy": 0,
-        "net_margin": 10.6,
-        "roe": 37.6,
-        "debt_equity": 0,
-        "pe_ttm": 0,
-        "eps_next_yr": 0
-      }
-    },
-    "XOM": {
-      "name": "XOM",
-      "sector": "Energy",
-      "price": 110.41,
-      "price_change": -0.91,
-      "price_change_pct": -0.82,
-      "market_cap_b": 0,
-      "rating": "HOLD",
-      "price_target": 110.0,
-      "composite_score": 53,
-      "dcf": {
-        "bear": 0,
-        "base": 0,
-        "bull": 0,
-        "wacc": 0,
-        "terminal_growth": 0,
-        "fcf_yield": 0
-      },
-      "reverse_dcf": {
-        "implied_growth": 0,
-        "consensus_growth": 0,
-        "stretched": false,
-        "sensitivity": []
-      },
-      "factors": {
-        "valuation": 50,
-        "growth": 50,
-        "quality": 45,
-        "momentum": 53,
-        "consensus": 75
-      },
-      "risk": {
-        "var_95": 0.0,
-        "cvar": 0.0,
-        "beta": NaN,
-        "sharpe": 0.08,
-        "sortino": 0.13,
-        "max_drawdown": -18.73,
-        "vol_21d": 0.0,
-        "vol_63d": 0.0
-      },
-      "price_history": [
-        {
-          "date": "2024-05-03",
-          "price": 107.06
-        },
-        {
-          "date": "2024-05-06",
-          "price": 107.75
-        },
-        {
-          "date": "2024-05-07",
-          "price": 107.22
-        },
-        {
-          "date": "2024-05-08",
-          "price": 107.2
-        },
-        {
-          "date": "2024-05-09",
-          "price": 109.31
-        },
-        {
-          "date": "2024-05-10",
-          "price": 108.87
-        },
-        {
-          "date": "2024-05-13",
-          "price": 108.82
-        },
-        {
-          "date": "2024-05-14",
-          "price": 109.48
-        },
-        {
-          "date": "2024-05-15",
-          "price": 110.33
-        },
-        {
-          "date": "2024-05-16",
-          "price": 109.67
-        },
-        {
-          "date": "2024-05-17",
-          "price": 111.32
-        },
-        {
-          "date": "2024-05-20",
-          "price": 110.41
-        }
-      ],
-      "commentary": {
-        "tone": "NEUTRAL",
-        "guidance": "XOM continues to show resilient performance in current market conditions.",
-        "themes": [
-          "Operational efficiency",
-          "Market share gains",
-          "Digital transformation"
-        ],
-        "risk_flags": [
-          "Macro headwinds",
-          "Competitive pressure"
-        ],
-        "tone_score": 0.55
-      },
-      "financials": {
-        "revenue_ttm_b": 0.0,
-        "revenue_growth_yoy": 0,
-        "net_margin": 9.1,
-        "roe": 12.6,
-        "debt_equity": 0,
-        "pe_ttm": 0,
-        "eps_next_yr": 0
-      }
-    },
-    "BLK": {
-      "name": "BLK",
-      "sector": "Financial Services",
-      "price": 762.87,
-      "price_change": -6.66,
-      "price_change_pct": -0.87,
-      "market_cap_b": 0,
-      "rating": "HOLD",
-      "price_target": 763.0,
-      "composite_score": 53,
-      "dcf": {
-        "bear": 0,
-        "base": 0,
-        "bull": 0,
-        "wacc": 0,
-        "terminal_growth": 0,
-        "fcf_yield": 0
-      },
-      "reverse_dcf": {
-        "implied_growth": 0,
-        "consensus_growth": 0,
-        "stretched": false,
-        "sensitivity": []
-      },
-      "factors": {
-        "valuation": 50,
-        "growth": 50,
-        "quality": 44,
-        "momentum": 55,
-        "consensus": 75
-      },
-      "risk": {
-        "var_95": 0.0,
-        "cvar": 0.0,
-        "beta": NaN,
-        "sharpe": 0.51,
-        "sortino": 0.83,
+        "sharpe": 0.56,
+        "sortino": 0.92,
         "max_drawdown": -20.38,
         "vol_21d": 0.0,
         "vol_63d": 0.0
       },
       "price_history": [
-        {
-          "date": "2024-05-03",
-          "price": 723.76
-        },
-        {
-          "date": "2024-05-06",
-          "price": 733.92
-        },
-        {
-          "date": "2024-05-07",
-          "price": 739.87
-        },
-        {
-          "date": "2024-05-08",
-          "price": 737.42
-        },
-        {
-          "date": "2024-05-09",
-          "price": 747.65
-        },
-        {
-          "date": "2024-05-10",
-          "price": 754.8
-        },
-        {
-          "date": "2024-05-13",
-          "price": 748.79
-        },
-        {
-          "date": "2024-05-14",
-          "price": 760.75
-        },
         {
           "date": "2024-05-15",
           "price": 772.83
@@ -676,6 +414,38 @@
         {
           "date": "2024-05-20",
           "price": 762.87
+        },
+        {
+          "date": "2024-05-21",
+          "price": 762.62
+        },
+        {
+          "date": "2024-05-22",
+          "price": 757.58
+        },
+        {
+          "date": "2024-05-23",
+          "price": 743.31
+        },
+        {
+          "date": "2024-05-24",
+          "price": 740.8
+        },
+        {
+          "date": "2024-05-28",
+          "price": 730.86
+        },
+        {
+          "date": "2024-05-29",
+          "price": 716.81
+        },
+        {
+          "date": "2024-05-30",
+          "price": 721.82
+        },
+        {
+          "date": "2024-05-31",
+          "price": 731.45
         }
       ],
       "commentary": {
@@ -702,16 +472,16 @@
         "eps_next_yr": 0
       }
     },
-    "MSFT": {
-      "name": "MSFT",
-      "sector": "Technology",
-      "price": 417.97,
-      "price_change": 5.04,
-      "price_change_pct": 1.22,
+    "JPM": {
+      "name": "JPM",
+      "sector": "Financial Services",
+      "price": 193.39,
+      "price_change": 3.15,
+      "price_change_pct": 1.66,
       "market_cap_b": 0,
       "rating": "HOLD",
-      "price_target": 418.0,
-      "composite_score": 63,
+      "price_target": 193.0,
+      "composite_score": 55,
       "dcf": {
         "bear": 0,
         "base": 0,
@@ -729,73 +499,73 @@
       "factors": {
         "valuation": 50,
         "growth": 50,
-        "quality": 88,
-        "momentum": 54,
+        "quality": 55,
+        "momentum": 50,
         "consensus": 75
       },
       "risk": {
         "var_95": 0.0,
         "cvar": 0.0,
         "beta": NaN,
-        "sharpe": 1.42,
-        "sortino": 2.25,
-        "max_drawdown": -12.99,
+        "sharpe": 1.9,
+        "sortino": 2.35,
+        "max_drawdown": -13.49,
         "vol_21d": 0.0,
         "vol_63d": 0.0
       },
       "price_history": [
         {
-          "date": "2024-05-03",
-          "price": 398.9
-        },
-        {
-          "date": "2024-05-06",
-          "price": 405.64
-        },
-        {
-          "date": "2024-05-07",
-          "price": 401.52
-        },
-        {
-          "date": "2024-05-08",
-          "price": 402.7
-        },
-        {
-          "date": "2024-05-09",
-          "price": 404.45
-        },
-        {
-          "date": "2024-05-10",
-          "price": 406.82
-        },
-        {
-          "date": "2024-05-13",
-          "price": 405.82
-        },
-        {
-          "date": "2024-05-14",
-          "price": 408.61
-        },
-        {
           "date": "2024-05-15",
-          "price": 415.75
+          "price": 192.89
         },
         {
           "date": "2024-05-16",
-          "price": 413.7
+          "price": 193.24
         },
         {
           "date": "2024-05-17",
-          "price": 412.93
+          "price": 195.45
         },
         {
           "date": "2024-05-20",
-          "price": 417.97
+          "price": 186.66
+        },
+        {
+          "date": "2024-05-21",
+          "price": 190.42
+        },
+        {
+          "date": "2024-05-22",
+          "price": 189.27
+        },
+        {
+          "date": "2024-05-23",
+          "price": 187.94
+        },
+        {
+          "date": "2024-05-24",
+          "price": 191.56
+        },
+        {
+          "date": "2024-05-28",
+          "price": 190.4
+        },
+        {
+          "date": "2024-05-29",
+          "price": 189.07
+        },
+        {
+          "date": "2024-05-30",
+          "price": 190.24
+        },
+        {
+          "date": "2024-05-31",
+          "price": 193.39
         }
       ],
       "commentary": {
         "tone": "NEUTRAL",
-        "guidance": "MSFT continues to show resilient performance in current market conditions.",
+        "guidance": "JPM continues to show resilient performance in current market conditions.",
         "themes": [
           "Operational efficiency",
           "Market share gains",
@@ -810,8 +580,8 @@
       "financials": {
         "revenue_ttm_b": 0.0,
         "revenue_growth_yoy": 0,
-        "net_margin": 40.3,
-        "roe": 34.0,
+        "net_margin": 34.9,
+        "roe": 17.8,
         "debt_equity": 0,
         "pe_ttm": 0,
         "eps_next_yr": 0
@@ -820,9 +590,9 @@
     "LAZ": {
       "name": "LAZ",
       "sector": "Financial Services",
-      "price": 37.34,
-      "price_change": 0.15,
-      "price_change_pct": 0.4,
+      "price": 36.66,
+      "price_change": -0.77,
+      "price_change_pct": -2.06,
       "market_cap_b": 0,
       "rating": "HOLD",
       "price_target": 37.0,
@@ -845,52 +615,20 @@
         "valuation": 50,
         "growth": 50,
         "quality": 71,
-        "momentum": 54,
+        "momentum": 50,
         "consensus": 75
       },
       "risk": {
         "var_95": 0.0,
         "cvar": 0.0,
         "beta": NaN,
-        "sharpe": 0.63,
-        "sortino": 1.04,
+        "sharpe": 0.77,
+        "sortino": 1.31,
         "max_drawdown": -25.08,
         "vol_21d": 0.0,
         "vol_63d": 0.0
       },
       "price_history": [
-        {
-          "date": "2024-05-03",
-          "price": 35.58
-        },
-        {
-          "date": "2024-05-06",
-          "price": 36.29
-        },
-        {
-          "date": "2024-05-07",
-          "price": 35.38
-        },
-        {
-          "date": "2024-05-08",
-          "price": 35.52
-        },
-        {
-          "date": "2024-05-09",
-          "price": 35.49
-        },
-        {
-          "date": "2024-05-10",
-          "price": 35.25
-        },
-        {
-          "date": "2024-05-13",
-          "price": 35.33
-        },
-        {
-          "date": "2024-05-14",
-          "price": 36.0
-        },
         {
           "date": "2024-05-15",
           "price": 36.57
@@ -906,6 +644,38 @@
         {
           "date": "2024-05-20",
           "price": 37.34
+        },
+        {
+          "date": "2024-05-21",
+          "price": 37.51
+        },
+        {
+          "date": "2024-05-22",
+          "price": 37.14
+        },
+        {
+          "date": "2024-05-23",
+          "price": 37.02
+        },
+        {
+          "date": "2024-05-24",
+          "price": 37.91
+        },
+        {
+          "date": "2024-05-28",
+          "price": 37.5
+        },
+        {
+          "date": "2024-05-29",
+          "price": 36.88
+        },
+        {
+          "date": "2024-05-30",
+          "price": 37.43
+        },
+        {
+          "date": "2024-05-31",
+          "price": 36.66
         }
       ],
       "commentary": {
@@ -932,16 +702,16 @@
         "eps_next_yr": 0
       }
     },
-    "META": {
-      "name": "META",
-      "sector": "Communication Services",
-      "price": 465.25,
-      "price_change": -3.05,
-      "price_change_pct": -0.65,
+    "MSFT": {
+      "name": "MSFT",
+      "sector": "Technology",
+      "price": 407.94,
+      "price_change": 0.45,
+      "price_change_pct": 0.11,
       "market_cap_b": 0,
       "rating": "HOLD",
-      "price_target": 465.0,
-      "composite_score": 61,
+      "price_target": 408.0,
+      "composite_score": 62,
       "dcf": {
         "bear": 0,
         "base": 0,
@@ -959,73 +729,73 @@
       "factors": {
         "valuation": 50,
         "growth": 50,
-        "quality": 79,
-        "momentum": 53,
+        "quality": 88,
+        "momentum": 48,
         "consensus": 75
       },
       "risk": {
         "var_95": 0.0,
         "cvar": 0.0,
         "beta": NaN,
-        "sharpe": 1.78,
-        "sortino": 2.99,
-        "max_drawdown": -18.43,
+        "sharpe": 1.15,
+        "sortino": 1.69,
+        "max_drawdown": -12.99,
         "vol_21d": 0.0,
         "vol_63d": 0.0
       },
       "price_history": [
         {
-          "date": "2024-05-03",
-          "price": 448.5
-        },
-        {
-          "date": "2024-05-06",
-          "price": 462.12
-        },
-        {
-          "date": "2024-05-07",
-          "price": 464.66
-        },
-        {
-          "date": "2024-05-08",
-          "price": 468.98
-        },
-        {
-          "date": "2024-05-09",
-          "price": 471.78
-        },
-        {
-          "date": "2024-05-10",
-          "price": 472.56
-        },
-        {
-          "date": "2024-05-13",
-          "price": 464.43
-        },
-        {
-          "date": "2024-05-14",
-          "price": 468.24
-        },
-        {
           "date": "2024-05-15",
-          "price": 477.85
+          "price": 415.75
         },
         {
           "date": "2024-05-16",
-          "price": 469.61
+          "price": 413.7
         },
         {
           "date": "2024-05-17",
-          "price": 468.3
+          "price": 412.93
         },
         {
           "date": "2024-05-20",
-          "price": 465.25
+          "price": 417.97
+        },
+        {
+          "date": "2024-05-21",
+          "price": 421.61
+        },
+        {
+          "date": "2024-05-22",
+          "price": 423.06
+        },
+        {
+          "date": "2024-05-23",
+          "price": 419.6
+        },
+        {
+          "date": "2024-05-24",
+          "price": 422.71
+        },
+        {
+          "date": "2024-05-28",
+          "price": 422.87
+        },
+        {
+          "date": "2024-05-29",
+          "price": 421.74
+        },
+        {
+          "date": "2024-05-30",
+          "price": 407.49
+        },
+        {
+          "date": "2024-05-31",
+          "price": 407.94
         }
       ],
       "commentary": {
         "tone": "NEUTRAL",
-        "guidance": "META continues to show resilient performance in current market conditions.",
+        "guidance": "MSFT continues to show resilient performance in current market conditions.",
         "themes": [
           "Operational efficiency",
           "Market share gains",
@@ -1040,23 +810,23 @@
       "financials": {
         "revenue_ttm_b": 0.0,
         "revenue_growth_yoy": 0,
-        "net_margin": 29.8,
-        "roe": 29.8,
+        "net_margin": 40.3,
+        "roe": 34.0,
         "debt_equity": 0,
         "pe_ttm": 0,
         "eps_next_yr": 0
       }
     },
-    "PG": {
-      "name": "PG",
-      "sector": "Consumer Defensive",
-      "price": 157.57,
-      "price_change": -0.32,
-      "price_change_pct": -0.2,
+    "MS": {
+      "name": "MS",
+      "sector": "Financial Services",
+      "price": 92.07,
+      "price_change": 0.57,
+      "price_change_pct": 0.62,
       "market_cap_b": 0,
       "rating": "HOLD",
-      "price_target": 158.0,
-      "composite_score": 61,
+      "price_target": 92.0,
+      "composite_score": 54,
       "dcf": {
         "bear": 0,
         "base": 0,
@@ -1074,73 +844,73 @@
       "factors": {
         "valuation": 50,
         "growth": 50,
-        "quality": 80,
-        "momentum": 51,
+        "quality": 55,
+        "momentum": 47,
         "consensus": 75
       },
       "risk": {
         "var_95": 0.0,
         "cvar": 0.0,
         "beta": NaN,
-        "sharpe": 0.49,
-        "sortino": 0.72,
-        "max_drawdown": -8.99,
+        "sharpe": 0.27,
+        "sortino": 0.39,
+        "max_drawdown": -24.95,
         "vol_21d": 0.0,
         "vol_63d": 0.0
       },
       "price_history": [
         {
-          "date": "2024-05-03",
-          "price": 154.89
-        },
-        {
-          "date": "2024-05-06",
-          "price": 154.87
-        },
-        {
-          "date": "2024-05-07",
-          "price": 156.11
-        },
-        {
-          "date": "2024-05-08",
-          "price": 155.46
-        },
-        {
-          "date": "2024-05-09",
-          "price": 156.38
-        },
-        {
-          "date": "2024-05-10",
-          "price": 157.14
-        },
-        {
-          "date": "2024-05-13",
-          "price": 156.22
-        },
-        {
-          "date": "2024-05-14",
-          "price": 156.11
-        },
-        {
           "date": "2024-05-15",
-          "price": 156.82
+          "price": 94.59
         },
         {
           "date": "2024-05-16",
-          "price": 158.09
+          "price": 93.71
         },
         {
           "date": "2024-05-17",
-          "price": 157.89
+          "price": 94.31
         },
         {
           "date": "2024-05-20",
-          "price": 157.57
+          "price": 94.41
+        },
+        {
+          "date": "2024-05-21",
+          "price": 95.54
+        },
+        {
+          "date": "2024-05-22",
+          "price": 94.8
+        },
+        {
+          "date": "2024-05-23",
+          "price": 93.09
+        },
+        {
+          "date": "2024-05-24",
+          "price": 93.13
+        },
+        {
+          "date": "2024-05-28",
+          "price": 92.85
+        },
+        {
+          "date": "2024-05-29",
+          "price": 91.53
+        },
+        {
+          "date": "2024-05-30",
+          "price": 91.5
+        },
+        {
+          "date": "2024-05-31",
+          "price": 92.07
         }
       ],
       "commentary": {
         "tone": "NEUTRAL",
-        "guidance": "PG continues to show resilient performance in current market conditions.",
+        "guidance": "MS continues to show resilient performance in current market conditions.",
         "themes": [
           "Operational efficiency",
           "Market share gains",
@@ -1155,8 +925,238 @@
       "financials": {
         "revenue_ttm_b": 0.0,
         "revenue_growth_yoy": 0,
-        "net_margin": 18.4,
-        "roe": 30.3,
+        "net_margin": 25.9,
+        "roe": 18.0,
+        "debt_equity": 0,
+        "pe_ttm": 0,
+        "eps_next_yr": 0
+      }
+    },
+    "GOOGL": {
+      "name": "GOOGL",
+      "sector": "Communication Services",
+      "price": 170.87,
+      "price_change": 0.38,
+      "price_change_pct": 0.22,
+      "market_cap_b": 0,
+      "rating": "HOLD",
+      "price_target": 171.0,
+      "composite_score": 66,
+      "dcf": {
+        "bear": 0,
+        "base": 0,
+        "bull": 0,
+        "wacc": 0,
+        "terminal_growth": 0,
+        "fcf_yield": 0
+      },
+      "reverse_dcf": {
+        "implied_growth": 0,
+        "consensus_growth": 0,
+        "stretched": false,
+        "sensitivity": []
+      },
+      "factors": {
+        "valuation": 50,
+        "growth": 50,
+        "quality": 100,
+        "momentum": 49,
+        "consensus": 75
+      },
+      "risk": {
+        "var_95": 0.0,
+        "cvar": 0.0,
+        "beta": NaN,
+        "sharpe": 1.35,
+        "sortino": 1.76,
+        "max_drawdown": -14.4,
+        "vol_21d": 0.0,
+        "vol_63d": 0.0
+      },
+      "price_history": [
+        {
+          "date": "2024-05-15",
+          "price": 170.88
+        },
+        {
+          "date": "2024-05-16",
+          "price": 172.54
+        },
+        {
+          "date": "2024-05-17",
+          "price": 174.4
+        },
+        {
+          "date": "2024-05-20",
+          "price": 175.25
+        },
+        {
+          "date": "2024-05-21",
+          "price": 176.17
+        },
+        {
+          "date": "2024-05-22",
+          "price": 174.72
+        },
+        {
+          "date": "2024-05-23",
+          "price": 171.91
+        },
+        {
+          "date": "2024-05-24",
+          "price": 173.34
+        },
+        {
+          "date": "2024-05-28",
+          "price": 174.74
+        },
+        {
+          "date": "2024-05-29",
+          "price": 174.24
+        },
+        {
+          "date": "2024-05-30",
+          "price": 170.49
+        },
+        {
+          "date": "2024-05-31",
+          "price": 170.87
+        }
+      ],
+      "commentary": {
+        "tone": "NEUTRAL",
+        "guidance": "GOOGL continues to show resilient performance in current market conditions.",
+        "themes": [
+          "Operational efficiency",
+          "Market share gains",
+          "Digital transformation"
+        ],
+        "risk_flags": [
+          "Macro headwinds",
+          "Competitive pressure"
+        ],
+        "tone_score": 0.55
+      },
+      "financials": {
+        "revenue_ttm_b": 0.0,
+        "revenue_growth_yoy": 0,
+        "net_margin": 54.8,
+        "roe": 48.7,
+        "debt_equity": 0,
+        "pe_ttm": 0,
+        "eps_next_yr": 0
+      }
+    },
+    "PJT": {
+      "name": "PJT",
+      "sector": "Financial Services",
+      "price": 104.88,
+      "price_change": 0.04,
+      "price_change_pct": 0.04,
+      "market_cap_b": 0,
+      "rating": "HOLD",
+      "price_target": 105.0,
+      "composite_score": 65,
+      "dcf": {
+        "bear": 0,
+        "base": 0,
+        "bull": 0,
+        "wacc": 0,
+        "terminal_growth": 0,
+        "fcf_yield": 0
+      },
+      "reverse_dcf": {
+        "implied_growth": 0,
+        "consensus_growth": 0,
+        "stretched": false,
+        "sensitivity": []
+      },
+      "factors": {
+        "valuation": 50,
+        "growth": 50,
+        "quality": 95,
+        "momentum": 55,
+        "consensus": 75
+      },
+      "risk": {
+        "var_95": 0.0,
+        "cvar": 0.0,
+        "beta": NaN,
+        "sharpe": 1.32,
+        "sortino": 2.01,
+        "max_drawdown": -13.63,
+        "vol_21d": 0.0,
+        "vol_63d": 0.0
+      },
+      "price_history": [
+        {
+          "date": "2024-05-15",
+          "price": 98.98
+        },
+        {
+          "date": "2024-05-16",
+          "price": 97.91
+        },
+        {
+          "date": "2024-05-17",
+          "price": 99.52
+        },
+        {
+          "date": "2024-05-20",
+          "price": 101.61
+        },
+        {
+          "date": "2024-05-21",
+          "price": 102.74
+        },
+        {
+          "date": "2024-05-22",
+          "price": 102.57
+        },
+        {
+          "date": "2024-05-23",
+          "price": 103.16
+        },
+        {
+          "date": "2024-05-24",
+          "price": 105.22
+        },
+        {
+          "date": "2024-05-28",
+          "price": 106.13
+        },
+        {
+          "date": "2024-05-29",
+          "price": 103.88
+        },
+        {
+          "date": "2024-05-30",
+          "price": 104.84
+        },
+        {
+          "date": "2024-05-31",
+          "price": 104.88
+        }
+      ],
+      "commentary": {
+        "tone": "NEUTRAL",
+        "guidance": "PJT continues to show resilient performance in current market conditions.",
+        "themes": [
+          "Operational efficiency",
+          "Market share gains",
+          "Digital transformation"
+        ],
+        "risk_flags": [
+          "Macro headwinds",
+          "Competitive pressure"
+        ],
+        "tone_score": 0.55
+      },
+      "financials": {
+        "revenue_ttm_b": 0.0,
+        "revenue_growth_yoy": 0,
+        "net_margin": 10.6,
+        "roe": 37.6,
         "debt_equity": 0,
         "pe_ttm": 0,
         "eps_next_yr": 0
@@ -1165,37 +1165,37 @@
   },
   "correlation_matrix": {
     "tickers": [
+      "UNH",
+      "PG",
       "AAPL",
-      "JEF",
-      "CVX",
-      "PJT",
-      "XOM"
+      "BLK",
+      "JPM"
     ],
     "values": [
       1.0,
+      0.89,
+      0.61,
+      0.1,
+      0.4,
+      0.89,
+      1.0,
+      0.74,
+      0.05,
       0.52,
-      0.23,
-      0.7,
-      -0.09,
+      0.61,
+      0.74,
+      1.0,
+      0.0,
+      0.58,
+      0.1,
+      0.05,
+      0.0,
+      1.0,
+      0.33,
+      0.4,
       0.52,
-      1.0,
-      0.51,
-      0.15,
-      0.37,
-      0.23,
-      0.51,
-      1.0,
-      -0.16,
-      0.86,
-      0.7,
-      0.15,
-      -0.16,
-      1.0,
-      -0.52,
-      -0.09,
-      0.37,
-      0.86,
-      -0.52,
+      0.58,
+      0.33,
       1.0
     ]
   },
@@ -1209,7 +1209,7 @@
     },
     {
       "date": "2026-07-15",
-      "ticker": "AAPL",
+      "ticker": "UNH",
       "event": "Q2 Earnings",
       "type": "EARNINGS",
       "conviction": "HIGH"

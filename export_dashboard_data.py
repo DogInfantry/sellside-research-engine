@@ -150,7 +150,7 @@ def _transform_to_dashboard_format(pipeline_data: Dict[str, Any], as_of: str) ->
                     )
                     
                     rdcf = reverse_dcf(current_price, inputs["net_debt"], inputs["shares_outstanding"], 
-                                      inputs["base_fcf"], inputs["wacc"], inputs["terminal_growth"])
+                                      inputs["base_fcf"], inputs["wacc"])
                     
                     implied_growth = float(rdcf["implied_growth"].iloc[0]) if len(rdcf) > 0 else 0
                     consensus_growth = inputs["base_growth"] * 100

@@ -164,6 +164,10 @@ def reverse_dcf(
     """
     if current_price <= 0:
         raise ValueError("current_price must be positive")
+    if shares_outstanding <= 0:
+        raise ValueError("shares_outstanding must be positive")
+    if base_fcf <= 0:
+        raise ValueError("base_fcf must be positive")
     if projection_years <= 0:
         raise ValueError("projection_years must be positive")
     if wacc <= terminal_growth:
@@ -195,7 +199,7 @@ def reverse_dcf(
                 return float(brentq(objective, lower, candidate_upper))
         if allow_nan:
             return float("nan")
-        return float("nan")
+        raise ValueError("could not bracket implied growth rate")
 
     implied_growth_rate = solve_for_wacc(wacc)
     sensitivity = {
@@ -383,7 +387,6 @@ def derive_dcf_inputs(ticker_meta: Dict, sec_data: Dict) -> Dict:
         "base_growth": min(max(float(revenue_growth or 0.05), -0.20), 0.50),
         "wacc": wacc,
         "net_debt": net_debt,
-        "shares_outstanding": max(float(shares or 1), 0.001),
+        "shares_outstanding": max(float(shares or 1), 1),
         "market_cap": market_cap,
-        "terminal_growth": 0.025,
     }
