@@ -268,7 +268,7 @@ def build_research_report_v2(
     tactical = build_tactical_takeaways(research_df, sector_summary, europe_summary, macro_summary)
 
     sector_snap = build_price_snapshot(prices_df, as_of_date)
-    sector_snap = sector_snap[sector_snap.index.isin(sector_tickers)].copy()
+    sector_snap = sector_snap[sector_snap["ticker"].isin(sector_tickers)].set_index("ticker")
     sector_snap["sector_name"] = sector_snap.index.map(US_SECTOR_PROXIES)
 
     # Risk analytics loading
