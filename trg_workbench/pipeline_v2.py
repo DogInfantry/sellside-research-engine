@@ -161,6 +161,9 @@ def value_ticker(
     )
 
     sm_row = security_master_df[security_master_df["ticker"] == ticker].iloc[0].to_dict() if ticker in security_master_df["ticker"].values else {}
+    # ponytail: FCF DCF is meaningless for balance sheet lenders; residual income model is the upgrade path
+    if str(sm_row.get("industry", "")).startswith(("Banks", "Capital Markets", "Insurance")):
+        return None
     sec_row = fundamentals_df[fundamentals_df["ticker"] == ticker].iloc[0].to_dict() if ticker in fundamentals_df["ticker"].values else {}
 
     inputs = derive_dcf_inputs(sm_row, sec_row)

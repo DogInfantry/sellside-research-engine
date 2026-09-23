@@ -375,12 +375,16 @@ def derive_dcf_inputs(ticker_meta: Dict, sec_data: Dict) -> Dict:
         return next((d[k] for k in keys if d.get(k) is not None and not pd.isna(d[k])), default)
 
     net_income = pick(sec_data, "net_income") or pick(ticker_meta, "net_income_to_common", "netIncomeToCommon", default=0)
-    revenue_growth = pick(sec_data, "revenue_growth") or pick(ticker_meta, "revenue_growth", "revenueGrowth", default=0.05)
-    shares = pick(sec_data, "shares_outstanding") or pick(ticker_meta, "shares_outstanding", "sharesOutstanding", default=1)
+    # consensus +1y revenue growth first: trailing growth carries one offs (M&A, commodity swings) into 5 years
+    consensus_growth = pick(ticker_meta, "revenue_growth_next_year")
+    revenue_growth = consensus_growth or pick(sec_data, "revenue_growth") or pick(ticker_meta, "revenue_growth", "revenueGrowth", default=0.05)
+    # security master shares first: it holds all share classes (GOOGL, META); SEC dei counts one class
+    shares = pick(ticker_meta, "shares_outstanding", "sharesOutstanding") or pick(sec_data, "shares_outstanding", default=1)
     market_cap = pick(ticker_meta, "market_cap", "marketCap", default=0)
     total_debt = pick(ticker_meta, "total_debt", "totalDebt", default=0)
     total_cash = pick(ticker_meta, "total_cash", "totalCash", default=0)
-    beta_val = pick(ticker_meta, "beta", default=1.0) or 1.0
+    # ponytail: Blume adjusted beta (Bloomberg ADJ BETA), shrinks raw beta toward 1; industry betas are the upgrade
+    beta_val = 0.67 * (pick(ticker_meta, "beta", default=1.0) or 1.0) + 0.33
 
     base_fcf = (net_income or 0) * 0.80
     net_debt = (total_debt or 0) - (total_cash or 0)
@@ -392,6 +396,7 @@ def derive_dcf_inputs(ticker_meta: Dict, sec_data: Dict) -> Dict:
     return {
         "base_fcf": base_fcf,
         "base_growth": min(max(float(revenue_growth or 0.05), -0.20), 0.50),
+        "consensus_growth": consensus_growth,
         "wacc": wacc,
         "net_debt": net_debt,
         "shares_outstanding": max(float(shares or 1), 1),

@@ -260,7 +260,7 @@ function buildKPIs() {
     {label:'DCF INTRINSIC VALUE', val:dollar(d.dcf.base),
       sub:`<span class="${upside>=0?'pos':'neg'}">${pct(upside)} to target ${dollar(d.price_target)}</span>`},
     {label:'REVERSE DCF: IMPLIED GROWTH', val:`<span style="color:${rdcf.stretched?'#E57373':'#4CAF50'}">${pc(rdcf.implied_growth,1)}</span>`,
-      sub:`Consensus: ${pc(rdcf.consensus_growth,1)} · <span style="color:${rdcf.stretched?'#E57373':'#4CAF50'};font-weight:600">${rdcf.stretched?'STRETCHED':'DISCOUNT'}</span>`},
+      sub:`Consensus: ${pc(rdcf.consensus_growth,1)} · <span style="color:${rdcf.stretched?'#E57373':'#4CAF50'};font-weight:600">${!ok(rdcf.implied_growth)||!ok(rdcf.consensus_growth)?'n/a':rdcf.stretched?'STRETCHED':'DISCOUNT'}</span>`},
     {label:'ANALYST RATING', val:`<span class="pill pill-${d.rating.toLowerCase()}">${d.rating}</span>`,
       sub:`Composite: <span class="gold">${d.composite_score??'n/a'}</span>/100`},
     {label:'MARKET CAP', val:ok(d.market_cap_b)?`$${d.market_cap_b.toLocaleString()}B`:'n/a', sub:`<span style="color:var(--t2)">${d.sector??'n/a'}</span>`},
@@ -338,7 +338,7 @@ function buildFootball() {
 function buildRDCF() {
   const d = DATA.tickers[active];
   const {sensitivity,implied_growth,consensus_growth,stretched} = d.reverse_dcf;
-  const waccs=[7,8,9,10],tgs=[1.5,2.0,2.5,3.0];
+  const waccs=[...new Set(sensitivity.map(s=>s.wacc))],tgs=[...new Set(sensitivity.map(s=>s.tg))];
   const getV=(w,t)=>(sensitivity.find(s=>s.wacc===w&&s.tg===t)||{implied:null}).implied;
   function cellStyle(v){
     if(!ok(v)||!ok(consensus_growth))return{bg:'rgba(255,255,255,0.03)',col:'#7a7a7a'};
@@ -352,7 +352,7 @@ function buildRDCF() {
   let html=`<div style="font-size:10px;color:var(--t2);margin-bottom:10px">
     Implied: <span style="color:${stretched?'#E57373':'#4CAF50'};font-weight:600">${pc(implied_growth,1)}</span>
     vs consensus ${pc(consensus_growth,1)} →
-    <span style="color:${stretched?'#E57373':'#4CAF50'};font-weight:600">${stretched?'STRETCHED':'UNDERPRICED'}</span>
+    <span style="color:${stretched?'#E57373':'#4CAF50'};font-weight:600">${!ok(implied_growth)||!ok(consensus_growth)?'n/a':stretched?'STRETCHED':'UNDERPRICED'}</span>
   </div>
   <table style="width:100%;border-collapse:separate;border-spacing:2px;font-size:10px">
   <tr><th style="padding:3px 6px;color:var(--t3);font-size:9px;font-weight:500;text-align:left">TG＼WACC</th>

@@ -53,7 +53,18 @@ def test_derive_dcf_inputs_reads_snake_case_security_master():
 
     assert inputs["net_debt"] == 50.0
     assert inputs["market_cap"] == 500.0
-    assert inputs["wacc"] == estimate_wacc(beta=1.4)
+    assert inputs["wacc"] == estimate_wacc(beta=0.67 * 1.4 + 0.33)  # Blume adjusted
     assert inputs["base_fcf"] == pytest.approx(40.0)
     assert inputs["shares_outstanding"] == 10.0
     assert derive_dcf_inputs({**sm_row, "sector": "Financial Services"}, {})["net_debt"] == 0
+
+
+def test_derive_dcf_inputs_prefers_consensus_growth_and_all_class_shares():
+    # CVX style one off: trailing +53.5% (deal + oil) vs consensus -6.8%; GOOGL style SEC shares count one class
+    sm_row = {"net_income_to_common": 50.0, "revenue_growth": 0.535, "revenue_growth_next_year": -0.068,
+              "shares_outstanding": 12.1}
+    inputs = derive_dcf_inputs(sm_row, {"revenue_growth": 0.535, "shares_outstanding": 5.87})
+
+    assert inputs["base_growth"] == pytest.approx(-0.068)
+    assert inputs["consensus_growth"] == pytest.approx(-0.068)
+    assert inputs["shares_outstanding"] == 12.1
