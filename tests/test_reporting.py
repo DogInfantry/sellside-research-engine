@@ -128,3 +128,28 @@ def test_html_template_renders_reverse_dcf_section():
     assert "Market-Implied FCF CAGR" in content
     assert "12.0%" in content
     assert "Management Commentary" in content
+
+
+def test_screen_dashboard_labels_bars_by_ticker(tmp_path, monkeypatch):
+    # build_research_dataset returns a RangeIndex with tickers in a column
+    research_df = pd.DataFrame(
+        {
+            "ticker": ["AAA", "BBB", "CCC"],
+            "research_score": [0.9, 0.5, 0.1],
+            "valuation_score": [0.5, 0.3, 0.1],
+            "growth_score": [0.4, 0.2, 0.0],
+        }
+    )
+    saved = {}
+    monkeypatch.setattr(
+        "trg_workbench.reporting.charts._save",
+        lambda fig, path: saved.__setitem__(path.stem, fig),
+    )
+
+    build_research_charts(
+        pd.DataFrame(), research_df, pd.DataFrame(), pd.DataFrame(), pd.DataFrame(),
+        tmp_path, "2026-04-08", quiet=True, static=True,
+    )
+
+    fig = saved["screen_dashboard_2026_04_08"]
+    assert {t.get_text() for t in fig.axes[0].get_yticklabels()} == {"AAA", "BBB", "CCC"}
