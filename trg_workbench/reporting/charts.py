@@ -702,7 +702,7 @@ def plot_screen_dashboard(
     if not factor_cols or "research_score" not in research_df.columns:
         return output_path
 
-    df = research_df.nlargest(top_n, "research_score")[factor_cols].copy()
+    df = research_df.nlargest(top_n, "research_score").set_index("ticker")[factor_cols].copy()
     df = df.sort_values(factor_cols[0])
 
     factor_colors = {
