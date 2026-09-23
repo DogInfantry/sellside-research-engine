@@ -1,13 +1,13 @@
 {
- "generated_at": "2026-09-23T05:13:25+00:00",
+ "generated_at": "2026-09-23T06:52:30+00:00",
  "as_of": "2026-09-23",
  "macro": {
   "ust_10y": 4.963,
   "ust_2y": 3.982,
   "ust_30y": 5.296,
   "vix": 14.87,
-  "dxy": 100.714,
-  "wti": 89.15,
+  "dxy": 100.719,
+  "wti": 89.22,
   "spread_2s10s": 0.981,
   "eurusd": 1.1463
  },
@@ -15,8 +15,8 @@
   "ust_10y": "-3.5bps",
   "ust_2y": "+0.4bps",
   "vix": "+0.06",
-  "dxy": "+0.28",
-  "wti": "-5.8%",
+  "dxy": "+0.29",
+  "wti": "-5.7%",
   "spread_2s10s": "-3.9bps",
   "eurusd": "-0.0027"
  },
@@ -32,15 +32,15 @@
    "price_target": 327.7,
    "composite_score": 80.0,
    "dcf": {
-    "bear": 183.2,
-    "base": 361.41,
-    "bull": 659.63,
-    "wacc": 9.4,
+    "bear": 118.2,
+    "base": 193.95,
+    "bull": 311.47,
+    "wacc": 14.5,
     "terminal_growth": 2.5,
     "fcf_yield": 2.8
    },
    "reverse_dcf": {
-    "implied_growth": 14.2,
+    "implied_growth": 24.3,
     "consensus_growth": 68.5,
     "stretched": false,
     "sensitivity": [
@@ -57,27 +57,27 @@
      {
       "wacc": 9,
       "tg": 1.5,
-      "implied": 14.6
+      "implied": 14.5
      },
      {
       "wacc": 10,
       "tg": 1.5,
-      "implied": 16.7
+      "implied": 16.6
      },
      {
       "wacc": 7,
       "tg": 2.0,
-      "implied": 9.0
+      "implied": 8.9
      },
      {
       "wacc": 8,
       "tg": 2.0,
-      "implied": 11.6
+      "implied": 11.5
      },
      {
       "wacc": 9,
       "tg": 2.0,
-      "implied": 14.0
+      "implied": 13.9
      },
      {
       "wacc": 10,
@@ -92,12 +92,12 @@
      {
       "wacc": 8,
       "tg": 2.5,
-      "implied": 10.8
+      "implied": 10.7
      },
      {
       "wacc": 9,
       "tg": 2.5,
-      "implied": 13.3
+      "implied": 13.2
      },
      {
       "wacc": 10,
@@ -122,7 +122,7 @@
      {
       "wacc": 10,
       "tg": 3.0,
-      "implied": 14.9
+      "implied": 14.8
      }
     ]
    },
@@ -668,17 +668,17 @@
    "price_target": 1323.31,
    "composite_score": 65.0,
    "dcf": {
-    "bear": 669.33,
-    "base": 1147.51,
-    "bull": 1851.37,
-    "wacc": 9.4,
+    "bear": 553.53,
+    "base": 892.51,
+    "bull": 1355.56,
+    "wacc": 11.2,
     "terminal_growth": 2.5,
     "fcf_yield": 3.1
    },
    "reverse_dcf": {
-    "implied_growth": 12.8,
+    "implied_growth": 16.7,
     "consensus_growth": 14.3,
-    "stretched": false,
+    "stretched": true,
     "sensitivity": [
      {
       "wacc": 7,
@@ -1304,97 +1304,97 @@
    "price_target": 429.46,
    "composite_score": 63.0,
    "dcf": {
-    "bear": 576.18,
-    "base": 937.65,
-    "bull": 1442.4,
-    "wacc": 9.4,
+    "bear": 541.17,
+    "base": 838.94,
+    "bull": 1236.25,
+    "wacc": 10.3,
     "terminal_growth": 2.5,
     "fcf_yield": 9.4
    },
    "reverse_dcf": {
-    "implied_growth": -2.0,
+    "implied_growth": -1.2,
     "consensus_growth": -27.7,
     "stretched": true,
     "sensitivity": [
      {
       "wacc": 7,
       "tg": 1.5,
+      "implied": -6.3
+     },
+     {
+      "wacc": 8,
+      "tg": 1.5,
+      "implied": -4.4
+     },
+     {
+      "wacc": 9,
+      "tg": 1.5,
+      "implied": -2.6
+     },
+     {
+      "wacc": 10,
+      "tg": 1.5,
+      "implied": -1.0
+     },
+     {
+      "wacc": 7,
+      "tg": 2.0,
+      "implied": -7.0
+     },
+     {
+      "wacc": 8,
+      "tg": 2.0,
+      "implied": -4.9
+     },
+     {
+      "wacc": 9,
+      "tg": 2.0,
+      "implied": -3.1
+     },
+     {
+      "wacc": 10,
+      "tg": 2.0,
+      "implied": -1.4
+     },
+     {
+      "wacc": 7,
+      "tg": 2.5,
+      "implied": -7.7
+     },
+     {
+      "wacc": 8,
+      "tg": 2.5,
       "implied": -5.5
      },
      {
-      "wacc": 8,
-      "tg": 1.5,
+      "wacc": 9,
+      "tg": 2.5,
       "implied": -3.6
      },
      {
-      "wacc": 9,
-      "tg": 1.5,
+      "wacc": 10,
+      "tg": 2.5,
       "implied": -1.8
      },
      {
-      "wacc": 10,
-      "tg": 1.5,
-      "implied": -0.1
+      "wacc": 7,
+      "tg": 3.0,
+      "implied": -8.5
      },
      {
-      "wacc": 7,
-      "tg": 2.0,
+      "wacc": 8,
+      "tg": 3.0,
       "implied": -6.2
      },
      {
-      "wacc": 8,
-      "tg": 2.0,
+      "wacc": 9,
+      "tg": 3.0,
       "implied": -4.1
      },
      {
-      "wacc": 9,
-      "tg": 2.0,
-      "implied": -2.2
-     },
-     {
-      "wacc": 10,
-      "tg": 2.0,
-      "implied": -0.5
-     },
-     {
-      "wacc": 7,
-      "tg": 2.5,
-      "implied": -6.9
-     },
-     {
-      "wacc": 8,
-      "tg": 2.5,
-      "implied": -4.7
-     },
-     {
-      "wacc": 9,
-      "tg": 2.5,
-      "implied": -2.8
-     },
-     {
-      "wacc": 10,
-      "tg": 2.5,
-      "implied": -0.9
-     },
-     {
-      "wacc": 7,
-      "tg": 3.0,
-      "implied": -7.8
-     },
-     {
-      "wacc": 8,
-      "tg": 3.0,
-      "implied": -5.4
-     },
-     {
-      "wacc": 9,
-      "tg": 3.0,
-      "implied": -3.3
-     },
-     {
       "wacc": 10,
       "tg": 3.0,
-      "implied": -1.4
+      "implied": -2.3
      }
     ]
    },
@@ -1940,97 +1940,97 @@
    "price_target": 329.2,
    "composite_score": 61.0,
    "dcf": {
-    "bear": 157.94,
-    "base": 247.07,
-    "bull": 366.34,
-    "wacc": 9.4,
+    "bear": 118.55,
+    "base": 180.03,
+    "bull": 255.93,
+    "wacc": 11.3,
     "terminal_growth": 2.5,
     "fcf_yield": 3.9
    },
    "reverse_dcf": {
-    "implied_growth": 9.9,
+    "implied_growth": 14.3,
     "consensus_growth": -18.6,
     "stretched": true,
     "sensitivity": [
      {
       "wacc": 7,
       "tg": 1.5,
-      "implied": 5.7
+      "implied": 6.3
      },
      {
       "wacc": 8,
       "tg": 1.5,
-      "implied": 8.1
+      "implied": 8.7
      },
      {
       "wacc": 9,
       "tg": 1.5,
+      "implied": 10.8
+     },
+     {
+      "wacc": 10,
+      "tg": 1.5,
+      "implied": 12.8
+     },
+     {
+      "wacc": 7,
+      "tg": 2.0,
+      "implied": 5.5
+     },
+     {
+      "wacc": 8,
+      "tg": 2.0,
+      "implied": 8.0
+     },
+     {
+      "wacc": 9,
+      "tg": 2.0,
       "implied": 10.2
      },
      {
       "wacc": 10,
-      "tg": 1.5,
-      "implied": 12.2
+      "tg": 2.0,
+      "implied": 12.3
      },
      {
       "wacc": 7,
-      "tg": 2.0,
-      "implied": 4.9
+      "tg": 2.5,
+      "implied": 4.6
      },
      {
       "wacc": 8,
-      "tg": 2.0,
-      "implied": 7.4
+      "tg": 2.5,
+      "implied": 7.2
      },
      {
       "wacc": 9,
-      "tg": 2.0,
+      "tg": 2.5,
       "implied": 9.6
      },
      {
       "wacc": 10,
-      "tg": 2.0,
-      "implied": 11.7
+      "tg": 2.5,
+      "implied": 11.8
      },
      {
       "wacc": 7,
-      "tg": 2.5,
-      "implied": 4.0
+      "tg": 3.0,
+      "implied": 3.5
      },
      {
       "wacc": 8,
-      "tg": 2.5,
-      "implied": 6.6
+      "tg": 3.0,
+      "implied": 6.4
      },
      {
       "wacc": 9,
-      "tg": 2.5,
-      "implied": 9.0
+      "tg": 3.0,
+      "implied": 8.9
      },
      {
       "wacc": 10,
-      "tg": 2.5,
+      "tg": 3.0,
       "implied": 11.2
-     },
-     {
-      "wacc": 7,
-      "tg": 3.0,
-      "implied": 3.0
-     },
-     {
-      "wacc": 8,
-      "tg": 3.0,
-      "implied": 5.8
-     },
-     {
-      "wacc": 9,
-      "tg": 3.0,
-      "implied": 8.3
-     },
-     {
-      "wacc": 10,
-      "tg": 3.0,
-      "implied": 10.6
      }
     ]
    },
@@ -2576,97 +2576,97 @@
    "price_target": 576.4,
    "composite_score": 58.0,
    "dcf": {
-    "bear": 217.99,
-    "base": 335.32,
-    "bull": 489.37,
-    "wacc": 9.4,
+    "bear": 200.42,
+    "base": 306.56,
+    "bull": 442.51,
+    "wacc": 9.9,
     "terminal_growth": 2.5,
     "fcf_yield": 2.9
    },
    "reverse_dcf": {
-    "implied_growth": 13.9,
+    "implied_growth": 15.1,
     "consensus_growth": 19.8,
     "stretched": false,
     "sensitivity": [
      {
       "wacc": 7,
       "tg": 1.5,
-      "implied": 9.6
+      "implied": 9.7
      },
      {
       "wacc": 8,
       "tg": 1.5,
-      "implied": 12.0
-     },
-     {
-      "wacc": 9,
-      "tg": 1.5,
-      "implied": 14.3
-     },
-     {
-      "wacc": 10,
-      "tg": 1.5,
-      "implied": 16.4
-     },
-     {
-      "wacc": 7,
-      "tg": 2.0,
-      "implied": 8.7
-     },
-     {
-      "wacc": 8,
-      "tg": 2.0,
-      "implied": 11.3
-     },
-     {
-      "wacc": 9,
-      "tg": 2.0,
-      "implied": 13.7
-     },
-     {
-      "wacc": 10,
-      "tg": 2.0,
-      "implied": 15.8
-     },
-     {
-      "wacc": 7,
-      "tg": 2.5,
-      "implied": 7.8
-     },
-     {
-      "wacc": 8,
-      "tg": 2.5,
-      "implied": 10.5
-     },
-     {
-      "wacc": 9,
-      "tg": 2.5,
-      "implied": 13.0
-     },
-     {
-      "wacc": 10,
-      "tg": 2.5,
-      "implied": 15.2
-     },
-     {
-      "wacc": 7,
-      "tg": 3.0,
-      "implied": 6.7
-     },
-     {
-      "wacc": 8,
-      "tg": 3.0,
-      "implied": 9.6
-     },
-     {
-      "wacc": 9,
-      "tg": 3.0,
       "implied": 12.2
      },
      {
+      "wacc": 9,
+      "tg": 1.5,
+      "implied": 14.5
+     },
+     {
+      "wacc": 10,
+      "tg": 1.5,
+      "implied": 16.6
+     },
+     {
+      "wacc": 7,
+      "tg": 2.0,
+      "implied": 8.9
+     },
+     {
+      "wacc": 8,
+      "tg": 2.0,
+      "implied": 11.5
+     },
+     {
+      "wacc": 9,
+      "tg": 2.0,
+      "implied": 13.8
+     },
+     {
+      "wacc": 10,
+      "tg": 2.0,
+      "implied": 16.0
+     },
+     {
+      "wacc": 7,
+      "tg": 2.5,
+      "implied": 7.9
+     },
+     {
+      "wacc": 8,
+      "tg": 2.5,
+      "implied": 10.7
+     },
+     {
+      "wacc": 9,
+      "tg": 2.5,
+      "implied": 13.2
+     },
+     {
+      "wacc": 10,
+      "tg": 2.5,
+      "implied": 15.4
+     },
+     {
+      "wacc": 7,
+      "tg": 3.0,
+      "implied": 6.8
+     },
+     {
+      "wacc": 8,
+      "tg": 3.0,
+      "implied": 9.8
+     },
+     {
+      "wacc": 9,
+      "tg": 3.0,
+      "implied": 12.4
+     },
+     {
       "wacc": 10,
       "tg": 3.0,
-      "implied": 14.6
+      "implied": 14.8
      }
     ]
    },
@@ -3212,15 +3212,15 @@
    "price_target": 375.14,
    "composite_score": 56.0,
    "dcf": {
-    "bear": 375.84,
-    "base": 643.34,
-    "bull": 1036.47,
-    "wacc": 9.4,
+    "bear": 380.16,
+    "base": 653.43,
+    "bull": 1057.28,
+    "wacc": 9.3,
     "terminal_growth": 2.5,
     "fcf_yield": 5.4
    },
    "reverse_dcf": {
-    "implied_growth": 5.4,
+    "implied_growth": 5.2,
     "consensus_growth": 3.2,
     "stretched": true,
     "sensitivity": [
@@ -3848,97 +3848,97 @@
    "price_target": 222.17,
    "composite_score": 56.0,
    "dcf": {
-    "bear": 240.75,
-    "base": 474.94,
-    "bull": 866.85,
-    "wacc": 9.4,
+    "bear": 305.31,
+    "base": 697.55,
+    "bull": 1481.06,
+    "wacc": 7.2,
     "terminal_growth": 2.5,
     "fcf_yield": 4.1
    },
    "reverse_dcf": {
-    "implied_growth": 9.1,
+    "implied_growth": 4.8,
     "consensus_growth": -16.2,
     "stretched": true,
     "sensitivity": [
      {
       "wacc": 7,
       "tg": 1.5,
+      "implied": 5.9
+     },
+     {
+      "wacc": 8,
+      "tg": 1.5,
+      "implied": 8.2
+     },
+     {
+      "wacc": 9,
+      "tg": 1.5,
+      "implied": 10.3
+     },
+     {
+      "wacc": 10,
+      "tg": 1.5,
+      "implied": 12.3
+     },
+     {
+      "wacc": 7,
+      "tg": 2.0,
       "implied": 5.0
      },
      {
       "wacc": 8,
-      "tg": 1.5,
-      "implied": 7.3
-     },
-     {
-      "wacc": 9,
-      "tg": 1.5,
-      "implied": 9.4
-     },
-     {
-      "wacc": 10,
-      "tg": 1.5,
-      "implied": 11.4
-     },
-     {
-      "wacc": 7,
       "tg": 2.0,
-      "implied": 4.2
-     },
-     {
-      "wacc": 8,
-      "tg": 2.0,
-      "implied": 6.6
+      "implied": 7.5
      },
      {
       "wacc": 9,
       "tg": 2.0,
-      "implied": 8.8
+      "implied": 9.8
      },
      {
       "wacc": 10,
       "tg": 2.0,
-      "implied": 10.9
+      "implied": 11.8
      },
      {
       "wacc": 7,
       "tg": 2.5,
-      "implied": 3.3
+      "implied": 4.1
      },
      {
       "wacc": 8,
       "tg": 2.5,
+      "implied": 6.8
+     },
+     {
+      "wacc": 9,
+      "tg": 2.5,
+      "implied": 9.1
+     },
+     {
+      "wacc": 10,
+      "tg": 2.5,
+      "implied": 11.3
+     },
+     {
+      "wacc": 7,
+      "tg": 3.0,
+      "implied": 3.1
+     },
+     {
+      "wacc": 8,
+      "tg": 3.0,
       "implied": 5.9
      },
      {
       "wacc": 9,
-      "tg": 2.5,
-      "implied": 8.2
-     },
-     {
-      "wacc": 10,
-      "tg": 2.5,
-      "implied": 10.3
-     },
-     {
-      "wacc": 7,
       "tg": 3.0,
-      "implied": 2.3
-     },
-     {
-      "wacc": 8,
-      "tg": 3.0,
-      "implied": 5.1
-     },
-     {
-      "wacc": 9,
-      "tg": 3.0,
-      "implied": 7.5
+      "implied": 8.4
      },
      {
       "wacc": 10,
       "tg": 3.0,
-      "implied": 9.8
+      "implied": 10.7
      }
     ]
    },
@@ -4484,97 +4484,97 @@
    "price_target": 481.72,
    "composite_score": 55.0,
    "dcf": {
-    "bear": 130.86,
-    "base": 170.0,
-    "bull": 210.26,
-    "wacc": 9.4,
+    "bear": 110.92,
+    "base": 174.07,
+    "bull": 250.9,
+    "wacc": 7.8,
     "terminal_growth": 2.5,
     "fcf_yield": 3.3
    },
    "reverse_dcf": {
-    "implied_growth": 11.9,
+    "implied_growth": 9.6,
     "consensus_growth": 13.8,
     "stretched": false,
     "sensitivity": [
      {
       "wacc": 7,
       "tg": 1.5,
-      "implied": 7.7
+      "implied": 9.2
      },
      {
       "wacc": 8,
       "tg": 1.5,
+      "implied": 11.6
+     },
+     {
+      "wacc": 9,
+      "tg": 1.5,
+      "implied": 13.8
+     },
+     {
+      "wacc": 10,
+      "tg": 1.5,
+      "implied": 15.9
+     },
+     {
+      "wacc": 7,
+      "tg": 2.0,
+      "implied": 8.3
+     },
+     {
+      "wacc": 8,
+      "tg": 2.0,
+      "implied": 10.9
+     },
+     {
+      "wacc": 9,
+      "tg": 2.0,
+      "implied": 13.2
+     },
+     {
+      "wacc": 10,
+      "tg": 2.0,
+      "implied": 15.4
+     },
+     {
+      "wacc": 7,
+      "tg": 2.5,
+      "implied": 7.3
+     },
+     {
+      "wacc": 8,
+      "tg": 2.5,
       "implied": 10.1
      },
      {
       "wacc": 9,
-      "tg": 1.5,
-      "implied": 12.3
-     },
-     {
-      "wacc": 10,
-      "tg": 1.5,
-      "implied": 14.3
-     },
-     {
-      "wacc": 7,
-      "tg": 2.0,
-      "implied": 6.8
-     },
-     {
-      "wacc": 8,
-      "tg": 2.0,
-      "implied": 9.4
-     },
-     {
-      "wacc": 9,
-      "tg": 2.0,
-      "implied": 11.7
-     },
-     {
-      "wacc": 10,
-      "tg": 2.0,
-      "implied": 13.8
-     },
-     {
-      "wacc": 7,
       "tg": 2.5,
-      "implied": 5.9
-     },
-     {
-      "wacc": 8,
-      "tg": 2.5,
-      "implied": 8.6
-     },
-     {
-      "wacc": 9,
-      "tg": 2.5,
-      "implied": 11.0
-     },
-     {
-      "wacc": 10,
-      "tg": 2.5,
-      "implied": 13.2
-     },
-     {
-      "wacc": 7,
-      "tg": 3.0,
-      "implied": 4.9
-     },
-     {
-      "wacc": 8,
-      "tg": 3.0,
-      "implied": 7.8
-     },
-     {
-      "wacc": 9,
-      "tg": 3.0,
-      "implied": 10.3
-     },
-     {
-      "wacc": 10,
-      "tg": 3.0,
       "implied": 12.6
+     },
+     {
+      "wacc": 10,
+      "tg": 2.5,
+      "implied": 14.8
+     },
+     {
+      "wacc": 7,
+      "tg": 3.0,
+      "implied": 6.3
+     },
+     {
+      "wacc": 8,
+      "tg": 3.0,
+      "implied": 9.2
+     },
+     {
+      "wacc": 9,
+      "tg": 3.0,
+      "implied": 11.8
+     },
+     {
+      "wacc": 10,
+      "tg": 3.0,
+      "implied": 14.2
      }
     ]
    },
@@ -5120,15 +5120,15 @@
    "price_target": 59.5,
    "composite_score": 55.0,
    "dcf": {
-    "bear": 71.0,
-    "base": 125.95,
-    "bull": 209.51,
-    "wacc": 9.4,
+    "bear": 57.18,
+    "base": 94.66,
+    "bull": 147.22,
+    "wacc": 11.5,
     "terminal_growth": 2.5,
     "fcf_yield": 6.9
    },
    "reverse_dcf": {
-    "implied_growth": 2.2,
+    "implied_growth": 5.9,
     "consensus_growth": 22.4,
     "stretched": false,
     "sensitivity": [
@@ -5756,97 +5756,97 @@
    "price_target": 761.01,
    "composite_score": 53.0,
    "dcf": {
-    "bear": 462.0,
-    "base": 775.77,
-    "bull": 1228.2,
-    "wacc": 9.4,
+    "bear": 403.54,
+    "base": 658.91,
+    "bull": 1009.92,
+    "wacc": 10.4,
     "terminal_growth": 2.5,
     "fcf_yield": 3.3
    },
    "reverse_dcf": {
-    "implied_growth": 11.9,
+    "implied_growth": 14.3,
     "consensus_growth": 8.3,
     "stretched": true,
     "sensitivity": [
      {
       "wacc": 7,
       "tg": 1.5,
-      "implied": 7.7
-     },
-     {
-      "wacc": 8,
-      "tg": 1.5,
-      "implied": 10.1
-     },
-     {
-      "wacc": 9,
-      "tg": 1.5,
-      "implied": 12.3
-     },
-     {
-      "wacc": 10,
-      "tg": 1.5,
-      "implied": 14.3
-     },
-     {
-      "wacc": 7,
-      "tg": 2.0,
-      "implied": 6.8
-     },
-     {
-      "wacc": 8,
-      "tg": 2.0,
-      "implied": 9.4
-     },
-     {
-      "wacc": 9,
-      "tg": 2.0,
-      "implied": 11.7
-     },
-     {
-      "wacc": 10,
-      "tg": 2.0,
-      "implied": 13.8
-     },
-     {
-      "wacc": 7,
-      "tg": 2.5,
-      "implied": 5.9
-     },
-     {
-      "wacc": 8,
-      "tg": 2.5,
-      "implied": 8.6
-     },
-     {
-      "wacc": 9,
-      "tg": 2.5,
-      "implied": 11.0
-     },
-     {
-      "wacc": 10,
-      "tg": 2.5,
-      "implied": 13.2
-     },
-     {
-      "wacc": 7,
-      "tg": 3.0,
-      "implied": 4.9
-     },
-     {
-      "wacc": 8,
-      "tg": 3.0,
       "implied": 7.8
      },
      {
+      "wacc": 8,
+      "tg": 1.5,
+      "implied": 10.2
+     },
+     {
+      "wacc": 9,
+      "tg": 1.5,
+      "implied": 12.4
+     },
+     {
+      "wacc": 10,
+      "tg": 1.5,
+      "implied": 14.5
+     },
+     {
+      "wacc": 7,
+      "tg": 2.0,
+      "implied": 7.0
+     },
+     {
+      "wacc": 8,
+      "tg": 2.0,
+      "implied": 9.5
+     },
+     {
+      "wacc": 9,
+      "tg": 2.0,
+      "implied": 11.8
+     },
+     {
+      "wacc": 10,
+      "tg": 2.0,
+      "implied": 14.0
+     },
+     {
+      "wacc": 7,
+      "tg": 2.5,
+      "implied": 6.1
+     },
+     {
+      "wacc": 8,
+      "tg": 2.5,
+      "implied": 8.8
+     },
+     {
+      "wacc": 9,
+      "tg": 2.5,
+      "implied": 11.2
+     },
+     {
+      "wacc": 10,
+      "tg": 2.5,
+      "implied": 13.4
+     },
+     {
+      "wacc": 7,
+      "tg": 3.0,
+      "implied": 5.0
+     },
+     {
+      "wacc": 8,
+      "tg": 3.0,
+      "implied": 7.9
+     },
+     {
       "wacc": 9,
       "tg": 3.0,
-      "implied": 10.3
+      "implied": 10.5
      },
      {
       "wacc": 10,
       "tg": 3.0,
-      "implied": 12.6
+      "implied": 12.8
      }
     ]
    },
