@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Sellside Research Engine — Institutional Dashboard</title>
+<title>Sellside Research Engine: Institutional Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.26.0/plotly.min.js"></script>
 <style>
@@ -12,71 +15,79 @@
   --gold:#C9A84C;--green:#4CAF50;--red:#E57373;--amber:#FFB300;
   --bg:#0d0e11;--card:#13151a;--hover:#1a1d24;
   --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.04);
-  --t1:#e8e6e0;--t2:#7a7a7a;--t3:#4a4a4a;
+  /* text: t1 primary, t2 secondary (7:1 on card), t3 metadata (5:1 on card) */
+  --t1:#e8e6e0;--t2:#a3a3a3;--t3:#8a8a8a;
+  --sans:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,'Cascadia Mono',Consolas,monospace;
 }
-body{background:var(--bg);color:var(--t1);font-family:'JetBrains Mono','Fira Code','Courier New',monospace;-webkit-font-smoothing:antialiased;min-height:100vh}
-::-webkit-scrollbar{width:4px;height:4px}
+body{background:var(--bg);color:var(--t1);font-family:var(--sans);font-size:13px;line-height:1.45;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;min-height:100vh}
+/* numbers and tickers read in mono, labels and prose in sans */
+td,.kpi-val,.tick-price,.tick-chg,.risk-val,.corr-cell,.num{font-family:var(--mono)}
+::-webkit-scrollbar{width:6px;height:6px}
 ::-webkit-scrollbar-track{background:var(--bg)}
-::-webkit-scrollbar-thumb{background:#2a2a2a;border-radius:2px}
+::-webkit-scrollbar-thumb{background:#2a2a2a;border-radius:3px}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-@keyframes spin{to{transform:rotate(360deg)}}
 
 /* TOPBAR */
 .topbar{border-bottom:1px solid var(--border)}
-.brand-row{display:flex;align-items:center;justify-content:space-between;padding:10px 24px;border-bottom:1px solid var(--border2)}
-.brand{font-size:13px;font-weight:600;letter-spacing:3px}
+.brand-row{display:flex;align-items:center;justify-content:space-between;gap:8px 16px;flex-wrap:wrap;padding:12px 24px;border-bottom:1px solid var(--border2)}
+.brand{font-size:14px;font-weight:600;letter-spacing:.12em}
 .brand span{color:var(--gold)}
-.status-row{display:flex;gap:16px;font-size:10px;color:var(--t3);letter-spacing:1px;align-items:center}
-.live-dot{width:5px;height:5px;border-radius:50%;background:var(--green);display:inline-block;margin-right:5px;animation:blink 2s infinite}
+.status-row{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--t2);letter-spacing:.04em;align-items:center}
+.sep{color:#3a3a3a}
 .ticker-strip{display:flex;overflow-x:auto;padding:0 24px}
-.tick-btn{display:flex;flex-direction:column;padding:10px 20px;background:transparent;border:none;border-bottom:2px solid transparent;cursor:pointer;text-align:left;min-width:110px;transition:all .15s;font-family:inherit}
+.tick-btn{display:flex;flex-direction:column;gap:1px;padding:10px 18px;background:transparent;border:none;border-bottom:2px solid transparent;cursor:pointer;text-align:left;min-width:112px;transition:background .15s,border-color .15s;font-family:inherit;color:inherit}
+.tick-btn:hover{background:var(--hover)}
+.tick-btn:focus-visible{outline:1px solid var(--gold);outline-offset:-1px}
 .tick-btn.active{background:rgba(201,168,76,0.06);border-bottom-color:var(--gold)}
-.tick-sym{font-size:10px;letter-spacing:1.5px;color:var(--t2);font-weight:600;margin-bottom:2px}
+.tick-sym{font-size:12px;letter-spacing:.06em;color:var(--t2);font-weight:600}
 .tick-btn.active .tick-sym{color:var(--gold)}
-.tick-price{font-size:14px;font-weight:500;color:var(--t1)}
-.tick-chg{font-size:10px}
+.tick-price{font-size:15px;font-weight:500;color:var(--t1)}
+.tick-chg{font-size:12px}
 
 /* LAYOUT */
-.page{padding:0}
 .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:16px 24px}
 .row2{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:10px;padding:0 24px;margin-bottom:10px}
 .row3{display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:10px;padding:0 24px;margin-bottom:10px}
-.row4{padding:0 24px;margin-bottom:10px}
 .row5{display:grid;grid-template-columns:1.6fr 1fr 1.2fr;gap:10px;padding:0 24px;margin-bottom:32px}
+.row2>*,.row3>*,.row5>*,.kpi-grid>*{min-width:0}
 
 /* CARD */
 .card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px 16px}
-.card-title{font-size:9px;letter-spacing:2px;color:var(--t3);text-transform:uppercase;margin-bottom:12px}
+.card-title{font-size:12px;font-weight:500;letter-spacing:.06em;color:var(--t2);text-transform:uppercase;margin-bottom:12px}
 
 /* KPI */
-.kpi-val{font-size:20px;font-weight:500;margin-bottom:4px}
-.kpi-sub{font-size:10px;color:var(--t2);line-height:1.4}
+.kpi-val{font-size:24px;font-weight:500;line-height:1.2;margin-bottom:6px}
+.kpi-sub{font-size:12px;color:var(--t2);line-height:1.45}
 .pos{color:var(--green)}.neg{color:var(--red)}.gold{color:var(--gold)}
 
 /* PILLS */
-.pill{padding:2px 10px;border-radius:3px;font-size:10px;letter-spacing:1px;font-weight:600;display:inline-block}
+.pill{padding:2px 10px;border-radius:3px;font-size:12px;letter-spacing:.06em;font-weight:600;display:inline-block}
 .pill-buy{background:rgba(76,175,80,.12);color:var(--green);border:1px solid rgba(76,175,80,.3)}
 .pill-hold{background:rgba(255,179,0,.12);color:var(--amber);border:1px solid rgba(255,179,0,.3)}
 .pill-sell{background:rgba(229,115,115,.12);color:var(--red);border:1px solid rgba(229,115,115,.3)}
 
 /* SCREENER TABLE */
 .screener-wrap{padding:0 24px;margin-bottom:10px}
-.sec-label{font-size:9px;letter-spacing:2px;color:var(--t3);text-transform:uppercase;margin-bottom:8px}
-table{width:100%;border-collapse:collapse;font-size:11px}
-th{padding:8px 12px;color:var(--t3);text-align:left;font-weight:500;font-size:9px;letter-spacing:1px;border-bottom:1px solid var(--border)}
-td{padding:8px 12px;border-bottom:1px solid var(--border2)}
-tr:hover td{background:rgba(255,255,255,0.015);cursor:pointer}
-tr.active-row td{background:rgba(201,168,76,0.05)}
+.sec-label{font-size:12px;font-weight:500;letter-spacing:.06em;color:var(--t2);text-transform:uppercase;margin-bottom:8px}
+.table-scroll{overflow-x:auto}
+#screenerTable{min-width:980px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{padding:9px 12px;color:var(--t2);text-align:left;font-weight:500;font-size:12px;letter-spacing:.04em;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:9px 12px;border-bottom:1px solid var(--border2);white-space:nowrap}
+#screenerTable tr:hover td{background:rgba(255,255,255,0.02);cursor:pointer}
+tr.active-row td{background:rgba(201,168,76,0.06)}
 
 /* SIGNAL BOX */
-.signal-box{border-left:2px solid var(--gold);padding:7px 10px;background:rgba(255,255,255,0.02);border-radius:0 4px 4px 0;margin-bottom:8px;font-size:11px;color:var(--t2);line-height:1.6}
-.signal-box.risk{border-left-color:var(--red)}
-.signal-label{font-size:8px;letter-spacing:1.5px;color:var(--gold);margin-bottom:3px;text-transform:uppercase}
+.signal-box{border:1px solid var(--border);padding:8px 10px;background:rgba(255,255,255,0.02);border-radius:4px;margin-bottom:8px;font-size:13px;color:var(--t2);line-height:1.55}
+.signal-label{font-size:12px;font-weight:500;letter-spacing:.06em;color:var(--gold);margin-bottom:3px;text-transform:uppercase}
 .signal-box.risk .signal-label{color:var(--red)}
-.tag{font-size:10px;padding:2px 8px;border-radius:3px;display:inline-block;margin:2px}
+.tag{font-size:12px;padding:2px 8px;border-radius:3px;display:inline-block;margin:2px}
 
 /* FOOTER */
-.footer{border-top:1px solid var(--border2);padding:12px 24px;display:flex;justify-content:space-between;font-size:9px;color:var(--t3);letter-spacing:1px}
+.footer{border-top:1px solid var(--border2);padding:14px 24px;display:flex;flex-wrap:wrap;gap:6px 16px;justify-content:space-between;font-size:12px;color:var(--t3);letter-spacing:.04em}
+.footer a{color:var(--t2);text-decoration:none}
+.footer a:hover{color:var(--t1)}
 
 /* LOADING */
 #loader{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:999}
@@ -89,40 +100,51 @@ tr.active-row td{background:rgba(201,168,76,0.05)}
 /* RISK GRID */
 .risk-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .risk-cell{background:var(--bg);border-radius:4px;padding:8px 10px;border:1px solid var(--border2)}
-.risk-label{font-size:9px;color:var(--t3);letter-spacing:1px;margin-bottom:3px}
-.risk-val{font-size:14px;font-weight:500}
+.risk-label{font-size:12px;color:var(--t2);margin-bottom:2px}
+.risk-val{font-size:16px;font-weight:500}
 
 /* CORR TABLE */
-.corr-cell{padding:4px 6px;text-align:center;border-radius:3px;font-size:10px}
+.corr-cell{padding:4px 5px;text-align:center;border-radius:3px;font-size:12px}
 
 /* MACRO */
-.macro-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border2);font-size:11px}
+.macro-row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border2);font-size:13px}
 
 /* CATALYST */
-.cat-row{display:flex;gap:10px;align-items:flex-start;padding:6px 0;border-bottom:1px solid var(--border2)}
-.cat-date{font-size:9px;color:var(--gold);min-width:50px;letter-spacing:.5px}
-.cat-ticker{font-size:9px;color:var(--t2);font-weight:600;min-width:38px}
-.cat-event{font-size:10px;color:var(--t2);flex:1;line-height:1.4}
+.cat-row{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-bottom:1px solid var(--border2)}
+.cat-date{font-size:12px;color:var(--gold);min-width:52px;font-family:var(--mono)}
+.cat-ticker{font-size:12px;color:var(--t1);font-weight:600;min-width:44px;font-family:var(--mono)}
+.cat-event{font-size:13px;color:var(--t2);flex:1;line-height:1.4}
 
 /* TONE BAR */
 .tone-bar-wrap{height:3px;background:rgba(255,255,255,0.06);border-radius:2px;position:relative;margin-bottom:4px}
-.tone-bar-fill{position:absolute;left:0;height:100%;border-radius:2px;transition:width .4s}
+.tone-bar-fill{position:absolute;left:0;height:100%;border-radius:2px}
 .tone-mid{position:absolute;left:50%;top:-2px;width:1px;height:7px;background:rgba(255,255,255,.15)}
 
 /* BAR CELL */
-.bar-cell{display:flex;align-items:center;gap:7px}
+.bar-cell{display:flex;align-items:center;gap:8px}
 .bar-bg{width:48px;height:4px;background:rgba(255,255,255,0.06);border-radius:2px;flex-shrink:0}
 .bar-fill{height:100%;border-radius:2px}
+
+/* NARROW SCREENS: one column, KPIs in pairs, tables scroll inside their card */
+@media (max-width:900px){
+  .kpi-grid{grid-template-columns:repeat(2,1fr);padding:12px 16px}
+  .row2,.row3,.row5{grid-template-columns:1fr;padding:0 16px}
+  .brand-row,.ticker-strip,.screener-wrap,.footer{padding-left:16px;padding-right:16px}
+  .kpi-val{font-size:20px}
+  .sep{display:none}
+}
+/* wide grids scroll inside their card at any width instead of spilling into the next card */
+#corrContent,#rdcfContent{overflow-x:auto}
 </style>
 </head>
 <body>
 
 <div id="loader">
-  <div class="brand" style="font-size:13px">SELL<span>SIDE</span> RESEARCH ENGINE</div>
+  <div class="brand">SELL<span>SIDE</span> RESEARCH ENGINE</div>
   <div class="loader-dots">
     <div class="loader-dot"></div><div class="loader-dot"></div><div class="loader-dot"></div>
   </div>
-  <div style="font-size:10px;color:var(--t3);letter-spacing:2px">INITIALISING DASHBOARD...</div>
+  <div style="font-size:12px;color:var(--t2);letter-spacing:.06em">LOADING DASHBOARD DATA</div>
 </div>
 
 <div id="app" style="display:none">
@@ -130,15 +152,12 @@ tr.active-row td{background:rgba(201,168,76,0.05)}
 <!-- TOPBAR -->
 <div class="topbar">
   <div class="brand-row">
-    <div class="brand">SELL<span>SIDE</span> RESEARCH ENGINE <span style="font-size:10px;color:var(--t3);letter-spacing:1px;margin-left:8px">v1.3.0</span></div>
+    <div class="brand">SELL<span>SIDE</span> RESEARCH ENGINE <span style="font-size:12px;color:var(--t3);letter-spacing:.04em;margin-left:8px;font-weight:400">v1.3.0</span></div>
     <div class="status-row">
-      <span><span class="live-dot"></span>SEC EDGAR</span>
-      <span style="color:#2a2a2a">|</span>
-      <span>YAHOO FINANCE</span>
-      <span style="color:#2a2a2a">|</span>
-      <span>OPENAI NLP</span>
-      <span style="color:#2a2a2a">|</span>
-      <span id="asof" style="color:var(--t2)"></span>
+      <span>SEC EDGAR</span><span class="sep">|</span>
+      <span>YAHOO FINANCE</span><span class="sep">|</span>
+      <span>WEEKDAY REFRESH</span><span class="sep">|</span>
+      <span id="asof" style="color:var(--t1)"></span>
     </div>
   </div>
   <div class="ticker-strip" id="tickerStrip"></div>
@@ -150,15 +169,15 @@ tr.active-row td{background:rgba(201,168,76,0.05)}
 <!-- ROW 2: Price + Football + Reverse DCF -->
 <div class="row2">
   <div class="card">
-    <div class="card-title">PRICE — 6 MONTH</div>
+    <div class="card-title">PRICE, 6 MONTHS</div>
     <div style="position:relative;height:200px" id="priceChartWrap"></div>
   </div>
   <div class="card">
-    <div class="card-title">DCF VALUATION — FOOTBALL FIELD</div>
+    <div class="card-title">DCF VALUATION: FOOTBALL FIELD</div>
     <div style="position:relative;height:200px" id="footballWrap"></div>
   </div>
   <div class="card" id="rdcfCard">
-    <div class="card-title">REVERSE DCF — IMPLIED GROWTH SENSITIVITY</div>
+    <div class="card-title">REVERSE DCF: IMPLIED GROWTH SENSITIVITY</div>
     <div id="rdcfContent"></div>
   </div>
 </div>
@@ -166,9 +185,9 @@ tr.active-row td{background:rgba(201,168,76,0.05)}
 <!-- ROW 3: Radar + Risk + Commentary -->
 <div class="row3">
   <div class="card">
-    <div class="card-title">MULTI-FACTOR COMPOSITE</div>
+    <div class="card-title">MULTIFACTOR COMPOSITE</div>
     <div style="position:relative;height:220px" id="radarWrap"></div>
-    <div id="factorList" style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:8px"></div>
+    <div id="factorList" style="display:grid;grid-template-columns:1fr 1fr;gap:4px 20px;margin-top:8px"></div>
   </div>
   <div class="card">
     <div class="card-title">RISK METRICS</div>
@@ -176,15 +195,15 @@ tr.active-row td{background:rgba(201,168,76,0.05)}
     <div id="volRegime" style="margin-top:10px;padding:8px 10px;background:var(--bg);border-radius:4px;border:1px solid var(--border2)"></div>
   </div>
   <div class="card" id="commentaryCard">
-    <div class="card-title">MGMT COMMENTARY — NLP SIGNALS</div>
+    <div class="card-title">MGMT COMMENTARY: KEYWORD SIGNALS</div>
     <div id="commentaryContent"></div>
   </div>
 </div>
 
 <!-- SCREENER TABLE -->
 <div class="screener-wrap">
-  <div class="sec-label">SCREENER — WATCHLIST RANKING</div>
-  <div class="card" style="padding:0;overflow:hidden">
+  <div class="sec-label">SCREENER: WATCHLIST RANKING</div>
+  <div class="card table-scroll" style="padding:0">
     <table id="screenerTable">
       <thead><tr>
         <th>TICKER</th><th>COMPOSITE</th><th>VAL</th><th>GROWTH</th><th>QUALITY</th>
@@ -213,7 +232,7 @@ tr.active-row td{background:rgba(201,168,76,0.05)}
 </div>
 
 <div class="footer">
-  <span>SELLSIDE RESEARCH ENGINE — <span class="gold">DogInfantry</span> — github.com/DogInfantry/sellside-research-engine</span>
+  <span>SELLSIDE RESEARCH ENGINE · <span class="gold">DogInfantry</span> · <a href="https://github.com/DogInfantry/sellside-research-engine">github.com/DogInfantry/sellside-research-engine</a></span>
   <span id="genAt"></span>
 </div>
 
@@ -224,7 +243,7 @@ tr.active-row td{background:rgba(201,168,76,0.05)}
 let DATA = null;
 
 // ─── STATE ───────────────────────────────────────────────────────────────────
-let active = 'AAPL';
+let active = null;  // first ticker in the data
 let priceChart = null, footballChart = null, radarChart = null;
 
 // ─── UTILS ───────────────────────────────────────────────────────────────────
@@ -235,6 +254,17 @@ const pct = n => ok(n) ? (n>=0?'+':'')+f(n,1)+'%' : 'n/a';
 const dollar = n => ok(n) ? '$'+Number(n).toFixed(2) : 'n/a';
 const scoreColor = v => v>=80?'#4CAF50':v>=65?'#C9A84C':'#E57373';
 const toneColor = t => t==='POSITIVE'?'#4CAF50':t==='CAUTIOUS'?'#E57373':'#FFB300';
+const sign = n => ok(n) ? (n>=0?'pos':'neg') : '';
+const times = n => ok(n) ? f(n,1)+'×' : 'n/a';
+// market implied growth vs consensus revenue growth; no verdict without both numbers
+const rdcfVerdict = r => !ok(r.implied_growth)||!ok(r.consensus_growth) ? ['n/a','var(--t2)']
+  : r.stretched ? ['STRETCHED','#E57373'] : ['DISCOUNT','#4CAF50'];
+
+// one font setup for every chart, so canvases match the page
+const MONO = "'IBM Plex Mono', ui-monospace, monospace";
+Chart.defaults.font.family = MONO; Chart.defaults.font.size = 12; Chart.defaults.color = '#a3a3a3';
+Chart.defaults.animation = false;  // data terminal: charts draw final state at once, also on ticker switch
+const PLOT_FONT = {family:MONO, size:12, color:'#a3a3a3'};
 
 // ─── TICKER STRIP ────────────────────────────────────────────────────────────
 function buildStrip() {
@@ -253,20 +283,21 @@ function buildStrip() {
 function buildKPIs() {
   const d = DATA.tickers[active];
   const upside = ok(d.price_target) ? (d.price_target - d.price)/d.price*100 : null;
-  const rdcf = d.reverse_dcf;
+  const dcfGap = ok(d.dcf.base) ? (d.dcf.base - d.price)/d.price*100 : null;
+  const rdcf = d.reverse_dcf, [verdict, vcol] = rdcfVerdict(rdcf);
   document.getElementById('kpiGrid').innerHTML = [
     {label:'CURRENT PRICE', val:dollar(d.price),
-      sub:`<span class="${d.price_change>=0?'pos':'neg'}">${d.price_change>=0?'+':''}${f(d.price_change)} (${pct(d.price_change_pct)}) today</span>`},
-    {label:'DCF INTRINSIC VALUE', val:dollar(d.dcf.base),
-      sub:`<span class="${upside>=0?'pos':'neg'}">${pct(upside)} to target ${dollar(d.price_target)}</span>`},
-    {label:'REVERSE DCF: IMPLIED GROWTH', val:`<span style="color:${rdcf.stretched?'#E57373':'#4CAF50'}">${pc(rdcf.implied_growth,1)}</span>`,
-      sub:`Consensus: ${pc(rdcf.consensus_growth,1)} · <span style="color:${rdcf.stretched?'#E57373':'#4CAF50'};font-weight:600">${!ok(rdcf.implied_growth)||!ok(rdcf.consensus_growth)?'n/a':rdcf.stretched?'STRETCHED':'DISCOUNT'}</span>`},
-    {label:'ANALYST RATING', val:`<span class="pill pill-${d.rating.toLowerCase()}">${d.rating}</span>`,
-      sub:`Composite: <span class="gold">${d.composite_score??'n/a'}</span>/100`},
-    {label:'MARKET CAP', val:ok(d.market_cap_b)?`$${d.market_cap_b.toLocaleString()}B`:'n/a', sub:`<span style="color:var(--t2)">${d.sector??'n/a'}</span>`},
-    {label:'P/E (TTM)', val:`${f(d.financials.pe_ttm)}×`, sub:`EPS NTM: $${f(d.financials.eps_next_yr)}`},
-    {label:'NET MARGIN', val:`${pc(d.financials.net_margin)}`, sub:`Rev growth: <span class="pos">${pct(d.financials.revenue_growth_yoy,1)}</span>`},
-    {label:'FCF YIELD', val:`${pc(d.dcf.fcf_yield)}`, sub:`WACC: ${pc(d.dcf.wacc)}`}
+      sub:`<span class="${sign(d.price_change)}">${d.price_change>=0?'+':''}${f(d.price_change)} (${pct(d.price_change_pct)}) today</span>`},
+    {label:'DCF VALUE (BASE)', val:dollar(d.dcf.base),
+      sub:ok(dcfGap)?`<span class="${sign(dcfGap)}">${pct(dcfGap)} vs price</span>`:'n/a'},
+    {label:'REVERSE DCF: IMPLIED GROWTH', val:`<span style="color:${vcol}">${pc(rdcf.implied_growth,1)}</span>`,
+      sub:`Consensus rev +1y: ${pc(rdcf.consensus_growth,1)} · <span style="color:${vcol};font-weight:600">${verdict}</span>`},
+    {label:'RATING (VS CONSENSUS TARGET)', val:`<span class="pill pill-${d.rating.toLowerCase()}">${d.rating}</span>`,
+      sub:`Target ${dollar(d.price_target)} <span class="${sign(upside)}">(${pct(upside)})</span> · Composite <span class="gold">${d.composite_score??'n/a'}</span>`},
+    {label:'MARKET CAP', val:ok(d.market_cap_b)?`$${d.market_cap_b.toLocaleString()}B`:'n/a', sub:d.sector??'n/a'},
+    {label:'P/E (TTM)', val:times(d.financials.pe_ttm), sub:`EPS next year: ${dollar(d.financials.eps_next_yr)}`},
+    {label:'NET MARGIN', val:`${pc(d.financials.net_margin,1)}`, sub:`Rev growth: <span class="${sign(d.financials.revenue_growth_yoy)}">${pct(d.financials.revenue_growth_yoy)}</span>`},
+    {label:'FCF YIELD', val:`${pc(d.dcf.fcf_yield,1)}`, sub:`WACC: ${pc(d.dcf.wacc,1)}`}
   ].map(c=>`<div class="card"><div class="card-title">${c.label}</div><div class="kpi-val">${c.val}</div><div class="kpi-sub">${c.sub}</div></div>`).join('');
 }
 
@@ -278,20 +309,21 @@ function buildPriceChart() {
   const dates = d.price_history.map(h=>h.date);
   const prices = d.price_history.map(h=>h.price);
   Plotly.newPlot('priceChart',[
-    {x:dates,y:prices,type:'scatter',mode:'lines',name:'Price',
-     line:{color:'#C9A84C',width:2},fill:'tozeroy',fillcolor:'rgba(201,168,76,0.05)'},
+    // no fill: 'tozeroy' forced the axis to $0 and flattened the trend
+    {x:dates,y:prices,type:'scatter',mode:'lines',name:'Price',line:{color:'#C9A84C',width:2}},
     {x:[dates[0],dates[dates.length-1]],y:[d.price_target,d.price_target],type:'scatter',mode:'lines',
-     name:'Target',line:{color:'#4CAF50',width:1,dash:'dot'},showlegend:true},
+     name:'Target',line:{color:'#4CAF50',width:1,dash:'dot'},showlegend:ok(d.price_target)},
     {x:[dates[0],dates[dates.length-1]],y:[d.dcf.base,d.dcf.base],type:'scatter',mode:'lines',
-     name:'DCF Base',line:{color:'rgba(255,255,255,0.2)',width:1,dash:'dash'},showlegend:true}
+     name:'DCF Base',line:{color:'rgba(255,255,255,0.45)',width:1,dash:'dash'},showlegend:ok(d.dcf.base)}
   ],{
     paper_bgcolor:'transparent',plot_bgcolor:'transparent',
-    margin:{t:4,r:8,b:30,l:44},
-    xaxis:{showgrid:false,tickfont:{color:'#4a4a4a',size:9,family:'monospace'},tickformat:'%b %d',nticks:5},
-    yaxis:{showgrid:true,gridcolor:'rgba(255,255,255,0.04)',tickfont:{color:'#4a4a4a',size:9,family:'monospace'},tickprefix:'$'},
-    legend:{font:{color:'#7a7a7a',size:9,family:'monospace'},bgcolor:'transparent',orientation:'h',y:-0.25},
+    margin:{t:4,r:8,b:34,l:52},
+    font:PLOT_FONT,
+    xaxis:{showgrid:false,tickfont:PLOT_FONT,tickformat:'%b %d',nticks:5},
+    yaxis:{showgrid:true,gridcolor:'rgba(255,255,255,0.05)',tickfont:PLOT_FONT,tickprefix:'$'},
+    legend:{font:PLOT_FONT,bgcolor:'transparent',orientation:'h',y:-0.28},
     hovermode:'x unified',
-    hoverlabel:{bgcolor:'#1a1d24',bordercolor:'rgba(255,255,255,0.1)',font:{color:'#e8e6e0',size:11,family:'monospace'}}
+    hoverlabel:{bgcolor:'#1a1d24',bordercolor:'rgba(255,255,255,0.1)',font:{...PLOT_FONT,color:'#e8e6e0',size:13}}
   },{displayModeBar:false,responsive:true});
 }
 
@@ -299,8 +331,9 @@ function buildPriceChart() {
 function buildFootball() {
   const d = DATA.tickers[active];
   const wrap = document.getElementById('footballWrap');
-  wrap.innerHTML = '<canvas id="footballChart"></canvas>';
   if(footballChart){footballChart.destroy();footballChart=null;}
+  if(!ok(d.dcf.base)){wrap.innerHTML='<div class="signal-box">n/a: no FCF DCF for this ticker (banks, brokers and insurers)</div>';return;}
+  wrap.innerHTML = '<canvas id="footballChart"></canvas>';
   const ctx = document.getElementById('footballChart').getContext('2d');
   footballChart = new Chart(ctx,{
     type:'bar',
@@ -318,54 +351,59 @@ function buildFootball() {
       plugins:{
         legend:{display:false},
         tooltip:{callbacks:{label:ctx=>' $'+ctx.raw.toFixed(0)},
-          bodyFont:{family:'monospace',size:11},backgroundColor:'#1a1d24',borderColor:'rgba(255,255,255,0.1)',borderWidth:1}
+          bodyFont:{size:13},backgroundColor:'#1a1d24',borderColor:'rgba(255,255,255,0.1)',borderWidth:1}
       },
       scales:{
-        x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4a4a4a',font:{size:9,family:'monospace'},callback:v=>'$'+v},
-           min:Math.min(d.dcf.bear*0.88,d.price*0.88)},
-        y:{grid:{display:false},ticks:{color:'#7a7a7a',font:{size:10,family:'monospace'}}}
+        // axis always spans the price, so the price line is never off chart
+        x:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{callback:v=>'$'+Math.round(v),maxRotation:0,autoSkipPadding:12,includeBounds:false},
+           min:Math.floor(Math.min(d.dcf.bear??d.price,d.price)*0.88/10)*10,
+           max:Math.ceil(Math.max(d.dcf.bull??d.price,d.price)*1.08/10)*10},
+        y:{grid:{display:false},ticks:{color:'#e8e6e0'}}
       }
-    }
+    },
+    plugins:[{id:'priceLine',afterDatasetsDraw(c){
+      const x=c.scales.x.getPixelForValue(d.price),{top,bottom,right}=c.chartArea,g=c.ctx,flip=x>right-110;
+      g.save();g.strokeStyle='#e8e6e0';g.setLineDash([4,3]);g.beginPath();g.moveTo(x,top);g.lineTo(x,bottom);g.stroke();
+      g.fillStyle='#e8e6e0';g.font=`12px ${MONO}`;g.textAlign=flip?'right':'left';
+      g.fillText(`Price $${d.price.toFixed(0)}`,flip?x-6:x+6,top+12);g.restore();
+    }}]
   });
-  // Add current price annotation manually
-  const priceLabel = document.createElement('div');
-  priceLabel.style.cssText = `position:absolute;bottom:28px;font-size:9px;color:#C9A84C;letter-spacing:1px`;
-  priceLabel.innerHTML = `— Current $${d.price.toFixed(0)}`;
-  wrap.appendChild(priceLabel);
 }
 
 // ─── REVERSE DCF HEATMAP ─────────────────────────────────────────────────────
 function buildRDCF() {
   const d = DATA.tickers[active];
-  const {sensitivity,implied_growth,consensus_growth,stretched} = d.reverse_dcf;
+  const {sensitivity,implied_growth,consensus_growth} = d.reverse_dcf, [verdict, vcol] = rdcfVerdict(d.reverse_dcf);
   const waccs=[...new Set(sensitivity.map(s=>s.wacc))],tgs=[...new Set(sensitivity.map(s=>s.tg))];
   const getV=(w,t)=>(sensitivity.find(s=>s.wacc===w&&s.tg===t)||{implied:null}).implied;
   function cellStyle(v){
-    if(!ok(v)||!ok(consensus_growth))return{bg:'rgba(255,255,255,0.03)',col:'#7a7a7a'};
+    if(!ok(v)||!ok(consensus_growth))return{bg:'rgba(255,255,255,0.03)',col:'#a3a3a3'};
     const diff=v-consensus_growth;
-    if(diff>3)return{bg:'rgba(229,115,115,0.35)',col:'#E57373'};
+    if(diff>3)return{bg:'rgba(229,115,115,0.35)',col:'#ffcdd2'};  // light text keeps 4.5:1 on the strong tints
     if(diff>1)return{bg:'rgba(229,115,115,0.18)',col:'#ef9a9a'};
     if(diff>-1)return{bg:'rgba(255,179,0,0.15)',col:'#FFB300'};
     if(diff>-3)return{bg:'rgba(76,175,80,0.18)',col:'#81c784'};
-    return{bg:'rgba(76,175,80,0.30)',col:'#4CAF50'};
+    return{bg:'rgba(76,175,80,0.30)',col:'#81c784'};
   }
-  let html=`<div style="font-size:10px;color:var(--t2);margin-bottom:10px">
-    Implied: <span style="color:${stretched?'#E57373':'#4CAF50'};font-weight:600">${pc(implied_growth,1)}</span>
-    vs consensus ${pc(consensus_growth,1)} →
-    <span style="color:${stretched?'#E57373':'#4CAF50'};font-weight:600">${!ok(implied_growth)||!ok(consensus_growth)?'n/a':stretched?'STRETCHED':'UNDERPRICED'}</span>
-  </div>
-  <table style="width:100%;border-collapse:separate;border-spacing:2px;font-size:10px">
-  <tr><th style="padding:3px 6px;color:var(--t3);font-size:9px;font-weight:500;text-align:left">TG＼WACC</th>
-  ${waccs.map(w=>`<th style="padding:3px 6px;color:var(--t2);text-align:center;font-weight:500">${w}%</th>`).join('')}</tr>`;
+  let html=`<div style="font-size:13px;color:var(--t2);margin-bottom:10px">
+    Price implies <span class="num" style="color:${vcol};font-weight:600">${pc(implied_growth,1)}</span> a year FCF growth for 10 years
+    vs consensus revenue +1y <span class="num">${pc(consensus_growth,1)}</span> ·
+    <span style="color:${vcol};font-weight:600">${verdict}</span>
+  </div>`;
+  if(!sensitivity.length){document.getElementById('rdcfContent').innerHTML='<div class="signal-box">n/a: no reverse DCF without a DCF</div>';return;}
+  html+=`
+  <table style="width:100%;border-collapse:separate;border-spacing:2px;font-size:12px">
+  <tr><th style="padding:3px 6px;text-align:left">TG / WACC</th>
+  ${waccs.map(w=>`<th class="num" style="padding:3px 6px;text-align:center">${w}%</th>`).join('')}</tr>`;
   tgs.forEach(tg=>{
-    html+=`<tr><td style="padding:3px 6px;color:#C9A84C;font-size:9px">${tg}%</td>`;
+    html+=`<tr><td style="padding:3px 6px;color:#C9A84C;border:0">${f(tg,1)}%</td>`;
     waccs.forEach(w=>{
       const v=getV(w,tg);const s=cellStyle(v);
-      html+=`<td style="padding:5px 7px;background:${s.bg};color:${s.col};text-align:center;border-radius:3px;font-weight:500">${f(v,1)}</td>`;
+      html+=`<td style="padding:5px 6px;background:${s.bg};color:${s.col};text-align:center;border-radius:3px;border:0;font-weight:500">${f(v,1)}</td>`;
     });
     html+=`</tr>`;
   });
-  html+=`</table><div style="margin-top:8px;font-size:9px;color:var(--t3)">Red = implied > consensus → stretched valuation</div>`;
+  html+=`</table><div style="margin-top:8px;font-size:12px;color:var(--t3)">Cells: implied growth per WACC and terminal growth. Red: the price needs more growth than consensus.</div>`;
   document.getElementById('rdcfContent').innerHTML=html;
 }
 
@@ -379,24 +417,24 @@ function buildRadar() {
   radarChart = new Chart(ctx,{
     type:'radar',
     data:{
-      labels:['VALUATION','GROWTH','QUALITY','MOMENTUM','CONSENSUS'],
+      labels:['Valuation','Growth','Quality','Momentum','Consensus'],
       datasets:[{label:active,data:[f_.valuation,f_.growth,f_.quality,f_.momentum,f_.consensus],
         borderColor:'#C9A84C',backgroundColor:'rgba(201,168,76,0.1)',
         pointBackgroundColor:'#C9A84C',borderWidth:1.5,pointRadius:3}]
     },
     options:{
       responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},tooltip:{bodyFont:{family:'monospace',size:11},backgroundColor:'#1a1d24',borderColor:'rgba(255,255,255,0.1)',borderWidth:1}},
-      scales:{r:{min:0,max:100,grid:{color:'rgba(255,255,255,0.06)'},
-        pointLabels:{color:'#7a7a7a',font:{size:9,family:'monospace'}},ticks:{display:false}}}
+      plugins:{legend:{display:false},tooltip:{bodyFont:{size:13},backgroundColor:'#1a1d24',borderColor:'rgba(255,255,255,0.1)',borderWidth:1}},
+      scales:{r:{min:0,max:100,grid:{color:'rgba(255,255,255,0.08)'},angleLines:{color:'rgba(255,255,255,0.08)'},
+        pointLabels:{color:'#a3a3a3',font:{family:"'IBM Plex Sans', sans-serif",size:12}},ticks:{display:false}}}
     }
   });
   const factors_ = DATA.tickers[active].factors;
   document.getElementById('factorList').innerHTML =
     Object.entries(factors_).map(([k,v])=>`
-      <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--border2)">
-        <span style="font-size:9px;color:var(--t3);letter-spacing:1px">${k.toUpperCase()}</span>
-        <span style="font-size:10px;font-weight:600;color:${scoreColor(v)}">${v??'n/a'}</span>
+      <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border2)">
+        <span style="font-size:12px;color:var(--t2)">${k[0].toUpperCase()+k.slice(1)}</span>
+        <span class="num" style="font-size:13px;font-weight:600;color:${ok(v)?scoreColor(v):'var(--t2)'}">${v??'n/a'}</span>
       </div>`).join('');
 }
 
@@ -404,10 +442,11 @@ function buildRadar() {
 function buildRisk() {
   const r = DATA.tickers[active].risk;
   const riskColor=(k,v)=>{
+    if(!ok(v))return'var(--t2)';
     if(['var_95','cvar','max_drawdown'].includes(k))return'#E57373';
     if(k==='beta')return v>1.2?'#E57373':v>1.0?'#FFB300':'#4CAF50';
     if(['sharpe','sortino'].includes(k))return v>1.5?'#4CAF50':v>1.0?'#FFB300':'#E57373';
-    return'#7a7a7a';
+    return'#e8e6e0';
   };
   const metrics=[
     ['var_95','VaR 95% (1D)',`${pc(r.var_95)}`],['cvar','CVaR (ES)',`${pc(r.cvar)}`],
@@ -419,18 +458,18 @@ function buildRisk() {
     <div class="risk-cell"><div class="risk-label">${label}</div>
     <div class="risk-val" style="color:${riskColor(k,parseFloat(val))}">${val}</div></div>`).join('');
   const ratio=r.vol_21d/r.vol_63d;
-  const trend=!ok(ratio)?'N/A':ratio>1.05?'RISING':ratio<0.95?'FALLING':'STABLE';
-  const tc=ratio>1.05?'#E57373':ratio<0.95?'#4CAF50':'#FFB300';
+  const trend=!ok(ratio)?'n/a':ratio>1.05?'RISING':ratio<0.95?'FALLING':'STABLE';
+  const tc=!ok(ratio)?'var(--t2)':ratio>1.05?'#E57373':ratio<0.95?'#4CAF50':'#FFB300';
   document.getElementById('volRegime').innerHTML=`
     <div style="display:flex;justify-content:space-between;margin-bottom:6px">
-      <span style="font-size:9px;color:var(--t3);letter-spacing:1px">VOL REGIME</span>
-      <span style="font-size:10px;font-weight:600;color:${tc}">${trend}</span>
+      <span style="font-size:12px;color:var(--t2);letter-spacing:.06em">VOL REGIME</span>
+      <span style="font-size:12px;font-weight:600;color:${tc}">${trend}</span>
     </div>
     <div style="height:4px;background:rgba(255,255,255,.06);border-radius:2px">
       <div style="width:${Math.min((r.vol_21d/40)*100,100)}%;height:100%;background:${tc};opacity:.7;border-radius:2px"></div>
     </div>
-    <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:9px;color:var(--t3)">
-      <span>21D: ${pc(r.vol_21d)}</span><span>63D: ${pc(r.vol_63d)}</span>
+    <div class="num" style="display:flex;justify-content:space-between;margin-top:4px;font-size:12px;color:var(--t2)">
+      <span>21D: ${pc(r.vol_21d,1)}</span><span>63D: ${pc(r.vol_63d,1)}</span>
     </div>`;
 }
 
@@ -441,9 +480,9 @@ function buildCommentary() {
   const tc = toneColor(c.tone);
   document.getElementById('commentaryContent').innerHTML=`
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-      <span style="font-size:9px;color:var(--t3)">TONE SCORE</span>
+      <span style="font-size:12px;color:var(--t2);letter-spacing:.06em">TONE SCORE</span>
       <div style="display:flex;align-items:center;gap:8px">
-        <span style="font-size:13px;font-weight:600;color:${tc}">${f(c.tone_score)}</span>
+        <span class="num" style="font-size:14px;font-weight:600;color:${tc}">${f(c.tone_score)}</span>
         <span class="pill" style="background:${tc}1a;color:${tc};border:1px solid ${tc}4d">${c.tone}</span>
       </div>
     </div>
@@ -451,7 +490,7 @@ function buildCommentary() {
       <div class="tone-bar-fill" style="width:${c.tone_score*100}%;background:${tc};opacity:.7"></div>
       <div class="tone-mid"></div>
     </div>
-    <div style="display:flex;justify-content:space-between;font-size:8px;color:var(--t3);margin-bottom:12px;margin-top:3px">
+    <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--t3);margin-bottom:12px;margin-top:3px">
       <span>BEARISH</span><span>NEUTRAL</span><span>BULLISH</span>
     </div>
     <div class="signal-box"><div class="signal-label">GUIDANCE</div>${c.guidance}</div>
@@ -472,9 +511,9 @@ function buildScreener() {
     .sort((a,b)=>b.composite_score-a.composite_score);
   document.getElementById('screenerBody').innerHTML = rows.map(r=>`
     <tr class="${r.t===active?'active-row':''}" onclick="setActive('${r.t}')">
-      <td style="font-weight:600;color:${r.t===active?'#C9A84C':'var(--t1)'}">${r.t}${r.t===active?'<span style="font-size:8px;color:#C9A84C;margin-left:6px;opacity:.7">▶</span>':''}</td>
-      <td><div class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:${r.composite_score}%;background:${scoreColor(r.composite_score)}"></div></div>
-        <span style="color:${scoreColor(r.composite_score)};font-weight:600">${r.composite_score??'n/a'}</span></div></td>
+      <td style="font-weight:600;color:${r.t===active?'#C9A84C':'var(--t1)'}">${r.t}</td>
+      <td><div class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:${r.composite_score??0}%;background:var(--gold);opacity:.75"></div></div>
+        <span style="font-weight:600">${r.composite_score??'n/a'}</span></div></td>
       <td style="color:var(--t2)">${r.factors.valuation??'n/a'}</td>
       <td style="color:var(--t2)">${r.factors.growth??'n/a'}</td>
       <td style="color:var(--t2)">${r.factors.quality??'n/a'}</td>
@@ -482,8 +521,8 @@ function buildScreener() {
       <td style="color:var(--t2)">${r.factors.consensus??'n/a'}</td>
       <td>${dollar(r.price)}</td>
       <td class="gold">${dollar(r.price_target)}</td>
-      <td class="${r.upside>=0?'pos':'neg'}" style="font-weight:600">${pct(r.upside)}</td>
-      <td style="color:var(--t2)">${f(r.financials.pe_ttm)}×</td>
+      <td class="${sign(r.upside)}" style="font-weight:600">${pct(r.upside)}</td>
+      <td style="color:var(--t2)">${times(r.financials.pe_ttm)}</td>
       <td class="${r.financials.revenue_growth_yoy>=10?'pos':''}">${pct(r.financials.revenue_growth_yoy,1)}</td>
       <td><span class="pill pill-${r.rating.toLowerCase()}">${r.rating}</span></td>
     </tr>`).join('');
@@ -494,21 +533,22 @@ function buildCorr() {
   const {tickers,values} = DATA.correlation_matrix;
   const cellStyle=v=>{
     if(v===1.0)return{bg:'rgba(201,168,76,0.25)',col:'#C9A84C'};
-    if(v>=0.8)return{bg:'rgba(229,115,115,0.35)',col:'#E57373'};
+    if(v>=0.8)return{bg:'rgba(229,115,115,0.35)',col:'#ffcdd2'};
     if(v>=0.65)return{bg:'rgba(229,115,115,0.18)',col:'#ef9a9a'};
     if(v>=0.5)return{bg:'rgba(255,179,0,0.12)',col:'#FFB300'};
     return{bg:'rgba(76,175,80,0.15)',col:'#81c784'};
   };
-  let html=`<table style="width:100%;border-collapse:separate;border-spacing:2px;font-size:10px">
-    <tr><th></th>${tickers.map(t=>`<th style="padding:3px 5px;color:var(--t2);font-weight:500;font-size:9px">${t}</th>`).join('')}</tr>`;
+  let html=`<table style="width:100%;border-collapse:separate;border-spacing:2px;font-size:12px">
+    <tr><th style="padding:3px 4px"></th>${tickers.map(t=>`<th class="num" style="padding:3px 4px;text-align:center">${t}</th>`).join('')}</tr>`;
   tickers.forEach((rt,i)=>{
-    html+=`<tr><td style="padding:3px 5px;color:#C9A84C;font-size:9px;letter-spacing:1px">${rt}</td>`;
-    values[i].forEach((v,j)=>{const s=cellStyle(v);html+=`<td class="corr-cell" style="background:${s.bg};color:${s.col};font-weight:${v===1.0?600:400}">${f(v)}</td>`;});
+    html+=`<tr><td style="padding:3px 4px;color:#C9A84C;border:0">${rt}</td>`;
+    values[i].forEach((v,j)=>{const s=cellStyle(v);html+=`<td class="corr-cell" style="background:${s.bg};color:${s.col};border:0;font-weight:${v===1.0?600:400}">${f(v)}</td>`;});
     html+=`</tr>`;
   });
-  html+=`</table><div style="margin-top:8px;display:flex;gap:10px;flex-wrap:wrap">
-    ${[['rgba(229,115,115,0.35)','#E57373','≥0.80 high corr'],['rgba(255,179,0,0.12)','#FFB300','0.50–0.65'],['rgba(76,175,80,0.15)','#81c784','<0.50 low']].map(([bg,col,label])=>
-    `<span style="display:flex;align-items:center;gap:4px;font-size:9px;color:var(--t3)"><span style="width:8px;height:8px;border-radius:2px;background:${bg};border:1px solid ${col};display:inline-block"></span>${label}</span>`).join('')}
+  html+=`</table><div style="margin-top:8px;display:flex;gap:6px 12px;flex-wrap:wrap">
+    ${[['rgba(229,115,115,0.35)','#E57373','0.80 and up'],['rgba(229,115,115,0.18)','#ef9a9a','0.65 to 0.80'],['rgba(255,179,0,0.12)','#FFB300','0.50 to 0.65'],['rgba(76,175,80,0.15)','#81c784','below 0.50']].map(([bg,col,label])=>
+    `<span style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--t2)"><span style="width:10px;height:10px;border-radius:2px;background:${bg};border:1px solid ${col};display:inline-block"></span>${label}</span>`).join('')}
+    <span style="font-size:12px;color:var(--t3)">63 day daily returns</span>
   </div>`;
   document.getElementById('corrContent').innerHTML=html;
 }
@@ -517,23 +557,24 @@ function buildCorr() {
 function buildMacro() {
   const m=DATA.macro, c=DATA.macro_chg||{};
   const rows=[
-    ['10Y UST',pc(m.ust_10y),c.ust_10y],['2Y UST',pc(m.ust_2y),c.ust_2y],
-    ['2s/10s',pc(m.spread_2s10s),c.spread_2s10s],['VIX',f(m.vix,1),c.vix],
+    // ust_2y is ^IRX, the 13 week bill (macro_us.py), so label it as such
+    ['10Y UST',pc(m.ust_10y),c.ust_10y],['3M T-BILL',pc(m.ust_2y),c.ust_2y],
+    ['3M/10Y',pc(m.spread_2s10s),c.spread_2s10s],['VIX',f(m.vix,1),c.vix],
     ['DXY',f(m.dxy,1),c.dxy],['WTI',dollar(m.wti),c.wti],
     ['EUR/USD',f(m.eurusd,4),c.eurusd]
   ].map(([label,val,chg])=>[label,val,chg??'',!String(chg??'').startsWith('-')]);
   document.getElementById('macroContent').innerHTML=rows.map(([label,val,chg,up])=>{
     const isRisk=['VIX','DXY'].includes(label);
     const col=isRisk?(up?'#E57373':'#4CAF50'):(up?'#4CAF50':'#E57373');
-    return `<div class="macro-row"><span style="font-size:9px;color:var(--t2);letter-spacing:1px">${label}</span>
-    <span>${val} <span style="color:${col};font-size:10px">${chg}</span></span></div>`;
+    return `<div class="macro-row"><span style="font-size:12px;color:var(--t2);letter-spacing:.04em">${label}</span>
+    <span class="num">${val} <span style="color:${chg?col:'var(--t2)'};font-size:12px">${chg}</span></span></div>`;
   }).join('');
 }
 
 // ─── CATALYSTS ────────────────────────────────────────────────────────────────
 function buildCatalysts() {
   const typeColor=t=>t==='EARNINGS'?{bg:'rgba(76,175,80,.12)',col:'#4CAF50'}:{bg:'rgba(201,168,76,.12)',col:'#C9A84C'};
-  const convColor=c=>c==='HIGH'?'#4CAF50':c==='MED'?'#FFB300':'#7a7a7a';
+  const convColor=c=>c==='HIGH'?'#4CAF50':c==='MED'?'#FFB300':'#a3a3a3';
   if(!DATA.catalysts.length){document.getElementById('catalystContent').innerHTML='<div class="cat-row"><span class="cat-event">n/a: no upcoming earnings dates</span></div>';return;}
   document.getElementById('catalystContent').innerHTML=DATA.catalysts.map(c=>{
     const {bg,col}=typeColor(c.type);
@@ -542,8 +583,8 @@ function buildCatalysts() {
       <span class="cat-date">${d}</span><span class="cat-ticker">${c.ticker}</span>
       <span class="cat-event">${c.event}</span>
       <div style="display:flex;flex-direction:column;gap:2px;align-items:flex-end">
-        <span style="font-size:8px;padding:1px 6px;border-radius:2px;background:${bg};color:${col}">${c.type}</span>
-        <span style="font-size:8px;color:${convColor(c.conviction)}">${c.conviction??''}</span>
+        <span style="font-size:12px;padding:1px 6px;border-radius:2px;background:${bg};color:${col}">${c.type}</span>
+        ${c.conviction?`<span style="font-size:12px;color:${convColor(c.conviction)}">${c.conviction}</span>`:''}
       </div></div>`;
   }).join('');
 }
@@ -576,9 +617,11 @@ window.addEventListener('load',async()=>{
     if(!res.ok)throw new Error('HTTP '+res.status);
     DATA=await res.json();
   }catch(e){
-    document.getElementById('loader').innerHTML=`<div style="font-size:11px;color:#E57373;letter-spacing:1px">FAILED TO LOAD DASHBOARD DATA: ${e.message}</div>`;
+    document.getElementById('loader').innerHTML=`<div style="font-size:13px;color:#E57373;letter-spacing:.04em">FAILED TO LOAD DASHBOARD DATA: ${e.message}</div>`;
     return;
   }
+  // canvases paint once, so wait for the webfonts (falls through if Google Fonts is blocked)
+  await Promise.all(["400 12px 'IBM Plex Mono'","12px 'IBM Plex Sans'"].map(s=>document.fonts.load(s))).catch(()=>{});
   if(!DATA.tickers[active])active=Object.keys(DATA.tickers)[0];
   document.getElementById('loader').style.display='none';
   document.getElementById('app').style.display='block';
