@@ -1,8 +1,10 @@
 import json
 
+import numpy as np
 import pandas as pd
 
-from export_dashboard_data import sector_context, ticker_block
+from export_dashboard_data import pe_growth_fit, sector_block, sector_context, ticker_block
+from trg_workbench.analytics.valuation import build_comps_table
 from trg_workbench.pipeline_v2 import value_ticker
 
 
@@ -46,9 +48,48 @@ def test_sector_context_compares_with_peer_medians():
         {"ticker": "XLK", "instrument_group": "sector_proxy", "sector": "Technology", "forward_pe": 99.0},
         {"ticker": "ZZZ", "instrument_group": "us_equity", "sector": "Basic Materials", "forward_pe": 10.0},
     ])
-    ctx = sector_context(sm, "AAA")
+    comps = build_comps_table(sm)
+    ctx = sector_context(comps, "AAA")
     assert ctx["etf"] == "XLK" and ctx["peers"] == 2      # self and the ETF row are not peers
     assert ctx["fwd_pe"] == 30.0 and ctx["fwd_pe_median"] == 30.0
     assert ctx["margin_median"] == 30.0                    # NaN peer skipped, shown in pct
-    lonely = sector_context(sm, "ZZZ")
+    assert ctx["ev_ebitda"] is None and ctx["ev_ebitda_median"] is None  # no EV data: n/a
+    fin = {"instrument_group": "us_equity", "sector": "Financial Services", "forward_pe": 12.0}
+    banks = build_comps_table(pd.DataFrame([
+        {**fin, "ticker": "AM", "industry": "Asset Management", "enterprise_value": 150.0, "ebitda": 10.0},
+        *[{**fin, "ticker": t, "industry": "Banks - Diversified"} for t in ["B1", "B2", "B3"]],
+    ]))
+    bank = sector_context(banks, "B1")
+    assert bank["ev_ebitda_median"] is None  # one asset manager is not the median of three peers
+    assert bank["fwd_pe_median"] == 12.0
+    lonely = sector_context(comps, "ZZZ")
     assert lonely["etf"] is None and lonely["fwd_pe_median"] is None  # no ETF fetched, no peers: n/a
+
+
+def test_sector_block_windows_start_on_exact_dates():
+    d = pd.bdate_range("2025-12-01", periods=80)
+    wide = pd.DataFrame({"XLK": np.linspace(100, 179, 80), "XLE": 100.0, "SPX": np.linspace(200, 239.5, 80)}, index=d)
+    wide.loc[d[-2], "XLK"] = float("nan")  # Yahoo dropped one day for one series
+    block = sector_block(wide)
+    rows = {r["etf"]: r for r in block["rows"]}
+
+    assert block["as_of"] == d[-1].strftime("%Y-%m-%d")
+    assert rows["XLK"]["name"] == "Technology" and rows["SPX"]["name"] == "S&P 500"
+    assert rows["XLK"]["ret_1d"] is None  # no close on the start day: n/a, not a two day move
+    assert rows["XLK"]["ret_1w"] == round((179 / wide["XLK"].iloc[-6] - 1) * 100, 1)
+    spx = wide["SPX"]
+    assert rows["SPX"]["ret_1d"] == round((spx.iloc[-1] / spx.iloc[-2] - 1) * 100, 1)
+    assert rows["XLE"]["ret_1d"] == 0.0
+    last_2025 = spx[spx.index.year == 2025].iloc[-1]
+    assert rows["SPX"]["ret_ytd"] == round((spx.iloc[-1] / last_2025 - 1) * 100, 1)
+    assert rows["SPX"]["prior_2m"] == round((spx.iloc[-22] / spx.iloc[-64] - 1) * 100, 1)
+    json.dumps(block, allow_nan=False)
+
+
+def test_pe_growth_fit_recovers_a_line():
+    g = [5.0, 10.0, 20.0, 30.0]
+    comps = pd.DataFrame({"fwd_pe": [10 + 0.5 * x for x in g] + [-5.0], "growth": [x / 100 for x in g] + [0.1]})
+    fit = pe_growth_fit(comps)  # the negative P/E is left out
+
+    assert (fit["n"], fit["slope"], fit["intercept"], fit["r2"]) == (4, 0.5, 10.0, 1.0)
+    assert pe_growth_fit(comps.head(2)) is None  # too few names for a line

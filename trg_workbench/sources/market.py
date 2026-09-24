@@ -78,6 +78,8 @@ class MarketDataClient:
                 "next_earnings_date",
                 "total_debt",
                 "revenue_growth_next_year",
+                "enterprise_value",
+                "ebitda",
             }
             if required_columns.issubset(cached.columns):
                 return cached
@@ -129,6 +131,8 @@ class MarketDataClient:
                     "market_cap": info.get("marketCap"),
                     "total_debt": info.get("totalDebt"),
                     "total_cash": info.get("totalCash"),
+                    "enterprise_value": info.get("enterpriseValue"),
+                    "ebitda": info.get("ebitda"),
                     "beta": info.get("beta"),
                     "trailing_pe": info.get("trailingPE"),
                     "forward_pe": info.get("forwardPE"),

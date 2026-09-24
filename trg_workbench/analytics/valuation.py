@@ -231,44 +231,39 @@ def reverse_dcf(
 
 # ─── comps / peer table ───────────────────────────────────────────────────────
 
-def build_comps_table(research_df: pd.DataFrame) -> pd.DataFrame:
+# balance sheet businesses: debt and cash are operating items, so no FCF DCF and no EV multiples
+BALANCE_SHEET_INDUSTRIES = ("Banks", "Capital Markets", "Insurance")
+
+
+def build_comps_table(security_master: pd.DataFrame) -> pd.DataFrame:
     """
-    Build a peer comps table from the research dataset.
-    Columns: ticker, sector, market_cap_bn, trailing_pe, forward_pe,
-             ev_revenue (proxy), revenue_growth, net_margin, roe,
-             ret_1m, ret_3m, research_score.
+    Peer comps for the US stock universe from the yfinance security master (TTM, same basis for every name).
+    Columns: ticker, sector, fwd_pe, ev_ebitda, ev_sales, peg, growth, margin, roe, net_debt_ebitda.
+    Missing inputs stay NaN (shown as n/a); the page compares each metric with the sector peer median.
     """
-    cols_needed = [
-        "sector", "market_cap", "trailing_pe", "forward_pe",
-        "revenue_growth", "net_margin", "roe",
-        "ret_1m", "ret_3m",
-    ]
-    available = [c for c in cols_needed if c in research_df.columns]
-    df = research_df[available].copy()
-
-    if "market_cap" in df.columns:
-        df["market_cap_bn"] = (df["market_cap"] / 1e9).round(1)
-        df = df.drop(columns=["market_cap"])
-
-    # Sort by sector then market_cap_bn descending
-    sort_cols = []
-    if "sector" in df.columns:
-        sort_cols.append("sector")
-    if "market_cap_bn" in df.columns:
-        sort_cols.append("market_cap_bn")
-    if sort_cols:
-        df = df.sort_values(sort_cols, ascending=[True, False])
-
-    # Compute sector-median PE ratio for relative valuation flag
-    if "trailing_pe" in df.columns and "sector" in df.columns:
-        sector_med_pe = df.groupby("sector")["trailing_pe"].transform("median")
-        df["pe_vs_sector"] = ((df["trailing_pe"] / sector_med_pe) - 1).round(3)
-        df["pe_vs_sector_label"] = df["pe_vs_sector"].apply(
-            lambda x: f"+{x:.0%} prem" if x > 0.05 else (f"{x:.0%} disc" if x < -0.05 else "~par")
-            if not pd.isna(x) else "N/A"
-        )
-
-    return df
+    cols = ["ticker", "sector", "industry", "forward_pe", "enterprise_value", "ebitda", "total_revenue",
+            "eps_growth_next_year", "revenue_growth_next_year", "profit_margins", "return_on_equity",
+            "total_debt", "total_cash"]
+    df = security_master[security_master["instrument_group"] == "us_equity"].reindex(columns=cols)
+    col = lambda c: pd.to_numeric(df[c], errors="coerce")
+    bank = df["industry"].astype(str).str.startswith(BALANCE_SHEET_INDUSTRIES)
+    # loss makers have no P/E and cash rich names a negative EV: n/a, not a deep discount
+    fwd = col("forward_pe").where(lambda s: np.isfinite(s) & (s > 0))
+    ev = col("enterprise_value").mask(bank).where(lambda s: s > 0)
+    ebitda = col("ebitda").where(col("ebitda") > 0)
+    eps_growth = col("eps_growth_next_year")
+    return pd.DataFrame({
+        "ticker": df["ticker"],
+        "sector": df["sector"],
+        "fwd_pe": fwd,
+        "ev_ebitda": ev / ebitda,
+        "ev_sales": ev / col("total_revenue"),
+        "peg": fwd / (eps_growth * 100).where(eps_growth > 0),
+        "growth": col("revenue_growth_next_year"),
+        "margin": col("profit_margins"),
+        "roe": col("return_on_equity"),
+        "net_debt_ebitda": (col("total_debt") - col("total_cash")).mask(bank) / ebitda,
+    }).reset_index(drop=True)
 
 
 def football_field(

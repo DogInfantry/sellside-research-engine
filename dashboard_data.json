@@ -1,13 +1,13 @@
 {
- "generated_at": "2026-09-24T02:25:43+00:00",
+ "generated_at": "2026-09-24T04:17:12+00:00",
  "as_of": "2026-09-24",
  "macro": {
   "ust_10y": 5.114,
   "ust_2y": 4.028,
   "ust_30y": 5.401,
   "vix": 15.18,
-  "dxy": 101.19,
-  "wti": 91.76,
+  "dxy": 101.145,
+  "wti": 91.41,
   "spread_2s10s": 1.086,
   "eurusd": 1.1411
  },
@@ -15,8 +15,8 @@
   "ust_10y": "+15.1bps",
   "ust_2y": "+4.6bps",
   "vix": "+0.31",
-  "dxy": "+0.76",
-  "wti": "-3.0%",
+  "dxy": "+0.71",
+  "wti": "-3.4%",
   "spread_2s10s": "+10.5bps",
   "eurusd": "-0.0052"
  },
@@ -679,12 +679,24 @@
    "vs_sector": {
     "etf": "XLK",
     "peers": 2,
-    "fwd_pe": 14.4,
+    "fwd_pe": 14.38,
     "fwd_pe_median": 28.2,
-    "margin": 63.7,
-    "margin_median": 34.0,
-    "growth": 65.9,
-    "growth_median": 15.0
+    "ev_ebitda": 26.89,
+    "ev_ebitda_median": 24.41,
+    "ev_sales": 17.86,
+    "ev_sales_median": 10.97,
+    "peg": 0.21,
+    "peg_median": 2.57,
+    "fcf_yield": 2.83,
+    "fcf_yield_median": 2.49,
+    "growth": 65.89,
+    "growth_median": 14.99,
+    "margin": 63.66,
+    "margin_median": 33.96,
+    "roe": 117.21,
+    "roe_median": 91.4,
+    "net_debt_ebitda": -0.12,
+    "net_debt_ebitda_median": 0.2
    }
   },
   "BLK": {
@@ -1346,11 +1358,23 @@
     "etf": "XLF",
     "peers": 7,
     "fwd_pe": 16.5,
-    "fwd_pe_median": 12.6,
-    "margin": 24.1,
+    "fwd_pe_median": 12.65,
+    "ev_ebitda": 15.5,
+    "ev_ebitda_median": null,
+    "ev_sales": 6.31,
+    "ev_sales_median": null,
+    "peg": 1.16,
+    "peg_median": 1.23,
+    "fcf_yield": 3.05,
+    "fcf_yield_median": null,
+    "growth": 11.78,
+    "growth_median": 5.13,
+    "margin": 24.09,
     "margin_median": 25.9,
-    "growth": 11.8,
-    "growth_median": 5.1
+    "roe": 12.28,
+    "roe_median": 17.79,
+    "net_debt_ebitda": 0.1,
+    "net_debt_ebitda_median": null
    }
   },
   "MSFT": {
@@ -2011,12 +2035,24 @@
    "vs_sector": {
     "etf": "XLK",
     "peers": 2,
-    "fwd_pe": 21.1,
-    "fwd_pe_median": 24.8,
-    "margin": 40.3,
-    "margin_median": 45.6,
+    "fwd_pe": 21.14,
+    "fwd_pe_median": 24.82,
+    "ev_ebitda": 19.4,
+    "ev_ebitda_median": 28.15,
+    "ev_sales": 11.36,
+    "ev_sales_median": 14.22,
+    "peg": 1.07,
+    "peg_median": 2.15,
+    "fcf_yield": 2.88,
+    "fcf_yield_median": 2.47,
     "growth": 19.5,
-    "growth_median": 38.2
+    "growth_median": 38.19,
+    "margin": 40.3,
+    "margin_median": 45.64,
+    "roe": 34.04,
+    "roe_median": 132.98,
+    "net_debt_ebitda": 0.27,
+    "net_debt_ebitda_median": 0.01
    }
   },
   "AMZN": {
@@ -2677,12 +2713,24 @@
    "vs_sector": {
     "etf": "XLY",
     "peers": 1,
-    "fwd_pe": 24.0,
-    "fwd_pe_median": 18.5,
-    "margin": 17.4,
-    "margin_median": 8.4,
-    "growth": 14.4,
-    "growth_median": 3.4
+    "fwd_pe": 23.99,
+    "fwd_pe_median": 18.52,
+    "ev_ebitda": 16.68,
+    "ev_ebitda_median": 14.49,
+    "ev_sales": 3.63,
+    "ev_sales_median": 2.11,
+    "peg": null,
+    "peg_median": 2.77,
+    "fcf_yield": 4.03,
+    "fcf_yield_median": 3.84,
+    "growth": 14.43,
+    "growth_median": 3.44,
+    "margin": 17.44,
+    "margin_median": 8.41,
+    "roe": 30.56,
+    "roe_median": 104.3,
+    "net_debt_ebitda": 0.76,
+    "net_debt_ebitda_median": 2.48
    }
   },
   "GOOGL": {
@@ -3343,12 +3391,24 @@
    "vs_sector": {
     "etf": "XLC",
     "peers": 1,
-    "fwd_pe": 22.7,
-    "fwd_pe_median": 21.4,
-    "margin": 54.8,
-    "margin_median": 29.8,
+    "fwd_pe": 22.67,
+    "fwd_pe_median": 21.36,
+    "ev_ebitda": 23.26,
+    "ev_ebitda_median": 17.49,
+    "ev_sales": 9.03,
+    "ev_sales_median": 8.4,
+    "peg": null,
+    "peg_median": 2.5,
+    "fcf_yield": 4.73,
+    "fcf_yield_median": 2.87,
     "growth": 23.1,
-    "growth_median": 20.4
+    "growth_median": 20.45,
+    "margin": 54.77,
+    "margin_median": 29.83,
+    "roe": 48.68,
+    "roe_median": 29.85,
+    "net_debt_ebitda": -0.7,
+    "net_debt_ebitda_median": 0.2
    }
   },
   "CVX": {
@@ -4009,12 +4069,24 @@
    "vs_sector": {
     "etf": "XLE",
     "peers": 1,
-    "fwd_pe": 15.1,
-    "fwd_pe_median": 14.9,
-    "margin": 9.8,
-    "margin_median": 9.1,
-    "growth": -6.9,
-    "growth_median": -2.0
+    "fwd_pe": 15.14,
+    "fwd_pe_median": 14.88,
+    "ev_ebitda": 8.63,
+    "ev_ebitda_median": 10.33,
+    "ev_sales": 2.09,
+    "ev_sales_median": 1.94,
+    "peg": null,
+    "peg_median": null,
+    "fcf_yield": 4.09,
+    "fcf_yield_median": 3.95,
+    "growth": -6.85,
+    "growth_median": -1.96,
+    "margin": 9.83,
+    "margin_median": 9.07,
+    "roe": 12.23,
+    "roe_median": 12.58,
+    "net_debt_ebitda": 0.56,
+    "net_debt_ebitda_median": 0.47
    }
   },
   "UNH": {
@@ -4675,12 +4747,24 @@
    "vs_sector": {
     "etf": "XLV",
     "peers": 0,
-    "fwd_pe": 16.4,
+    "fwd_pe": 16.42,
     "fwd_pe_median": null,
-    "margin": 3.1,
+    "ev_ebitda": 14.34,
+    "ev_ebitda_median": null,
+    "ev_sales": 0.85,
+    "ev_sales_median": null,
+    "peg": 1.19,
+    "peg_median": null,
+    "fcf_yield": 3.39,
+    "fcf_yield_median": null,
+    "growth": 2.79,
+    "growth_median": null,
+    "margin": 3.14,
     "margin_median": null,
-    "growth": 2.8,
-    "growth_median": null
+    "roe": 14.15,
+    "roe_median": null,
+    "net_debt_ebitda": 1.57,
+    "net_debt_ebitda_median": null
    }
   },
   "JPM": {
@@ -5240,12 +5324,24 @@
    "vs_sector": {
     "etf": "XLF",
     "peers": 7,
-    "fwd_pe": 13.5,
-    "fwd_pe_median": 12.6,
-    "margin": 34.9,
-    "margin_median": 24.1,
-    "growth": 2.6,
-    "growth_median": 7.9
+    "fwd_pe": 13.51,
+    "fwd_pe_median": 12.65,
+    "ev_ebitda": null,
+    "ev_ebitda_median": null,
+    "ev_sales": null,
+    "ev_sales_median": null,
+    "peg": 4.19,
+    "peg_median": 1.16,
+    "fcf_yield": null,
+    "fcf_yield_median": null,
+    "growth": 2.64,
+    "growth_median": 7.86,
+    "margin": 34.92,
+    "margin_median": 24.09,
+    "roe": 17.79,
+    "roe_median": 16.9,
+    "net_debt_ebitda": null,
+    "net_debt_ebitda_median": null
    }
   },
   "JEF": {
@@ -5805,12 +5901,24 @@
    "vs_sector": {
     "etf": "XLF",
     "peers": 7,
-    "fwd_pe": 10.5,
-    "fwd_pe_median": 13.5,
-    "margin": 10.8,
+    "fwd_pe": 10.55,
+    "fwd_pe_median": 13.51,
+    "ev_ebitda": null,
+    "ev_ebitda_median": null,
+    "ev_sales": null,
+    "ev_sales_median": null,
+    "peg": 0.47,
+    "peg_median": 1.23,
+    "fcf_yield": null,
+    "fcf_yield_median": null,
+    "growth": 7.86,
+    "growth_median": 5.13,
+    "margin": 10.77,
     "margin_median": 25.9,
-    "growth": 7.9,
-    "growth_median": 5.1
+    "roe": 8.27,
+    "roe_median": 17.79,
+    "net_debt_ebitda": null,
+    "net_debt_ebitda_median": null
    }
   },
   "META": {
@@ -6471,12 +6579,24 @@
    "vs_sector": {
     "etf": "XLC",
     "peers": 1,
-    "fwd_pe": 21.4,
-    "fwd_pe_median": 22.7,
-    "margin": 29.8,
-    "margin_median": 54.8,
-    "growth": 20.4,
-    "growth_median": 23.1
+    "fwd_pe": 21.36,
+    "fwd_pe_median": 22.67,
+    "ev_ebitda": 17.49,
+    "ev_ebitda_median": 23.26,
+    "ev_sales": 8.4,
+    "ev_sales_median": 9.03,
+    "peg": 2.5,
+    "peg_median": null,
+    "fcf_yield": 2.87,
+    "fcf_yield_median": 4.73,
+    "growth": 20.45,
+    "growth_median": 23.1,
+    "margin": 29.83,
+    "margin_median": 54.77,
+    "roe": 29.85,
+    "roe_median": 48.68,
+    "net_debt_ebitda": 0.2,
+    "net_debt_ebitda_median": -0.7
    }
   }
  },
@@ -10021,6 +10141,591 @@
    {
     "date": "2026-09-23",
     "price": 110.65
+   }
+  ]
+ },
+ "comps": {
+  "AAPL": {
+   "sector": "Technology",
+   "fwd_pe": 35.26,
+   "ev_ebitda": 29.41,
+   "ev_sales": 10.58,
+   "peg": 4.08,
+   "fcf_yield": 2.1,
+   "growth": 10.49,
+   "margin": 27.62,
+   "roe": 148.75,
+   "net_debt_ebitda": 0.13,
+   "vol_63d": 31.7,
+   "ret_3m": 15.1,
+   "composite": 42.0,
+   "factors": {
+    "valuation": 10.0,
+    "growth": 24.0,
+    "quality": 83.0,
+    "momentum": 88.0,
+    "consensus": 33.0
+   }
+  },
+  "AMZN": {
+   "sector": "Consumer Cyclical",
+   "fwd_pe": 23.99,
+   "ev_ebitda": 16.68,
+   "ev_sales": 3.63,
+   "peg": null,
+   "fcf_yield": 4.03,
+   "growth": 14.43,
+   "margin": 17.44,
+   "roe": 30.56,
+   "net_debt_ebitda": 0.76,
+   "vol_63d": 40.7,
+   "ret_3m": 6.4,
+   "composite": 62.0,
+   "factors": {
+    "valuation": 62.0,
+    "growth": 43.0,
+    "quality": 52.0,
+    "momentum": 62.0,
+    "consensus": 70.0
+   }
+  },
+  "BAC": {
+   "sector": "Financial Services",
+   "fwd_pe": 10.58,
+   "ev_ebitda": null,
+   "ev_sales": null,
+   "peg": 0.79,
+   "fcf_yield": null,
+   "growth": 5.13,
+   "margin": 29.52,
+   "roe": 11.2,
+   "net_debt_ebitda": null,
+   "vol_63d": 21.6,
+   "ret_3m": -2.5,
+   "composite": 52.0,
+   "factors": {
+    "valuation": 81.0,
+    "growth": 29.0,
+    "quality": 40.0,
+    "momentum": 36.0,
+    "consensus": 58.0
+   }
+  },
+  "BLK": {
+   "sector": "Financial Services",
+   "fwd_pe": 16.5,
+   "ev_ebitda": 15.5,
+   "ev_sales": 6.31,
+   "peg": 1.16,
+   "fcf_yield": 3.05,
+   "growth": 11.78,
+   "margin": 24.09,
+   "roe": 12.28,
+   "net_debt_ebitda": 0.1,
+   "vol_63d": 28.1,
+   "ret_3m": 5.0,
+   "composite": 65.0,
+   "factors": {
+    "valuation": 36.0,
+    "growth": 76.0,
+    "quality": 38.0,
+    "momentum": 52.0,
+    "consensus": 80.0
+   }
+  },
+  "CAT": {
+   "sector": "Industrials",
+   "fwd_pe": 25.08,
+   "ev_ebitda": 25.38,
+   "ev_sales": 5.52,
+   "peg": 1.31,
+   "fcf_yield": 2.32,
+   "growth": 11.24,
+   "margin": 14.51,
+   "roe": 56.97,
+   "net_debt_ebitda": 2.41,
+   "vol_63d": 41.2,
+   "ret_3m": -17.3,
+   "composite": 45.0,
+   "factors": {
+    "valuation": 26.0,
+    "growth": 52.0,
+    "quality": 62.0,
+    "momentum": 40.0,
+    "consensus": 45.0
+   }
+  },
+  "CVX": {
+   "sector": "Energy",
+   "fwd_pe": 15.14,
+   "ev_ebitda": 8.63,
+   "ev_sales": 2.09,
+   "peg": null,
+   "fcf_yield": 4.09,
+   "growth": -6.85,
+   "margin": 9.83,
+   "roe": 12.23,
+   "net_debt_ebitda": 0.56,
+   "vol_63d": 25.1,
+   "ret_3m": 17.8,
+   "composite": 57.0,
+   "factors": {
+    "valuation": 71.0,
+    "growth": 95.0,
+    "quality": 19.0,
+    "momentum": 83.0,
+    "consensus": 46.0
+   }
+  },
+  "GE": {
+   "sector": "Industrials",
+   "fwd_pe": 35.2,
+   "ev_ebitda": 29.81,
+   "ev_sales": 6.76,
+   "peg": 2.6,
+   "fcf_yield": 2.16,
+   "growth": 10.92,
+   "margin": 17.72,
+   "roe": 48.23,
+   "net_debt_ebitda": 0.9,
+   "vol_63d": 29.4,
+   "ret_3m": -10.2,
+   "composite": 45.0,
+   "factors": {
+    "valuation": 19.0,
+    "growth": 48.0,
+    "quality": 62.0,
+    "momentum": 31.0,
+    "consensus": 50.0
+   }
+  },
+  "GOOGL": {
+   "sector": "Communication Services",
+   "fwd_pe": 22.67,
+   "ev_ebitda": 23.26,
+   "ev_sales": 9.03,
+   "peg": null,
+   "fcf_yield": 4.73,
+   "growth": 23.1,
+   "margin": 54.77,
+   "roe": 48.68,
+   "net_debt_ebitda": -0.7,
+   "vol_63d": 35.6,
+   "ret_3m": -2.1,
+   "composite": 62.0,
+   "factors": {
+    "valuation": 45.0,
+    "growth": 57.0,
+    "quality": 88.0,
+    "momentum": 57.0,
+    "consensus": 61.0
+   }
+  },
+  "GS": {
+   "sector": "Financial Services",
+   "fwd_pe": 12.65,
+   "ev_ebitda": null,
+   "ev_sales": null,
+   "peg": 2.34,
+   "fcf_yield": null,
+   "growth": 1.93,
+   "margin": 31.04,
+   "roe": 16.9,
+   "net_debt_ebitda": null,
+   "vol_63d": 36.5,
+   "ret_3m": -14.0,
+   "composite": 46.0,
+   "factors": {
+    "valuation": 69.0,
+    "growth": 86.0,
+    "quality": 57.0,
+    "momentum": 21.0,
+    "consensus": 33.0
+   }
+  },
+  "HD": {
+   "sector": "Consumer Cyclical",
+   "fwd_pe": 18.52,
+   "ev_ebitda": 14.49,
+   "ev_sales": 2.11,
+   "peg": 2.77,
+   "fcf_yield": 3.84,
+   "growth": 3.44,
+   "margin": 8.41,
+   "roe": 104.3,
+   "net_debt_ebitda": 2.48,
+   "vol_63d": 26.0,
+   "ret_3m": -7.9,
+   "composite": 48.0,
+   "factors": {
+    "valuation": 69.0,
+    "growth": 19.0,
+    "quality": 52.0,
+    "momentum": 26.0,
+    "consensus": 55.0
+   }
+  },
+  "JEF": {
+   "sector": "Financial Services",
+   "fwd_pe": 10.55,
+   "ev_ebitda": null,
+   "ev_sales": null,
+   "peg": 0.47,
+   "fcf_yield": null,
+   "growth": 7.86,
+   "margin": 10.77,
+   "roe": 8.27,
+   "net_debt_ebitda": null,
+   "vol_63d": 40.4,
+   "ret_3m": -21.8,
+   "composite": 53.0,
+   "factors": {
+    "valuation": 95.0,
+    "growth": 81.0,
+    "quality": 19.0,
+    "momentum": 12.0,
+    "consensus": 55.0
+   }
+  },
+  "JPM": {
+   "sector": "Financial Services",
+   "fwd_pe": 13.51,
+   "ev_ebitda": null,
+   "ev_sales": null,
+   "peg": 4.19,
+   "fcf_yield": null,
+   "growth": 2.64,
+   "margin": 34.92,
+   "roe": 17.79,
+   "net_debt_ebitda": null,
+   "vol_63d": 19.1,
+   "ret_3m": 1.7,
+   "composite": 55.0,
+   "factors": {
+    "valuation": 64.0,
+    "growth": 71.0,
+    "quality": 62.0,
+    "momentum": 55.0,
+    "consensus": 46.0
+   }
+  },
+  "LAZ": {
+   "sector": "Financial Services",
+   "fwd_pe": 9.57,
+   "ev_ebitda": null,
+   "ev_sales": null,
+   "peg": 0.13,
+   "fcf_yield": null,
+   "growth": 20.2,
+   "margin": 7.09,
+   "roe": 25.66,
+   "net_debt_ebitda": null,
+   "vol_63d": 41.2,
+   "ret_3m": -11.9,
+   "composite": 33.0,
+   "factors": {
+    "valuation": 86.0,
+    "growth": 5.0,
+    "quality": 29.0,
+    "momentum": 12.0,
+    "consensus": null
+   }
+  },
+  "META": {
+   "sector": "Communication Services",
+   "fwd_pe": 21.36,
+   "ev_ebitda": 17.49,
+   "ev_sales": 8.4,
+   "peg": 2.5,
+   "fcf_yield": 2.87,
+   "growth": 20.45,
+   "margin": 29.83,
+   "roe": 29.85,
+   "net_debt_ebitda": 0.2,
+   "vol_63d": 49.2,
+   "ret_3m": 33.5,
+   "composite": 52.0,
+   "factors": {
+    "valuation": 26.0,
+    "growth": 64.0,
+    "quality": 64.0,
+    "momentum": 98.0,
+    "consensus": 41.0
+   }
+  },
+  "MS": {
+   "sector": "Financial Services",
+   "fwd_pe": 14.54,
+   "ev_ebitda": null,
+   "ev_sales": null,
+   "peg": 2.69,
+   "fcf_yield": null,
+   "growth": 4.65,
+   "margin": 25.9,
+   "roe": 17.97,
+   "net_debt_ebitda": null,
+   "vol_63d": 29.4,
+   "ret_3m": -11.7,
+   "composite": 50.0,
+   "factors": {
+    "valuation": 67.0,
+    "growth": 64.0,
+    "quality": 52.0,
+    "momentum": 33.0,
+    "consensus": 45.0
+   }
+  },
+  "MSFT": {
+   "sector": "Technology",
+   "fwd_pe": 21.14,
+   "ev_ebitda": 19.4,
+   "ev_sales": 11.36,
+   "peg": 1.07,
+   "fcf_yield": 2.88,
+   "growth": 19.5,
+   "margin": 40.3,
+   "roe": 34.04,
+   "net_debt_ebitda": 0.27,
+   "vol_63d": 39.8,
+   "ret_3m": 37.2,
+   "composite": 63.0,
+   "factors": {
+    "valuation": 21.0,
+    "growth": 33.0,
+    "quality": 79.0,
+    "momentum": 93.0,
+    "consensus": 69.0
+   }
+  },
+  "NVDA": {
+   "sector": "Technology",
+   "fwd_pe": 14.38,
+   "ev_ebitda": 26.89,
+   "ev_sales": 17.86,
+   "peg": 0.21,
+   "fcf_yield": 2.83,
+   "growth": 65.89,
+   "margin": 63.66,
+   "roe": 117.21,
+   "net_debt_ebitda": -0.12,
+   "vol_63d": 38.9,
+   "ret_3m": 13.4,
+   "composite": 79.0,
+   "factors": {
+    "valuation": 14.0,
+    "growth": 100.0,
+    "quality": 98.0,
+    "momentum": 83.0,
+    "consensus": 83.0
+   }
+  },
+  "PG": {
+   "sector": "Consumer Defensive",
+   "fwd_pe": 19.92,
+   "ev_ebitda": 14.89,
+   "ev_sales": 4.24,
+   "peg": 3.31,
+   "fcf_yield": 3.68,
+   "growth": 3.02,
+   "margin": 18.44,
+   "roe": 30.29,
+   "net_debt_ebitda": 1.01,
+   "vol_63d": 18.2,
+   "ret_3m": -1.6,
+   "composite": 38.0,
+   "factors": {
+    "valuation": 52.0,
+    "growth": 14.0,
+    "quality": 55.0,
+    "momentum": 69.0,
+    "consensus": 29.0
+   }
+  },
+  "PJT": {
+   "sector": "Financial Services",
+   "fwd_pe": 16.47,
+   "ev_ebitda": null,
+   "ev_sales": null,
+   "peg": 1.23,
+   "fcf_yield": null,
+   "growth": 11.28,
+   "margin": 10.58,
+   "roe": 37.63,
+   "net_debt_ebitda": null,
+   "vol_63d": 40.3,
+   "ret_3m": -3.7,
+   "composite": 40.0,
+   "factors": {
+    "valuation": 45.0,
+    "growth": 38.0,
+    "quality": 50.0,
+    "momentum": 26.0,
+    "consensus": null
+   }
+  },
+  "UNH": {
+   "sector": "Healthcare",
+   "fwd_pe": 16.42,
+   "ev_ebitda": 14.34,
+   "ev_sales": 0.85,
+   "peg": 1.19,
+   "fcf_yield": 3.39,
+   "growth": 2.79,
+   "margin": 3.14,
+   "roe": 14.15,
+   "net_debt_ebitda": 1.57,
+   "vol_63d": 23.7,
+   "ret_3m": -8.7,
+   "composite": 55.0,
+   "factors": {
+    "valuation": 71.0,
+    "growth": 10.0,
+    "quality": 17.0,
+    "momentum": 45.0,
+    "consensus": 74.0
+   }
+  },
+  "XOM": {
+   "sector": "Energy",
+   "fwd_pe": 14.88,
+   "ev_ebitda": 10.33,
+   "ev_sales": 1.94,
+   "peg": null,
+   "fcf_yield": 3.95,
+   "growth": -1.96,
+   "margin": 9.07,
+   "roe": 12.58,
+   "net_debt_ebitda": 0.47,
+   "vol_63d": 26.1,
+   "ret_3m": 16.1,
+   "composite": 39.0,
+   "factors": {
+    "valuation": 69.0,
+    "growth": 90.0,
+    "quality": 21.0,
+    "momentum": 76.0,
+    "consensus": 14.0
+   }
+  }
+ },
+ "pe_growth_fit": {
+  "slope": 0.024,
+  "intercept": 18.21,
+  "r2": 0.0,
+  "n": 21
+ },
+ "sectors": {
+  "as_of": "2026-09-23",
+  "rows": [
+   {
+    "etf": "XLC",
+    "name": "Communication Services",
+    "ret_1d": null,
+    "ret_1w": -0.1,
+    "ret_1m": 0.5,
+    "ret_3m": 6.0,
+    "ret_ytd": -3.5,
+    "prior_2m": 5.4
+   },
+   {
+    "etf": "XLE",
+    "name": "Energy",
+    "ret_1d": 1.0,
+    "ret_1w": -2.0,
+    "ret_1m": -0.6,
+    "ret_3m": 17.1,
+    "ret_ytd": 42.3,
+    "prior_2m": 17.8
+   },
+   {
+    "etf": "XLF",
+    "name": "Financials",
+    "ret_1d": -0.5,
+    "ret_1w": -2.1,
+    "ret_1m": -6.0,
+    "ret_3m": 1.9,
+    "ret_ytd": 0.8,
+    "prior_2m": 8.4
+   },
+   {
+    "etf": "XLI",
+    "name": "Industrials",
+    "ret_1d": null,
+    "ret_1w": 1.1,
+    "ret_1m": -4.7,
+    "ret_3m": -5.4,
+    "ret_ytd": 10.5,
+    "prior_2m": -0.7
+   },
+   {
+    "etf": "XLK",
+    "name": "Technology",
+    "ret_1d": null,
+    "ret_1w": 6.3,
+    "ret_1m": 8.6,
+    "ret_3m": 6.8,
+    "ret_ytd": 36.2,
+    "prior_2m": -1.6
+   },
+   {
+    "etf": "XLP",
+    "name": "Consumer Staples",
+    "ret_1d": null,
+    "ret_1w": -0.4,
+    "ret_1m": -5.1,
+    "ret_3m": -1.7,
+    "ret_ytd": 8.2,
+    "prior_2m": 3.6
+   },
+   {
+    "etf": "XLRE",
+    "name": "Real Estate",
+    "ret_1d": null,
+    "ret_1w": -1.4,
+    "ret_1m": -6.9,
+    "ret_3m": -5.2,
+    "ret_ytd": 6.2,
+    "prior_2m": 1.8
+   },
+   {
+    "etf": "XLU",
+    "name": "Utilities",
+    "ret_1d": null,
+    "ret_1w": -3.1,
+    "ret_1m": -7.4,
+    "ret_3m": -12.1,
+    "ret_ytd": -4.9,
+    "prior_2m": -5.1
+   },
+   {
+    "etf": "XLV",
+    "name": "Health Care",
+    "ret_1d": null,
+    "ret_1w": 1.0,
+    "ret_1m": -3.0,
+    "ret_3m": 10.5,
+    "ret_ytd": 10.4,
+    "prior_2m": 13.9
+   },
+   {
+    "etf": "XLY",
+    "name": "Consumer Discretionary",
+    "ret_1d": null,
+    "ret_1w": 0.6,
+    "ret_1m": -6.3,
+    "ret_3m": -3.6,
+    "ret_ytd": -6.8,
+    "prior_2m": 2.8
+   },
+   {
+    "etf": "SPX",
+    "name": "S&P 500",
+    "ret_1d": null,
+    "ret_1w": 2.0,
+    "ret_1m": 0.7,
+    "ret_3m": 4.7,
+    "ret_ytd": 12.6,
+    "prior_2m": 4.0
    }
   ]
  },

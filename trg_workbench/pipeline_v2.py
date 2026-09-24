@@ -153,6 +153,7 @@ def value_ticker(
     """DCF scenarios, sensitivity, football field and reverse DCF for one ticker.
     Returns None when there is no FCF proxy. Shared by the report and the dashboard export."""
     from trg_workbench.analytics.valuation import (
+        BALANCE_SHEET_INDUSTRIES,
         derive_dcf_inputs,
         dcf_sensitivity,
         football_field,
@@ -162,7 +163,7 @@ def value_ticker(
 
     sm_row = security_master_df[security_master_df["ticker"] == ticker].iloc[0].to_dict() if ticker in security_master_df["ticker"].values else {}
     # ponytail: FCF DCF is meaningless for balance sheet lenders; residual income model is the upgrade path
-    if str(sm_row.get("industry", "")).startswith(("Banks", "Capital Markets", "Insurance")):
+    if str(sm_row.get("industry", "")).startswith(BALANCE_SHEET_INDUSTRIES):
         return None
     sec_row = fundamentals_df[fundamentals_df["ticker"] == ticker].iloc[0].to_dict() if ticker in fundamentals_df["ticker"].values else {}
 
