@@ -191,7 +191,7 @@ def build_dashboard(as_of: str, limit: int = 10) -> dict:
         blocks[t] = ticker_block(row, wide[t].dropna(), val,
                                  risk.loc[t] if t in risk.index else None, commentary.get(t))
 
-    corr_t = tickers[:5]
+    corr_t = list(blocks)
     corr = wide[corr_t].pct_change().tail(63).corr()
     macro, macro_chg = macro_block(as_of)
 
@@ -205,10 +205,12 @@ def build_dashboard(as_of: str, limit: int = 10) -> dict:
                                "values": [[num(corr.at[a, b]) for b in corr_t] for a in corr_t]},
         "catalysts": [
             {"date": pd.Timestamp(c["next_earnings_date"]).strftime("%Y-%m-%d"), "ticker": c["ticker"],
-             "event": "Earnings" + (f" (EPS est ${num(c['calendar_earnings_average'])})"
+             "event": "Earnings" + (f" (EPS est ${num(c['calendar_earnings_average']):.2f})"
                                     if num(c.get("calendar_earnings_average")) is not None else ""),
              "type": "EARNINGS", "conviction": None}
-            for c in build_catalyst_calendar(research, as_of_date, limit=6)
+            # only names shown on the page; the calendar itself spans the whole universe
+            for c in [c for c in build_catalyst_calendar(research, as_of_date, limit=len(research))
+                      if c["ticker"] in blocks][:6]
         ],
     }
 
