@@ -163,7 +163,7 @@ tr.active-row td{background:rgba(201,168,76,0.06)}
   .sep{display:none}
 }
 /* wide grids scroll inside their card at any width instead of spilling into the next card */
-#corrContent,#rdcfContent,#factorContent,#sectorHeat{overflow-x:auto}
+#corrContent,#rdcfContent,#factorContent,#sectorHeat,#valueGrid{overflow-x:auto}
 </style>
 </head>
 <body>
@@ -209,8 +209,9 @@ tr.active-row td{background:rgba(201,168,76,0.06)}
     <div style="position:relative;height:200px" id="priceChartWrap"></div>
   </div>
   <div class="card">
-    <div class="card-title">DCF VALUATION: FOOTBALL FIELD</div>
+    <div class="card-title">VALUATION RANGES: FOOTBALL FIELD</div>
     <div style="position:relative;height:200px" id="footballWrap"></div>
+    <div class="caption">Bars run low to high. Tick: DCF base, residual income base or analyst mean. Dashed: price.</div>
   </div>
   <div class="card" id="rdcfCard">
     <div class="card-title">REVERSE DCF: IMPLIED GROWTH SENSITIVITY</div>
@@ -245,6 +246,30 @@ tr.active-row td{background:rgba(201,168,76,0.06)}
   <div class="card" id="commentaryCard">
     <div class="card-title">MGMT COMMENTARY: KEYWORD SIGNALS</div>
     <div id="commentaryContent"></div>
+  </div>
+</div>
+
+<!-- COMPANY DEPTH: reported quarters, DuPont and earnings quality, value grid, drawdown -->
+<div class="rowpair">
+  <div class="card">
+    <div class="card-title">QUARTERLY REVENUE AND OPERATING MARGIN</div>
+    <div style="position:relative;height:240px" id="quarterWrap"></div>
+    <div class="caption" id="quarterNote"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">DUPONT ROE AND EARNINGS QUALITY, TTM</div>
+    <div id="dupontContent"></div>
+  </div>
+</div>
+<div class="rowpair">
+  <div class="card">
+    <div class="card-title" id="valueGridTitle">DCF VALUE PER SHARE</div>
+    <div id="valueGrid"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">DRAWDOWN AND 21D VOLATILITY, 6 MONTHS</div>
+    <div style="position:relative;height:260px" id="drawdownWrap"></div>
+    <div class="caption">Top: % below the running 6 month high. Bottom: 21 session realized volatility, annualized.</div>
   </div>
 </div>
 
@@ -405,10 +430,13 @@ function buildKPIs() {
   const upside = ok(d.price_target) ? (d.price_target - d.price)/d.price*100 : null;
   const dcfGap = ok(d.dcf.base) ? (d.dcf.base - d.price)/d.price*100 : null;
   const rdcf = d.reverse_dcf, [verdict, vcol] = rdcfVerdict(rdcf);
+  const ri = d.residual_income, riGap = ri&&ok(ri.value) ? (ri.value-d.price)/d.price*100 : null, R = DATA.rates || {};
   document.getElementById('kpiGrid').innerHTML = [
     {label:'CURRENT PRICE', val:dollar(d.price),
       sub:`<span class="${sign(d.price_change)}">${d.price_change>=0?'+':''}${f(d.price_change)} (${pct(d.price_change_pct)}) today</span>`},
-    {label:'DCF VALUE (BASE)', val:dollar(d.dcf.base),
+    ri ? {label:'RESIDUAL INCOME VALUE', val:dollar(ri.value),
+      sub:`<span class="${sign(riGap)}">${pct(riGap)} vs price</span> · justified P/B ${ok(ri.justified_pb)?f(ri.justified_pb,2)+'×':'n/a'}`}
+    : {label:'DCF VALUE (BASE)', val:dollar(d.dcf.base),
       sub:ok(dcfGap)?`<span class="${sign(dcfGap)}">${pct(dcfGap)} vs price</span>`:'n/a'},
     {label:'REVERSE DCF: IMPLIED GROWTH', val:`<span style="color:${vcol}">${pc(rdcf.implied_growth,1)}</span>`,
       sub:`Consensus rev +1y: ${pc(rdcf.consensus_growth,1)} · <span style="color:${vcol};font-weight:600">${verdict}</span>`},
@@ -417,7 +445,8 @@ function buildKPIs() {
     {label:'MARKET CAP', val:ok(d.market_cap_b)?`$${d.market_cap_b.toLocaleString()}B`:'n/a', sub:d.sector??'n/a'},
     {label:'P/E (TTM)', val:times(d.financials.pe_ttm), sub:`EPS next year: ${dollar(d.financials.eps_next_yr)}`},
     {label:'NET MARGIN', val:`${pc(d.financials.net_margin,1)}`, sub:`Rev growth: <span class="${sign(d.financials.revenue_growth_yoy)}">${pct(d.financials.revenue_growth_yoy)}</span>`},
-    {label:'FCF YIELD', val:`${pc(d.dcf.fcf_yield,1)}`, sub:`WACC: ${pc(d.dcf.wacc,1)}`}
+    {label:'FCF YIELD', val:`${pc(d.dcf.fcf_yield,1)}`, sub: ri ? `Cost of equity ${pc(ri.cost_of_equity,1)}`
+      : `WACC ${pc(d.dcf.wacc,1)} · Rf ${pc(R.dcf_rf,2)} ${R.dcf_rf_source==='UST 10Y'?'(10Y)':'(default)'}`}
   ].map(c=>`<div class="card"><div class="card-title">${c.label}</div><div class="kpi-val">${c.val}</div><div class="kpi-sub">${c.sub}</div></div>`).join('');
 }
 
@@ -445,47 +474,129 @@ function buildPriceChart() {
   });
 }
 
-// ─── FOOTBALL FIELD (Chart.js horizontal bar) ────────────────────────────────
+// ─── FOOTBALL FIELD: each method low to high, a mid tick, the price line ─────
+const FF_LABEL = {'DCF Scenarios (Bear/Base/Bull)':'DCF bear to bull','Residual Income':'Residual income',
+  'Analyst Consensus Target':'Analyst targets','52-Week Range':'52 week range'};
 function buildFootball() {
-  const d = DATA.tickers[active];
+  const d = DATA.tickers[active], F = (d.football||[]).filter(m=>ok(m.low)&&ok(m.high));
   const wrap = document.getElementById('footballWrap');
   if(footballChart){footballChart.destroy();footballChart=null;}
-  if(!ok(d.dcf.base)){wrap.innerHTML='<div class="signal-box">n/a: no FCF DCF for this ticker (banks, brokers and insurers)</div>';return;}
+  if(!F.length){wrap.innerHTML='<div class="signal-box">n/a: no valuation ranges for this ticker</div>';return;}
   wrap.innerHTML = '<canvas id="footballChart"></canvas>';
-  const ctx = document.getElementById('footballChart').getContext('2d');
-  footballChart = new Chart(ctx,{
+  const lo = Math.min(...F.map(m=>m.low), d.price), hi = Math.max(...F.map(m=>m.high), d.price);
+  const hasMid = m => ok(m.mid) && m.method!=='52-Week Range';  // a trading range has no mid
+  footballChart = new Chart(document.getElementById('footballChart').getContext('2d'),{
     type:'bar',
-    data:{
-      labels:['BEAR','BASE','BULL'],
-      datasets:[{
-        data:[d.dcf.bear,d.dcf.base,d.dcf.bull],
-        backgroundColor:['rgba(229,115,115,0.7)','rgba(201,168,76,0.7)','rgba(76,175,80,0.7)'],
-        borderColor:['#E57373','#C9A84C','#4CAF50'],
-        borderWidth:1,borderRadius:3
-      }]
-    },
+    data:{labels:F.map(m=>FF_LABEL[m.method]??m.method),
+      datasets:[{data:F.map(m=>[m.low,m.high]),backgroundColor:'rgba(255,255,255,0.14)',borderColor:'rgba(255,255,255,0.35)',
+        borderWidth:1,borderRadius:3,borderSkipped:false}]},
     options:{
       indexAxis:'y',responsive:true,maintainAspectRatio:false,
       plugins:{
         legend:{display:false},
-        tooltip:{callbacks:{label:ctx=>' $'+ctx.raw.toFixed(0)},
+        tooltip:{callbacks:{label:c=>{const m=F[c.dataIndex];
+          return ` $${m.low.toFixed(0)} to $${m.high.toFixed(0)}`+(hasMid(m)?`, mid $${m.mid.toFixed(0)}`:'');}},
           bodyFont:{size:13},backgroundColor:'#1a1d24',borderColor:'rgba(255,255,255,0.1)',borderWidth:1}
       },
       scales:{
         // axis always spans the price, so the price line is never off chart
         x:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{callback:v=>'$'+Math.round(v),maxRotation:0,autoSkipPadding:12,includeBounds:false},
-           min:Math.floor(Math.min(d.dcf.bear??d.price,d.price)*0.88/10)*10,
-           max:Math.ceil(Math.max(d.dcf.bull??d.price,d.price)*1.08/10)*10},
+           min:Math.floor(lo*0.92/10)*10,max:Math.ceil(hi*1.05/10)*10},
         y:{grid:{display:false},ticks:{color:'#e8e6e0'}}
       }
     },
     plugins:[{id:'priceLine',afterDatasetsDraw(c){
-      const x=c.scales.x.getPixelForValue(d.price),{top,bottom,right}=c.chartArea,g=c.ctx,flip=x>right-110;
-      g.save();g.strokeStyle='#e8e6e0';g.setLineDash([4,3]);g.beginPath();g.moveTo(x,top);g.lineTo(x,bottom);g.stroke();
+      const g=c.ctx,{top,bottom,right}=c.chartArea,x=c.scales.x.getPixelForValue(d.price),flip=x>right-110;
+      g.save();g.strokeStyle='#e8e6e0';g.lineWidth=2;
+      F.forEach((m,i)=>{ if(!hasMid(m)) return;
+        const bar=c.getDatasetMeta(0).data[i], xm=c.scales.x.getPixelForValue(m.mid), h=bar.height/2;
+        g.beginPath();g.moveTo(xm,bar.y-h);g.lineTo(xm,bar.y+h);g.stroke();});
+      g.lineWidth=1;g.setLineDash([4,3]);g.beginPath();g.moveTo(x,top);g.lineTo(x,bottom);g.stroke();
       g.fillStyle='#e8e6e0';g.font=`12px ${MONO}`;g.textAlign=flip?'right':'left';
       g.fillText(`Price $${d.price.toFixed(0)}`,flip?x-6:x+6,top+12);g.restore();
     }}]
   });
+}
+
+// ─── QUARTERLY TREND: reported quarters, revenue bars and operating margin ───
+function buildQuarters() {
+  const Q = DATA.tickers[active].quarters || [], note = document.getElementById('quarterNote');
+  if(!Q.length){naBox('quarterWrap','no reported quarters from Yahoo');note.textContent='';return;}
+  const x = Q.map(q=>new Date(q.period+'T12:00').toLocaleDateString('en-US',{month:'short',year:'2-digit'}));
+  const hasMargin = Q.some(q=>ok(q.op_margin));  // banks report no operating income: no line, no empty axis
+  plot('quarterWrap',[
+    {x, y:Q.map(q=>q.revenue_b), type:'bar', name:'Revenue, $B', marker:{color:'rgba(255,255,255,0.22)'},
+     customdata:Q.map(q=>ok(q.eps)?'$'+f(q.eps):'n/a'), hovertemplate:'%{x}: revenue $%{y:.1f}B, diluted EPS %{customdata}<extra></extra>'},
+    ...(hasMargin ? [{x, y:Q.map(q=>q.op_margin), type:'scatter', mode:'lines+markers', name:'Operating margin, %', yaxis:'y2',
+     line:{color:'#e8e6e0',width:1.5}, marker:{size:6}, hovertemplate:'%{x}: operating margin %{y:.1f}%<extra></extra>'}] : [])],
+    {...PLOT_BASE, showlegend:true, legend:{font:PLOT_FONT,bgcolor:'transparent',orientation:'h',y:-0.18},
+     margin:{t:8,r:8,b:8,l:8}, xaxis:{...AXIS(''),type:'category'}, yaxis:AXIS('Revenue, $B'),
+     ...(hasMargin ? {yaxis2:{...AXIS('Op margin, %'),overlaying:'y',side:'right',showgrid:false}} : {})});
+  const miss = Q.filter(q=>!ok(q.revenue_b)).length;
+  note.textContent = `The ${Q.length} quarters Yahoo reports, labeled by quarter end. Hover for diluted EPS.`
+    + (miss ? ` n/a: revenue missing for ${miss} quarter${miss>1?'s':''}.` : '')
+    + (hasMargin ? '' : ' n/a: operating margin, Yahoo has no operating income line for this company.');
+}
+
+// ─── DUPONT AND EARNINGS QUALITY (TTM) ───────────────────────────────────────
+function buildDupont() {
+  const d = DATA.tickers[active], D = d.dupont || {}, Qy = d.quality || {}, x2 = n => ok(n) ? f(n,2)+'×' : 'n/a';
+  const row = ([label,val]) => `<tr><td>${label}</td><td>${val}</td></tr>`;
+  document.getElementById('dupontContent').innerHTML = `<table class="vs-table" style="font-size:13px">
+      ${[['Net margin',pc(D.net_margin,1)],['× Asset turnover',x2(D.asset_turnover)],['× Equity multiplier',x2(D.equity_multiplier)],
+         ['= ROE',pc(D.roe,1)]].map(row).join('')}</table>
+    <table class="vs-table" style="font-size:13px;margin-top:12px">
+      ${[['CFO / net income',x2(Qy.cfo_ni)],['Capex / revenue',pc(Qy.capex_pct_revenue,1)],
+         ['FCF margin (CFO less capex)',pc(Qy.fcf_margin,1)]].map(row).join('')}</table>
+    <div class="caption">${D.through ? `TTM to ${new Date(D.through+'T12:00').toLocaleDateString('en-US',{month:'short',year:'numeric'})}, the last 4 back to back quarters with revenue and net income` : 'n/a: TTM, Yahoo has no 4 back to back complete quarters'}; assets and equity from the balance sheet at that date, so ROE here can differ from Yahoo's. Earnings quality is n/a for banks, brokers and insurers (their cash flow is funding) and when net income is not positive.</div>`;
+}
+
+// ─── VALUE GRID (DCF) OR RESIDUAL INCOME (banks) ─────────────────────────────
+function buildValueGrid() {
+  const d = DATA.tickers[active], ri = d.residual_income, box = document.getElementById('valueGrid');
+  const title = document.getElementById('valueGridTitle');
+  if(ri){
+    title.textContent = 'RESIDUAL INCOME AND JUSTIFIED P/B';
+    const gapPct = ok(ri.value) ? (ri.value-d.price)/d.price*100 : null, x2 = n => ok(n) ? f(n,2)+'×' : 'n/a';
+    box.innerHTML = `<table class="vs-table" style="font-size:13px">
+      ${[['Book value per share',dollar(ri.book_value)],['ROE, TTM',pc(ri.roe,1)],['Cost of equity, CAPM',pc(ri.cost_of_equity,1)],
+         ['Long run growth',pc(ri.growth,1)],['Justified P/B, (ROE less g) / (r less g)',x2(ri.justified_pb)],['Actual P/B',x2(ri.actual_pb)],
+         ['Residual income value',`${dollar(ri.value)} <span class="${sign(gapPct)}">(${pct(gapPct)} vs price)</span>`]]
+        .map(([l,v])=>`<tr><td>${l}</td><td>${v}</td></tr>`).join('')}</table>
+      <div class="caption">Single stage residual income (CFA L2): value = book value × justified P/B. The cost of equity uses the live 10Y, a Blume beta and a 5.5% equity premium; the football field moves it 1pp each way.</div>`;
+    return;
+  }
+  title.textContent = 'DCF VALUE PER SHARE: WACC × TERMINAL GROWTH';
+  const G = d.dcf.grid || [];
+  if(!G.length) return naBox('valueGrid','no FCF DCF for this ticker');
+  const waccs = [...new Set(G.map(c=>c.wacc))], tgs = [...new Set(G.map(c=>c.tg))];
+  const tint = v => { if(!ok(v)) return ['rgba(255,255,255,0.03)','#a3a3a3']; const u = (v/d.price-1)*100;
+    return u>=20 ? ['rgba(76,175,80,0.30)','#81c784'] : u>=0 ? ['rgba(76,175,80,0.15)','#81c784']
+      : u>-20 ? ['rgba(229,115,115,0.18)','#ef9a9a'] : ['rgba(229,115,115,0.35)','#ffcdd2']; };
+  box.innerHTML = `<table class="heat" style="width:100%"><tr><th>TG / WACC</th>${waccs.map(w=>`<th class="num">${f(w,1)}%</th>`).join('')}</tr>
+    ${tgs.map(t=>`<tr><td style="font-family:var(--mono)">${f(t,1)}%</td>${waccs.map(w=>{
+      const v = G.find(c=>c.wacc===w&&c.tg===t)?.value, [bg,col] = tint(v), base = w===d.dcf.wacc&&t===2.5;
+      return `<td class="num" style="background:${bg};color:${col};${base?'outline:1px solid #e8e6e0;outline-offset:-1px;':''}">${ok(v)?'$'+Math.round(v):'n/a'}</td>`;}).join('')}</tr>`).join('')}</table>
+    <div class="caption">Value per share against today's $${f(d.price,0)}: green above, red below, strong at 20% or more. Outlined: the base case at its own WACC and 2.5% terminal growth. WACC uses Rf ${pc(d.dcf.rf,2)}.</div>`;
+}
+
+// ─── DRAWDOWN AND ROLLING VOL (from the 6 month price history) ───────────────
+function buildDrawdown() {
+  const P = (DATA.tickers[active].price_history||[]).filter(p=>ok(p.price));
+  if(P.length<23) return naBox('drawdownWrap','not enough price history');
+  const x = P.map(p=>p.date), px = P.map(p=>p.price);
+  let peak = -Infinity; const dd = px.map(v=>(peak=Math.max(peak,v), (v/peak-1)*100));
+  const lr = px.map((v,i)=>i ? Math.log(v/px[i-1]) : null);
+  // 21 log returns, sample std, annualized: the same as vol_21d in the risk table
+  const vol = px.map((_,i)=>{ if(i<21) return null; const w = lr.slice(i-20,i+1), m = w.reduce((a,v)=>a+v,0)/21;
+    return Math.sqrt(w.reduce((a,v)=>a+(v-m)**2,0)/20*252)*100; });
+  plot('drawdownWrap',[
+    {x, y:dd, type:'scatter', mode:'lines', fill:'tozeroy', line:{color:'#E57373',width:1}, fillcolor:'rgba(229,115,115,0.18)',
+     hovertemplate:'%{x|%b %d}: %{y:.1f}% below the high<extra></extra>'},
+    {x, y:vol, type:'scatter', mode:'lines', yaxis:'y2', line:{color:'#e8e6e0',width:1.5},
+     hovertemplate:'%{x|%b %d}: 21D vol %{y:.1f}%<extra></extra>'}],
+    {...PLOT_BASE, margin:{t:8,r:8,b:8,l:8}, xaxis:{...AXIS(''),tickformat:'%b %d',nticks:5,anchor:'y2'},
+     yaxis:{...AXIS('Drawdown, %'),domain:[0.56,1]}, yaxis2:{...AXIS('21D vol, %'),domain:[0,0.42]}});
 }
 
 // ─── REVERSE DCF HEATMAP ─────────────────────────────────────────────────────
@@ -722,11 +833,12 @@ function buildCorr() {
 
 // ─── MACRO ────────────────────────────────────────────────────────────────────
 function buildMacro() {
-  const m=DATA.macro, c=DATA.macro_chg||{};
+  const m=DATA.macro, c=DATA.macro_chg||{}, A=DATA.macro_as_of||{};
+  const dt = k => A[k]&&A.ust_10y&&A[k]!==A.ust_10y ? ` (${new Date(A[k]+'T12:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}).toUpperCase()})` : '';
   const rows=[
-    // ust_2y is ^IRX, the 13 week bill (macro_us.py), so label it as such
-    ['10Y UST',pc(m.ust_10y),c.ust_10y],['3M T-BILL',pc(m.ust_2y),c.ust_2y],
-    ['3M/10Y',pc(m.spread_2s10s),c.spread_2s10s],['VIX',f(m.vix,1),c.vix],
+    // the 2Y is FRED DGS2 and can lag Yahoo's 10Y by a day: show its date then
+    ['10Y UST',pc(m.ust_10y),c.ust_10y],[`2Y UST${dt('ust_2y')}`,pc(m.ust_2y),c.ust_2y],['3M T-BILL',pc(m.tbill_3m),c.tbill_3m],
+    ['2Y/10Y',pc(m.spread_2s10s),c.spread_2s10s],['VIX',f(m.vix,1),c.vix],
     ['DXY',f(m.dxy,1),c.dxy],['WTI',dollar(m.wti),c.wti],
     ['EUR/USD',f(m.eurusd,4),c.eurusd]
   ].map(([label,val,chg])=>[label,val,chg??'',!String(chg??'').startsWith('-')]);
@@ -902,6 +1014,10 @@ function renderAll() {
   buildRadar();
   buildRisk();
   buildCommentary();
+  buildQuarters();
+  buildDupont();
+  buildValueGrid();
+  buildDrawdown();
   buildComps();
   buildPeerCharts();
   buildFactorHeat();
