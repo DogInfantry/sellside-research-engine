@@ -14,6 +14,11 @@ from scipy.optimize import brentq
 
 # ─── WACC estimation ──────────────────────────────────────────────────────────
 
+def capm_cost_of_equity(beta: float, risk_free_rate: float = 0.053, equity_risk_premium: float = 0.055) -> float:
+    """CAPM: Re = Rf + beta x ERP."""
+    return risk_free_rate + beta * equity_risk_premium
+
+
 def estimate_wacc(
     beta: float = 1.0,
     risk_free_rate: float = 0.053,
@@ -26,13 +31,13 @@ def estimate_wacc(
     CAPM-based WACC.
     WACC = (E/V) * Re + (D/V) * Rd * (1 - Tc)
     """
-    cost_of_equity = risk_free_rate + beta * equity_risk_premium
+    cost_of_equity = capm_cost_of_equity(beta, risk_free_rate, equity_risk_premium)
     # D/E given → D/V = (D/E) / (1 + D/E), E/V = 1 / (1 + D/E)
     de = debt_to_equity
     e_weight = 1 / (1 + de)
     d_weight = de / (1 + de)
     wacc = e_weight * cost_of_equity + d_weight * cost_of_debt * (1 - tax_rate)
-    return round(wacc, 4)
+    return round(wacc, 3)  # 0.1pp: the precision it is shown at, so grid labels and the base case agree
 
 
 # ─── DCF engine ──────────────────────────────────────────────────────────────
@@ -269,9 +274,9 @@ def build_comps_table(security_master: pd.DataFrame) -> pd.DataFrame:
 def football_field(
     ticker: str,
     current_price: float,
-    dcf_base: float,
-    dcf_bull: float,
-    dcf_bear: float,
+    dcf_base: Optional[float] = None,
+    dcf_bull: Optional[float] = None,
+    dcf_bear: Optional[float] = None,
     peer_median_pe_implied: Optional[float] = None,
     peer_low_pe_implied: Optional[float] = None,
     peer_high_pe_implied: Optional[float] = None,
@@ -280,25 +285,30 @@ def football_field(
     analyst_consensus_high: Optional[float] = None,
     fifty_two_week_low: Optional[float] = None,
     fifty_two_week_high: Optional[float] = None,
+    residual_income: Optional[Tuple[float, float, float]] = None,
 ) -> Dict:
     """
     Assemble football field data for visualization.
-    Returns a dict of {methodology: (low, mid, high)} suitable for charting.
+    Returns a dict of {methodology: (low, mid, high)} suitable for charting. Only real ranges: a method
+    whose inputs are missing (None or NaN) is left out, never padded.
     """
+    ok = lambda *xs: all(x is not None and not pd.isna(x) for x in xs)
     methods: Dict[str, Tuple[float, float, float]] = {}
 
-    methods["DCF (Base Case)"] = (dcf_bear * 0.95, dcf_base, dcf_bull * 1.05)
-    methods["DCF Scenarios (Bear/Base/Bull)"] = (dcf_bear, dcf_base, dcf_bull)
+    if ok(dcf_bear, dcf_base, dcf_bull):
+        methods["DCF Scenarios (Bear/Base/Bull)"] = (dcf_bear, dcf_base, dcf_bull)
+    if residual_income and ok(*residual_income):
+        methods["Residual Income"] = tuple(residual_income)
 
-    if peer_low_pe_implied and peer_high_pe_implied:
+    if ok(peer_low_pe_implied, peer_high_pe_implied):
         mid = peer_median_pe_implied or (peer_low_pe_implied + peer_high_pe_implied) / 2
         methods["Trading Comps (P/E)"] = (peer_low_pe_implied, mid, peer_high_pe_implied)
 
-    if analyst_consensus_low and analyst_consensus_high:
-        mid = analyst_consensus_mean or (analyst_consensus_low + analyst_consensus_high) / 2
+    if ok(analyst_consensus_low, analyst_consensus_high):
+        mid = analyst_consensus_mean if ok(analyst_consensus_mean) else (analyst_consensus_low + analyst_consensus_high) / 2
         methods["Analyst Consensus Target"] = (analyst_consensus_low, mid, analyst_consensus_high)
 
-    if fifty_two_week_low and fifty_two_week_high:
+    if ok(fifty_two_week_low, fifty_two_week_high):
         mid52 = (fifty_two_week_low + fifty_two_week_high) / 2
         methods["52-Week Range"] = (fifty_two_week_low, mid52, fifty_two_week_high)
 
@@ -359,7 +369,20 @@ def scenario_analysis(
     return results
 
 
-def derive_dcf_inputs(ticker_meta: Dict, sec_data: Dict) -> Dict:
+def residual_income_value(book_value_ps: float, roe: float, cost_of_equity: float, growth: float = 0.025) -> Optional[Dict]:
+    """
+    Single stage residual income (CFA L2): V0 = B0 x (ROE - g) / (r - g), so the multiple is the justified P/B.
+    None when book value or ROE is missing, ROE is not above g, or r is within 0.5pp of g (value explodes).
+    """
+    if any(x is None or pd.isna(x) for x in (book_value_ps, roe)) or book_value_ps <= 0 or roe <= growth:
+        return None
+    if cost_of_equity - growth < 0.005:
+        return None
+    justified_pb = (roe - growth) / (cost_of_equity - growth)
+    return {"justified_pb": justified_pb, "value_per_share": book_value_ps * justified_pb}
+
+
+def derive_dcf_inputs(ticker_meta: Dict, sec_data: Dict, risk_free_rate: float = 0.053) -> Dict:
     """
     Derive DCF inputs from available data.
     Uses net income as FCF proxy (× 0.80 capex haircut).
@@ -386,7 +409,7 @@ def derive_dcf_inputs(ticker_meta: Dict, sec_data: Dict) -> Dict:
     # ponytail: bank debt/cash is operating balance sheet (JEF cash > 6x mcap), so no bridge for financials; also zeroes BLK/LAZ small corporate net debt
     if ticker_meta.get("sector") == "Financial Services":
         net_debt = 0
-    wacc = estimate_wacc(beta=beta_val)
+    wacc = estimate_wacc(beta=beta_val, risk_free_rate=risk_free_rate)
 
     return {
         "base_fcf": base_fcf,
@@ -396,4 +419,6 @@ def derive_dcf_inputs(ticker_meta: Dict, sec_data: Dict) -> Dict:
         "net_debt": net_debt,
         "shares_outstanding": max(float(shares or 1), 1),
         "market_cap": market_cap,
+        "risk_free_rate": risk_free_rate,
+        "cost_of_equity": capm_cost_of_equity(beta_val, risk_free_rate),
     }

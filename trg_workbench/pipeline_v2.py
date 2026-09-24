@@ -93,6 +93,11 @@ def _load_security_master(as_of: str) -> pd.DataFrame:
     return load_dataframe(path)
 
 
+def _load_quarterly(as_of: str) -> pd.DataFrame:
+    path = NORMALIZED_DIR / f"quarterly_{as_of}.csv"
+    return load_dataframe(path, parse_dates=["period_end"]) if path.exists() else pd.DataFrame()
+
+
 def _load_ecb(as_of: str) -> pd.DataFrame:
     path = NORMALIZED_DIR / f"ecb_macro_{as_of}.csv"
     if not path.exists():
@@ -117,6 +122,13 @@ def fetch_data_v2(as_of: str) -> Dict[str, Any]:
     # Run v1 data fetch (market, SEC, ECB)
     logger.info("Running v1 data fetch (market, SEC, ECB)...")
     v1_result = fetch_data_v1(as_of_date_obj)
+
+    from trg_workbench.sources.market import MarketDataClient
+    try:
+        quarterly = MarketDataClient().fetch_quarterly(as_of_date_obj)
+        save_dataframe(quarterly, NORMALIZED_DIR / f"quarterly_{as_of}.csv")
+    except Exception as exc:  # noqa: BLE001  quarterly trends are optional, shown as n/a
+        logger.warning("Quarterly statements fetch failed: %s", exc)
 
     # Fetch US macro
     logger.info("Fetching US macro data...")
@@ -144,11 +156,57 @@ def fetch_data_v2(as_of: str) -> Dict[str, Any]:
     }
 
 
+RI_GROWTH = 0.025  # residual income long run growth, the same as the DCF base terminal growth
+
+
+def _market_ranges(sm_row: Dict) -> Dict[str, Optional[float]]:
+    """Analyst target range and Yahoo's quoted 52 week range (traded prices, not the dividend adjusted closes
+    in the price history, and a calendar year rather than a row count), for the football field."""
+    return {"analyst_consensus_low": sm_row.get("target_low"), "analyst_consensus_mean": sm_row.get("target_mean"),
+            "analyst_consensus_high": sm_row.get("target_high"),
+            "fifty_two_week_low": sm_row.get("fifty_two_week_low"), "fifty_two_week_high": sm_row.get("fifty_two_week_high")}
+
+
+def value_bank(
+    ticker: str,
+    security_master_df: pd.DataFrame,
+    prices_wide: pd.DataFrame,
+    risk_free_rate: float = 0.053,
+) -> Optional[Dict[str, Any]]:
+    """Residual income value and justified P/B for banks, brokers and insurers, where value_ticker's FCF DCF
+    does not apply. The range moves the cost of equity by 1pp each way. None without book value or ROE."""
+    from trg_workbench.analytics.valuation import (
+        BALANCE_SHEET_INDUSTRIES,
+        derive_dcf_inputs,
+        football_field,
+        residual_income_value,
+    )
+
+    rows = security_master_df[security_master_df["ticker"] == ticker]
+    sm_row = rows.iloc[0].to_dict() if len(rows) else {}
+    if not str(sm_row.get("industry", "")).startswith(BALANCE_SHEET_INDUSTRIES):
+        return None
+    price = float(prices_wide[ticker].dropna().iloc[-1]) if ticker in prices_wide.columns else 0.0
+    r = derive_dcf_inputs(sm_row, {}, risk_free_rate)["cost_of_equity"]
+    bv, roe = sm_row.get("book_value"), sm_row.get("return_on_equity")
+    runs = [residual_income_value(bv, roe, r + d, RI_GROWTH) for d in (0.01, 0.0, -0.01)]
+    if price <= 0 or not all(runs):
+        return None
+    low, mid, high = (run["value_per_share"] for run in runs)
+    return {
+        "ticker": ticker, "cost_of_equity": r, "growth": RI_GROWTH, "roe": roe, "book_value": bv,
+        "justified_pb": runs[1]["justified_pb"], "actual_pb": price / bv, "value_per_share": mid,
+        "football_field": football_field(ticker, price, residual_income=(low, mid, high),
+                                         **_market_ranges(sm_row)),
+    }
+
+
 def value_ticker(
     ticker: str,
     security_master_df: pd.DataFrame,
     fundamentals_df: pd.DataFrame,
     prices_wide: pd.DataFrame,
+    risk_free_rate: float = 0.053,
 ) -> Optional[Dict[str, Any]]:
     """DCF scenarios, sensitivity, football field and reverse DCF for one ticker.
     Returns None when there is no FCF proxy. Shared by the report and the dashboard export."""
@@ -167,18 +225,23 @@ def value_ticker(
         return None
     sec_row = fundamentals_df[fundamentals_df["ticker"] == ticker].iloc[0].to_dict() if ticker in fundamentals_df["ticker"].values else {}
 
-    inputs = derive_dcf_inputs(sm_row, sec_row)
+    inputs = derive_dcf_inputs(sm_row, sec_row, risk_free_rate)
     if inputs["base_fcf"] == 0:
         return None
 
     scenarios = scenario_analysis(inputs["base_fcf"], inputs["base_growth"], inputs["wacc"], inputs["net_debt"], inputs["shares_outstanding"])
-    sensitivity_df = dcf_sensitivity(inputs["base_fcf"], [inputs["base_growth"] * (0.85 ** i) for i in range(5)], inputs["net_debt"], inputs["shares_outstanding"])
+    # value grid centred on the ticker's own WACC, so the middle cell is the base case
+    axes = {"wacc": [round(inputs["wacc"] + d, 3) for d in (-0.02, -0.01, 0.0, 0.01, 0.02)],
+            "tg": [0.015, 0.02, 0.025, 0.03, 0.035]}
+    sensitivity_df = dcf_sensitivity(inputs["base_fcf"], [inputs["base_growth"] * (0.85 ** i) for i in range(5)],
+                                     inputs["net_debt"], inputs["shares_outstanding"], axes["wacc"], axes["tg"])
     current_price = float(prices_wide[ticker].dropna().iloc[-1]) if ticker in prices_wide.columns else 0
 
     ff = football_field(ticker=ticker, current_price=current_price,
                         dcf_base=scenarios["Base Case"]["intrinsic_value_per_share"],
                         dcf_bull=scenarios["Bull Case"]["intrinsic_value_per_share"],
-                        dcf_bear=scenarios["Bear Case"]["intrinsic_value_per_share"])
+                        dcf_bear=scenarios["Bear Case"]["intrinsic_value_per_share"],
+                        **_market_ranges(sm_row))
 
     reverse_dcf_result = None
     if current_price > 0:
@@ -199,6 +262,7 @@ def value_ticker(
         "inputs": inputs,
         "scenarios": scenarios,
         "sensitivity_df": sensitivity_df,
+        "sensitivity_axes": axes,
         "football_field": ff,
         "current_price": current_price,
         "reverse_dcf": reverse_dcf_result,
@@ -289,9 +353,11 @@ def build_research_report_v2(
     _tc = "ticker" if "ticker" in top_candidates.columns else None
     top3 = list(top_candidates.head(3)[_tc].values) if (not top_candidates.empty and _tc) else []
 
+    ust10 = us_macro_df.set_index("key")["value"].get("ust_10y") if not us_macro_df.empty else None
+    report_rf = float(ust10) / 100 if ust10 is not None and not pd.isna(ust10) else 0.053  # same live 10Y as the dashboard
     for ticker in tqdm(top3, desc="Computing valuations", disable=disable_prog):
         try:
-            result = value_ticker(ticker, security_master_df, fundamentals_df, prices_wide)
+            result = value_ticker(ticker, security_master_df, fundamentals_df, prices_wide, risk_free_rate=report_rf)
             if result is None:
                 continue
             dcf_results.append(result)

@@ -34,7 +34,8 @@ Given the ticker universe in `trg_workbench/config.py` and a date, the engine:
 
 ### 📊 Research Automation
 - Multifactor stock screener: valuation, growth, quality, momentum, plus an analyst consensus forward view
-- DCF valuation with CAPM based WACC and bear/base/bull scenarios; football field chart on the dashboard. A WACC × terminal growth matrix is computed but not displayed yet
+- DCF valuation with CAPM based WACC (live 10Y risk free rate) and bear/base/bull scenarios. The dashboard football field shows DCF bear to bull, analyst targets and the 52 week range, next to a WACC × terminal growth value grid centred on each ticker's own WACC
+- Banks, brokers and insurers get a single stage residual income value and justified P/B vs actual P/B (CFA L2) instead of an FCF DCF
 - **Reverse DCF**: solves for the constant 10 year FCF growth rate implied by the current price (FCF proxy = net income × 0.8)
 - Earnings date calendar (Yahoo Finance) on the dashboard
 - Optional discretionary analyst overlays via CSV (thesis, conviction, catalysts, risks, client angle). They apply only to the v1 `main.py` daily/weekly reports; the v2 note and the dashboard ignore them
@@ -42,11 +43,12 @@ Given the ticker universe in `trg_workbench/config.py` and a date, the engine:
 
 ### 🖥️ Live Dashboard
 - Static `index.html` (vanilla JS, Chart.js 4.4.1 and Plotly 2.26 from cdnjs) that fetches `dashboard_data.json` at runtime, hosted on Vercel
-- Top 10 names by research score: price, 6 month price chart, factor radar, risk metrics, DCF football field (bear/base/bull)
+- Top 10 names by research score: price, 6 month price chart, factor radar, risk metrics, and a football field with DCF bear to bull (or residual income for banks), analyst targets and the quoted 52 week range
 - Rating derived from consensus target upside: BUY above +10%, SELL below -10%, HOLD in between
 - Reverse DCF verdict: market implied FCF growth vs consensus +1y revenue growth (STRETCHED / DISCOUNT), plus an implied growth grid across WACC (±2pp) and terminal growth (1.5% to 3.0%)
 - Correlation matrix of the names shown, macro snapshot, and upcoming earnings dates
 - Three sections behind a sticky Company | Peers | Sector nav (plain anchors, no tab JS)
+- Company depth: the quarters Yahoo reports (revenue, operating margin, diluted EPS), TTM DuPont ROE, CFO/net income, capex intensity, drawdown and 21 day volatility
 - Peers: comps table vs the sector peer median, forward P/E vs consensus revenue growth with a least squares line, risk vs return, and factor scores for the whole universe
 - Sector: sector ETF returns (1D to YTD) next to the S&P 500, a rotation view (each ETF vs the S&P, 3M to 1M ago against the last month), and each stock's 3M return against its own sector ETF
 - Management commentary panel: empty on the live site, because CI has no cached transcripts, so every ticker shows "n/a: no cached earnings call transcript"
@@ -73,7 +75,7 @@ Given the ticker universe in `trg_workbench/config.py` and a date, the engine:
 Missing values are written to `dashboard_data.json` as `null` (`allow_nan=False`) and render as n/a. Gaps are never filled with invented numbers.
 
 Known data gaps:
-- There is no 2 year Treasury series yet: the dashboard shows the 13 week T-bill (`^IRX`) and a 3M/10Y spread, labeled as such
+- The 2Y Treasury comes from FRED (`DGS2`, no key) and can lag Yahoo's 10Y by a day; the macro card then shows its date. The 3M T-bill (`^IRX`) is the cash rate for Sharpe and Sortino
 - The note's correlation heatmap drops tickers starting with "X" (so XOM) through the ETF filter in `charts.py`
 
 ### 📁 Outputs
@@ -204,13 +206,13 @@ The composite score is the equal weighted mean of the four factors. A second pas
 
 **Standard DCF inputs:**
 - FCF proxy = SEC net income (Yahoo fallback) × 0.80
-- **WACC** = E/V × (5.3% + Blume adjusted β × 5.5%) + D/V × 6% × (1 - 21%), with D/E fixed at 0.30. These are fixed defaults, not live Treasury yields
+- **WACC** = E/V × (Rf + Blume adjusted β × 5.5%) + D/V × 6% × (1 - 21%), with D/E fixed at 0.30. Rf is the live 10Y Treasury (`^TNX`); 5.3% is only the fallback when the macro fetch fails
 - Blume adjusted beta = 0.67 × raw Yahoo beta + 0.33
 - Growth = consensus +1y revenue growth (`revenue_growth_next_year`), trailing growth only as fallback, clamped to the range -20% to 50%
 - Shares from the security master (`impliedSharesOutstanding`, all share classes; SEC dei counts one class for GOOGL/META)
-- Financial Services names get net debt = 0 (bank debt and cash are operating balances). Banks, Capital Markets and Insurance get no FCF DCF: `value_ticker` returns None and the dashboard shows n/a (JPM and JEF in the current data)
+- Financial Services names get net debt = 0 (bank debt and cash are operating balances). Banks, Capital Markets and Insurance get no FCF DCF: `value_ticker` returns None and `value_bank` gives a residual income value instead (JPM and JEF in the current data)
 - 3 scenarios: Bear (growth × 0.7, TGR 1%, WACC +1pp), Base (TGR 2.5%), Bull (growth × 1.3, TGR 3.5%, WACC -0.5pp)
-- Sensitivity matrix: WACC 7% to 12% × terminal growth 1% to 4%, computed but not displayed yet
+- Value grid: the ticker's own WACC ±2pp × terminal growth 1.5% to 3.5%, shown on the dashboard and in the note; its middle cell is the base case
 - Output: intrinsic value per share for each scenario, with the WACC and TGR used
 
 **Reverse DCF:**
@@ -240,7 +242,7 @@ VaR (95%, 1D) · CVaR · Beta · Volatility (21D/63D) · Sharpe Ratio · Sortino
 
 - The risk table is shown on the dashboard. The note reads `risk_metrics_{date}.csv`, which nothing writes yet, so its risk table does not render
 - Dashboard beta is 63 day OLS vs the S&P 500 (`^GSPC`, cached by the macro client); WACC uses the Blume adjusted Yahoo beta instead
-- Sharpe and Sortino use a fixed 5.3% risk free rate
+- Sharpe and Sortino use the 3M T-bill as the risk free rate (5.3% fallback)
 - Spearman correlation drives the note heatmap; the dashboard matrix is Pearson on 63 days of daily returns
 
 ---
