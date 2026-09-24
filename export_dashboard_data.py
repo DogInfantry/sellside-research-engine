@@ -23,16 +23,18 @@ import pandas as pd
 from trg_workbench.analytics.risk import build_risk_table
 from trg_workbench.analytics.screening import RETURN_WINDOWS, build_research_dataset, top_screen_candidates
 from trg_workbench.analytics.summaries import build_catalyst_calendar
-from trg_workbench.analytics.valuation import build_comps_table, reverse_dcf
+from trg_workbench.analytics.valuation import BALANCE_SHEET_INDUSTRIES, build_comps_table, reverse_dcf
 from trg_workbench.config import CACHE_DIR, NORMALIZED_DIR, US_SECTOR_PROXIES
 from trg_workbench.io_utils import load_dataframe
 from trg_workbench.pipeline_v2 import (
     _load_ecb,
     _load_fundamentals,
     _load_prices,
+    _load_quarterly,
     _load_security_master,
     _prices_wide,
     fetch_data_v2,
+    value_bank,
     value_ticker,
 )
 
@@ -107,15 +109,46 @@ def pe_growth_fit(comps: pd.DataFrame) -> dict | None:
     return {"slope": num(slope, nd=3), "intercept": num(intercept), "r2": num(np.corrcoef(x, y)[0, 1] ** 2), "n": len(d)}
 
 
+def quarterly_block(q: pd.DataFrame, bank: bool) -> dict:
+    """Reported quarters (Yahoo keeps 4 to 7; up to 8 shown), plus TTM DuPont ROE and earnings quality from the
+    last 4 quarters and the latest balance sheet. Under 4 quarters there is no TTM. Earnings quality is n/a for
+    banks, brokers and insurers: their operating cash flow is funding, not earnings."""
+    cols = ["revenue", "eps", "net_income", "operating_income", "ocf", "capex", "total_assets", "equity"]
+    q = q.reindex(columns=["period_end", *cols]).dropna(subset=["period_end"]).sort_values("period_end").copy()
+    q[cols] = q[cols].apply(pd.to_numeric, errors="coerce")
+    ratio = lambda a, b, scale=1, nd=2: num(a / b, scale, nd) if b else None  # NaN in, None out
+    bs = q.dropna(subset=["total_assets", "equity"])
+    # Yahoo's balance sheet reaches further back than its income statement: those dates are not quarters
+    q = q.dropna(subset=["revenue", "eps", "net_income"], how="all").tail(8)
+    # TTM: the last 4 quarters with revenue and net income, and only if back to back (about 9 months first to last)
+    full = q.dropna(subset=["revenue", "net_income"]).tail(4)
+    ttm_ok = len(full) == 4 and (full["period_end"].iloc[-1] - full["period_end"].iloc[0]).days <= 300
+    t = full[["revenue", "net_income", "ocf", "capex"]].sum(min_count=4) if ttm_ok else {}
+    rev, ni, ocf, capex = (t.get(k, float("nan")) for k in ["revenue", "net_income", "ocf", "capex"])
+    if ttm_ok:
+        bs = bs[bs["period_end"] <= full["period_end"].iloc[-1]]
+    assets, equity = (bs["total_assets"].iloc[-1], bs["equity"].iloc[-1]) if len(bs) else (float("nan"),) * 2
+    return {
+        "quarters": [{"period": r.period_end.strftime("%Y-%m-%d"), "revenue_b": num(r.revenue, 1e-9), "eps": num(r.eps),
+                      "op_margin": ratio(r.operating_income, r.revenue, 100, 1)} for r in q.itertuples()],
+        "dupont": {"net_margin": ratio(ni, rev, 100, 1), "asset_turnover": ratio(rev, assets),
+                   "equity_multiplier": ratio(assets, equity), "roe": ratio(ni, equity, 100, 1),
+                   "through": full["period_end"].iloc[-1].strftime("%Y-%m-%d") if ttm_ok else None},
+        "quality": {"cfo_ni": ratio(ocf, ni) if not bank and ni > 0 else None,
+                    "capex_pct_revenue": None if bank else ratio(-capex, rev, 100, 1),
+                    "fcf_margin": None if bank else ratio(ocf + capex, rev, 100, 1)},
+    }
+
+
 def ticker_block(row: pd.Series, px: pd.Series, val: dict | None, risk: pd.Series | None,
-                 commentary: dict | None) -> dict:
+                 commentary: dict | None, bank: dict | None = None) -> dict:
     price = float(px.iloc[-1])
     prev = float(px.iloc[-2]) if len(px) > 1 else price
     upside = num(row.get("target_upside"))
     # ponytail: rating derived from analyst consensus target upside, +/-10% bands
     rating = "N/A" if upside is None else "BUY" if upside > 0.10 else "SELL" if upside < -0.10 else "HOLD"
 
-    dcf = dict.fromkeys(["bear", "base", "bull", "wacc", "terminal_growth", "fcf_yield"])
+    dcf = {**dict.fromkeys(["bear", "base", "bull", "wacc", "terminal_growth", "fcf_yield", "rf"]), "grid": []}
     rdcf = {"implied_growth": None, "consensus_growth": None, "stretched": False, "sensitivity": []}
     if val:
         sc, inputs = val["scenarios"], val["inputs"]
@@ -126,6 +159,10 @@ def ticker_block(row: pd.Series, px: pd.Series, val: dict | None, risk: pd.Serie
             "wacc": num(inputs["wacc"], 100, 1),
             "terminal_growth": num(sc["Base Case"]["tgr_used"], 100, 1),
             "fcf_yield": num(inputs["base_fcf"] / row["market_cap"], 100, 1) if num(row.get("market_cap")) else None,
+            "rf": num(inputs["risk_free_rate"], 100),
+            # value per share across WACC and terminal growth, centred on this ticker's WACC and 2.5%
+            "grid": [{"wacc": num(w, 100, 1), "tg": num(g, 100, 1), "value": num(val["sensitivity_df"].iat[i, j])}
+                     for j, g in enumerate(val["sensitivity_axes"]["tg"]) for i, w in enumerate(val["sensitivity_axes"]["wacc"])],
         }
         if val["reverse_dcf"]:
             rdcf["implied_growth"] = num(val["reverse_dcf"]["implied_growth_rate"], 100, 1)
@@ -140,6 +177,7 @@ def ticker_block(row: pd.Series, px: pd.Series, val: dict | None, risk: pd.Serie
             rdcf["stretched"] = rdcf["implied_growth"] > rdcf["consensus_growth"]
 
     r = risk if risk is not None else {}
+    ff = (val or bank or {}).get("football_field")
     return {
         "name": row.get("long_name") if isinstance(row.get("long_name"), str) else row.get("company_name"),
         "sector": row.get("sector") if isinstance(row.get("sector"), str) else None,
@@ -152,6 +190,12 @@ def ticker_block(row: pd.Series, px: pd.Series, val: dict | None, risk: pd.Serie
         "composite_score": num(row.get("research_score"), 100, 0),
         "dcf": dcf,
         "reverse_dcf": rdcf,
+        "football": [{"method": k, "low": num(lo), "mid": num(mid), "high": num(hi)}
+                     for k, (lo, mid, hi) in ff["methods"].items()] if ff else [],
+        "residual_income": None if not bank else {
+            "value": num(bank["value_per_share"]), "justified_pb": num(bank["justified_pb"]),
+            "actual_pb": num(bank["actual_pb"]), "roe": num(bank["roe"], 100, 1), "book_value": num(bank["book_value"]),
+            "cost_of_equity": num(bank["cost_of_equity"], 100, 1), "growth": num(bank["growth"], 100, 1)},
         "factors": {k: num(row.get(col), 100, 0) for k, col in FACTORS.items()},
         "risk": {
             "var_95": num(r.get("var_95_1d"), -100), "cvar": num(r.get("cvar_95_1d"), -100),
@@ -176,8 +220,9 @@ def ticker_block(row: pd.Series, px: pd.Series, val: dict | None, risk: pd.Serie
     }
 
 
-def macro_block(as_of: str) -> tuple[dict, dict]:
-    """Latest values plus preformatted 1-day changes (bps for yields, % for commodities)."""
+def macro_block(as_of: str) -> tuple[dict, dict, dict]:
+    """Latest values, preformatted 1-day changes (bps for yields, % for commodities) and each series' last date.
+    The 2Y comes from FRED and can lag Yahoo's 10Y by a day, so the page shows its date."""
     path = NORMALIZED_DIR / f"us_macro_{as_of}.csv"
     m = load_dataframe(path).set_index("key") if path.exists() else pd.DataFrame()
     val = lambda k: num(m.at[k, "value"], nd=3) if k in m.index else None
@@ -190,12 +235,15 @@ def macro_block(as_of: str) -> tuple[dict, dict]:
             c *= 100
         return f"{c:+.{1 if unit else 2}f}{unit}"
 
-    macro = {k: val(k) for k in ["ust_10y", "ust_2y", "ust_30y", "vix", "dxy", "wti"]}
+    macro = {k: val(k) for k in ["ust_10y", "ust_2y", "tbill_3m", "ust_30y", "vix", "dxy", "wti"]}
     changes = {"ust_10y": fmt(chg("ust_10y"), "bps"), "ust_2y": fmt(chg("ust_2y"), "bps"),
+               "tbill_3m": fmt(chg("tbill_3m"), "bps"),
                "vix": fmt(chg("vix"), ""), "dxy": fmt(chg("dxy"), ""), "wti": fmt(chg("wti"), "%")}
+    dates = {k: str(m.at[k, "as_of"]) for k in macro if k in m.index and "as_of" in m}
     if macro["ust_10y"] is not None and macro["ust_2y"] is not None:
         macro["spread_2s10s"] = round(macro["ust_10y"] - macro["ust_2y"], 3)
-        if chg("ust_10y") is not None and chg("ust_2y") is not None:
+        # a 1 day change only when both legs moved over the same day
+        if chg("ust_10y") is not None and chg("ust_2y") is not None and dates.get("ust_10y") == dates.get("ust_2y"):
             changes["spread_2s10s"] = fmt(chg("ust_10y") - chg("ust_2y"), "bps")
 
     fx = _load_ecb(as_of)
@@ -203,7 +251,7 @@ def macro_block(as_of: str) -> tuple[dict, dict]:
     macro["eurusd"] = num(fx["value"].iloc[-1], nd=4) if len(fx) else None
     if len(fx) > 1:
         changes["eurusd"] = f"{fx['value'].iloc[-1] - fx['value'].iloc[-2]:+.4f}"
-    return macro, changes
+    return macro, changes, dates
 
 
 def build_dashboard(as_of: str, limit: int = 10) -> dict:
@@ -215,6 +263,10 @@ def build_dashboard(as_of: str, limit: int = 10) -> dict:
         raise SystemExit(f"No normalized data for {as_of}. Run: python main_v2.py fetch-all --as-of {as_of}")
 
     wide = _prices_wide(prices)
+    macro, macro_chg, macro_as_of = macro_block(as_of)
+    # live rates: 10Y for the DCF discount rate, 3M bill for Sharpe/Sortino; without them the old 5.3% default stays
+    dcf_rf = macro["ust_10y"] / 100 if macro["ust_10y"] is not None else 0.053
+    cash_rf = macro["tbill_3m"] / 100 if macro["tbill_3m"] is not None else 0.053
     research = build_research_dataset(fundamentals, prices, security_master, as_of_date)
     top = top_screen_candidates(research, limit=limit)
     tickers = [t for t in top["ticker"] if t in wide.columns]
@@ -223,7 +275,7 @@ def build_dashboard(as_of: str, limit: int = 10) -> dict:
     spx_path = CACHE_DIR / f"us_macro_spx_{as_of}.csv"
     if spx_path.exists():
         wide["SPX"] = load_dataframe(spx_path, parse_dates=["date"]).set_index("date")["value"].reindex(wide.index)
-    risk = build_risk_table(wide[universe + [c for c in ["SPX"] if c in wide]], market_col="SPX")
+    risk = build_risk_table(wide[universe + [c for c in ["SPX"] if c in wide]], market_col="SPX", rfr=cash_rf)
 
     commentary = {}
     try:
@@ -234,7 +286,7 @@ def build_dashboard(as_of: str, limit: int = 10) -> dict:
 
     def safe_value(t):
         try:
-            return value_ticker(t, security_master, fundamentals, wide)
+            return value_ticker(t, security_master, fundamentals, wide, risk_free_rate=dcf_rf)
         except Exception:  # noqa: BLE001  same tolerance as build_research_report_v2
             return None
 
@@ -246,14 +298,17 @@ def build_dashboard(as_of: str, limit: int = 10) -> dict:
     base_fcf = pd.to_numeric(comps["ticker"].map(lambda t: vals[t]["inputs"]["base_fcf"] if vals.get(t) else None))
     comps["fcf_yield"] = base_fcf / comps["market_cap"].where(comps["market_cap"] > 0)
 
+    quarterly = _load_quarterly(as_of)
     blocks = {}
     for _, row in top.iterrows():
         t = row["ticker"]
         if t not in tickers:
             continue
-        blocks[t] = ticker_block(row, wide[t].dropna(), vals.get(t),
-                                 risk.loc[t] if t in risk.index else None, commentary.get(t))
+        blocks[t] = ticker_block(row, wide[t].dropna(), vals.get(t), risk.loc[t] if t in risk.index else None,
+                                 commentary.get(t), value_bank(t, security_master, wide, risk_free_rate=dcf_rf))
         blocks[t]["vs_sector"] = sector_context(comps, t)
+        is_bank = str(row.get("industry", "")).startswith(BALANCE_SHEET_INDUSTRIES)
+        blocks[t].update(quarterly_block(quarterly[quarterly["ticker"] == t] if len(quarterly) else quarterly, is_bank))
 
     # same shape and window as price_history, so the page can rebase stock, sector and market together
     bench = {"SPX"} | {b["vs_sector"]["etf"] for b in blocks.values()}
@@ -262,13 +317,15 @@ def build_dashboard(as_of: str, limit: int = 10) -> dict:
 
     corr_t = list(blocks)
     corr = wide[corr_t].pct_change().tail(63).corr()
-    macro, macro_chg = macro_block(as_of)
 
     return {
         "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "as_of": as_of,
         "macro": macro,
         "macro_chg": macro_chg,
+        "macro_as_of": macro_as_of,
+        "rates": {"dcf_rf": num(dcf_rf, 100), "dcf_rf_source": "UST 10Y" if macro["ust_10y"] is not None else "default",
+                  "cash_rf": num(cash_rf, 100), "cash_rf_source": "UST 3M bill" if macro["tbill_3m"] is not None else "default"},
         "tickers": blocks,
         "benchmarks": benchmarks,
         "comps": {c["ticker"]: {

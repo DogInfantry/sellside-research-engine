@@ -2,10 +2,11 @@ import json
 
 import numpy as np
 import pandas as pd
+import pytest
 
-from export_dashboard_data import pe_growth_fit, sector_block, sector_context, ticker_block
+from export_dashboard_data import pe_growth_fit, quarterly_block, sector_block, sector_context, ticker_block
 from trg_workbench.analytics.valuation import build_comps_table
-from trg_workbench.pipeline_v2 import value_ticker
+from trg_workbench.pipeline_v2 import value_bank, value_ticker
 
 
 def test_ticker_block_has_real_dcf_and_strict_json():
@@ -93,3 +94,65 @@ def test_pe_growth_fit_recovers_a_line():
 
     assert (fit["n"], fit["slope"], fit["intercept"], fit["r2"]) == (4, 0.5, 10.0, 1.0)
     assert pe_growth_fit(comps.head(2)) is None  # too few names for a line
+
+
+def test_value_ticker_grid_centers_on_own_wacc():
+    sm = pd.DataFrame([{"ticker": "AAA", "net_income_to_common": 1e9, "shares_outstanding": 1e8, "beta": 1.2,
+                        "target_low": 90.0, "target_mean": 110.0, "target_high": 130.0}])
+    px = pd.DataFrame({"AAA": np.linspace(80, 100, 300)}, index=pd.bdate_range("2025-06-02", periods=300))
+    val = value_ticker("AAA", sm, pd.DataFrame(columns=["ticker"]), px, risk_free_rate=0.045)
+
+    axes, grid = val["sensitivity_axes"], val["sensitivity_df"]
+    i, j = axes["wacc"].index(val["inputs"]["wacc"]), axes["tg"].index(0.025)
+    assert grid.iat[i, j] == val["scenarios"]["Base Case"]["intrinsic_value_per_share"]  # centre cell is the base DCF
+    ff = val["football_field"]["methods"]
+    assert ff["52-Week Range"] == (px["AAA"].tail(252).min(), pytest.approx((px["AAA"].tail(252).min() + 100) / 2), 100.0)
+    assert ff["Analyst Consensus Target"] == (90.0, 110.0, 130.0)
+
+
+def test_value_bank_residual_income():
+    sm = pd.DataFrame([{"ticker": "BNK", "industry": "Banks - Diversified", "book_value": 100.0,
+                        "return_on_equity": 0.15, "beta": 1.0, "target_low": 150.0, "target_mean": 170.0,
+                        "target_high": 200.0}])
+    px = pd.DataFrame({"BNK": [150.0, 160.0]})
+    bank = value_bank("BNK", sm, px, risk_free_rate=0.045)
+
+    r = bank["cost_of_equity"]
+    assert bank["justified_pb"] == pytest.approx((0.15 - 0.025) / (r - 0.025))
+    assert bank["actual_pb"] == pytest.approx(1.6)
+    lo, mid, hi = bank["football_field"]["methods"]["Residual Income"]
+    assert lo < mid < hi and mid == pytest.approx(bank["value_per_share"])  # cost of equity +1pp / base / -1pp
+    assert value_bank("BNK", sm.assign(industry="Semiconductors"), px) is None  # not a bank: the DCF applies
+    assert value_bank("BNK", sm.assign(book_value=float("nan")), px) is None
+
+
+def test_quarterly_block_ttm_dupont_and_quality():
+    q = pd.DataFrame({
+        "period_end": pd.to_datetime(["2025-06-30", "2025-09-30", "2025-12-31", "2026-03-31", "2026-06-30"]),
+        "revenue": [9e9, 10e9, 10e9, 10e9, 10e9], "eps": [1.0, 1.1, 1.2, 1.3, 1.4],
+        "net_income": [1e9, 2e9, 2e9, 2e9, 2e9], "operating_income": [2e9, 3e9, 3e9, 3e9, 3e9],
+        "ocf": [1e9, 2.5e9, 2.5e9, 2.5e9, 2.5e9], "capex": [-1e9, -1e9, -1e9, -1e9, -1e9],
+        "total_assets": [None, None, None, None, 80e9], "equity": [None, None, None, None, 40e9],
+    })
+    balance_sheet_only = pd.DataFrame({"period_end": pd.to_datetime(["2025-03-31"]), "total_assets": [70e9], "equity": [35e9]})
+    b = quarterly_block(pd.concat([balance_sheet_only, q]), bank=False)
+
+    # Yahoo's balance sheet goes further back than its income statement: those dates are not quarters
+    assert [x["period"] for x in b["quarters"]][-1] == "2026-06-30" and len(b["quarters"]) == 5
+    assert b["quarters"][-1]["op_margin"] == 30.0 and b["quarters"][-1]["revenue_b"] == 10.0
+    d = b["dupont"]  # TTM over the last 4 quarters, latest balance sheet
+    assert (d["net_margin"], d["asset_turnover"], d["equity_multiplier"], d["roe"]) == (20.0, 0.5, 2.0, 20.0)
+    assert b["quality"] == {"cfo_ni": 1.25, "capex_pct_revenue": 10.0, "fcf_margin": 15.0}
+    bank = quarterly_block(q.assign(operating_income=None, capex=None), bank=True)
+    assert bank["quality"] == {"cfo_ni": None, "capex_pct_revenue": None, "fcf_margin": None}  # CFO is funding, not earnings
+    assert bank["quarters"][-1]["op_margin"] is None and bank["dupont"]["roe"] == 20.0
+    assert d["through"] == "2026-06-30"
+    eps_only = pd.DataFrame({"period_end": pd.to_datetime(["2026-09-30"]), "eps": [1.5]})  # Yahoo half filled a quarter
+    late = quarterly_block(pd.concat([q, eps_only]), bank=False)
+    assert late["quarters"][-1]["eps"] == 1.5 and late["quarters"][-1]["revenue_b"] is None
+    assert late["dupont"]["through"] == "2026-06-30" and late["dupont"]["roe"] == 20.0  # TTM on the last 4 complete quarters
+    gap = quarterly_block(q.drop(index=2), bank=False)  # a missing quarter in the middle
+    assert gap["dupont"]["roe"] is None  # 4 quarters that are not back to back are not a TTM
+    short = quarterly_block(q.tail(3), bank=False)
+    assert short["dupont"]["roe"] is None and short["quality"]["cfo_ni"] is None  # under 4 quarters: no TTM
+    json.dumps(b, allow_nan=False)

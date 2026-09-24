@@ -21,7 +21,8 @@ except ImportError:  # pragma: no cover
 # Tickers available via yfinance for US macro
 US_MACRO_TICKERS = {
     "ust_10y":   {"ticker": "^TNX",     "label": "UST 10Y Yield",     "category": "rates",       "unit": "pct"},
-    "ust_2y":    {"ticker": "^IRX",     "label": "UST 3M / 2Y Proxy", "category": "rates",       "unit": "pct"},
+    "ust_2y":    {"fred": "DGS2",       "label": "UST 2Y Yield",      "category": "rates",       "unit": "pct"},
+    "tbill_3m":  {"ticker": "^IRX",     "label": "UST 3M Bill",       "category": "rates",       "unit": "pct"},
     "ust_30y":   {"ticker": "^TYX",     "label": "UST 30Y Yield",     "category": "rates",       "unit": "pct"},
     "vix":       {"ticker": "^VIX",     "label": "VIX",               "category": "vol",         "unit": "index"},
     "dxy":       {"ticker": "DX-Y.NYB", "label": "DXY Dollar Index",  "category": "fx",          "unit": "index"},
@@ -65,13 +66,19 @@ class USMacroClient:
         end = (datetime.strptime(as_of, "%Y-%m-%d") + timedelta(days=1)).strftime("%Y-%m-%d")
 
         try:
-            raw = yf.download(meta["ticker"], start=start, end=end, auto_adjust=True, progress=False)
-            if raw.empty:
+            if "fred" in meta:  # FRED csv, no key; "." marks a holiday. Yahoo has no 2Y Treasury.
+                raw = pd.read_csv(f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={meta['fred']}")
+                df = pd.DataFrame({"date": pd.to_datetime(raw.iloc[:, 0]), "value": pd.to_numeric(raw.iloc[:, 1], errors="coerce")})
+                df = df[(df["date"] >= start) & (df["date"] < end)].dropna().reset_index(drop=True)
+            else:
+                raw = yf.download(meta["ticker"], start=start, end=end, auto_adjust=True, progress=False)
+                df = raw[["Close"]].copy() if not raw.empty else pd.DataFrame()
+                if not df.empty:
+                    df.index = pd.to_datetime(df.index)
+                    df = df.reset_index()
+                    df.columns = ["date", "value"]
+            if df.empty:
                 return pd.DataFrame(columns=["date", "value", "label", "category", "unit"])
-            df = raw[["Close"]].copy()
-            df.index = pd.to_datetime(df.index)
-            df = df.reset_index()
-            df.columns = ["date", "value"]
             df["label"] = meta["label"]
             df["category"] = meta["category"]
             df["unit"] = meta["unit"]

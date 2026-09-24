@@ -12,6 +12,11 @@ import yfinance as yf
 from trg_workbench.config import CACHE_DIR, DEFAULT_US_TICKERS, EUROPE_INDICES, US_SECTOR_PROXIES
 from trg_workbench.io_utils import read_json, utc_now_iso, write_json
 
+# Yahoo statement rows kept per quarter (Yahoo keeps 4 to 7 quarters); banks have no operating income or capex
+QUARTERLY_ROWS = {"Total Revenue": "revenue", "Diluted EPS": "eps", "Net Income": "net_income",
+                  "Operating Income": "operating_income", "Operating Cash Flow": "ocf", "Capital Expenditure": "capex",
+                  "Total Assets": "total_assets", "Stockholders Equity": "equity"}
+
 
 class MarketDataClient:
     def __init__(self, cache_dir: Path | None = None) -> None:
@@ -80,6 +85,7 @@ class MarketDataClient:
                 "revenue_growth_next_year",
                 "enterprise_value",
                 "ebitda",
+                "book_value",
             }
             if required_columns.issubset(cached.columns):
                 return cached
@@ -133,6 +139,7 @@ class MarketDataClient:
                     "total_cash": info.get("totalCash"),
                     "enterprise_value": info.get("enterpriseValue"),
                     "ebitda": info.get("ebitda"),
+                    "book_value": info.get("bookValue"),  # per share
                     "beta": info.get("beta"),
                     "trailing_pe": info.get("trailingPE"),
                     "forward_pe": info.get("forwardPE"),
@@ -150,6 +157,26 @@ class MarketDataClient:
 
         write_json(cache_path, [self._normalize_row(row) for row in rows])
         return pd.DataFrame(rows)
+
+    def fetch_quarterly(self, as_of_date: date, refresh: bool = False) -> pd.DataFrame:
+        """Reported quarters per US stock: one row per ticker and quarter end, columns from QUARTERLY_ROWS."""
+        cache_path = self.cache_dir / f"quarterly_{as_of_date.isoformat()}.csv"
+        if cache_path.exists() and not refresh:
+            return pd.read_csv(cache_path, parse_dates=["period_end"])
+        frames = []
+        for ticker in DEFAULT_US_TICKERS:
+            try:
+                t = yf.Ticker(ticker)
+                q = pd.concat([t.quarterly_income_stmt, t.quarterly_cashflow, t.quarterly_balance_sheet])
+            except Exception:  # noqa: BLE001  a missing statement leaves that ticker's quarters n/a
+                continue
+            q = q[~q.index.duplicated()].reindex(list(QUARTERLY_ROWS)).T.rename(columns=QUARTERLY_ROWS)
+            frames.append(q.rename_axis("period_end").reset_index().assign(ticker=ticker))
+            time.sleep(0.1)
+        cols = ["ticker", "period_end", *QUARTERLY_ROWS.values()]
+        out = pd.concat(frames, ignore_index=True)[cols] if frames else pd.DataFrame(columns=cols)
+        out.to_csv(cache_path, index=False)
+        return out
 
     def build_market_dataset(
         self,

@@ -1,7 +1,8 @@
 import pandas as pd
 import pytest
 
-from trg_workbench.analytics.valuation import build_comps_table, dcf_valuation, derive_dcf_inputs, estimate_wacc, reverse_dcf
+from trg_workbench.analytics.valuation import (build_comps_table, capm_cost_of_equity, dcf_valuation, derive_dcf_inputs,
+                                               estimate_wacc, football_field, residual_income_value, reverse_dcf)
 
 
 def test_reverse_dcf_recovers_known_growth_rate():
@@ -102,3 +103,31 @@ def test_build_comps_table_multiples_and_balance_sheet_names():
     assert c.loc["LOS", ["fwd_pe", "peg", "ev_ebitda", "ev_sales"]].isna().all()
     old_cache = build_comps_table(pd.DataFrame([{"ticker": "Z", "instrument_group": "us_equity"}]))
     assert old_cache[["fwd_pe", "ev_ebitda"]].isna().all(axis=None)  # no new columns yet: n/a, not KeyError
+
+
+def test_live_risk_free_rate_flows_into_wacc_and_cost_of_equity():
+    sm_row = {"net_income_to_common": 50.0, "shares_outstanding": 10.0, "beta": 1.0}
+    live = derive_dcf_inputs(sm_row, {}, risk_free_rate=0.045)
+
+    assert live["cost_of_equity"] == pytest.approx(capm_cost_of_equity(1.0, 0.045))  # Blume beta of 1 is 1
+    assert live["wacc"] == estimate_wacc(beta=1.0, risk_free_rate=0.045)
+    assert live["wacc"] < derive_dcf_inputs(sm_row, {})["wacc"]  # 4.5% Rf vs the old 5.3% default
+
+
+def test_residual_income_is_book_times_justified_pb():
+    ri = residual_income_value(book_value_ps=100.0, roe=0.15, cost_of_equity=0.10, growth=0.025)
+    assert ri["justified_pb"] == pytest.approx(0.125 / 0.075)
+    assert ri["value_per_share"] == pytest.approx(100 * 0.125 / 0.075)
+    assert residual_income_value(float("nan"), 0.15, 0.10) is None  # no book value: n/a
+    assert residual_income_value(100.0, 0.02, 0.10) is None  # ROE below growth: the model says nothing useful
+    assert residual_income_value(100.0, 0.15, 0.028) is None  # r too close to g: value explodes
+
+
+def test_football_field_uses_only_real_ranges():
+    ff = football_field("X", 100.0, dcf_base=110.0, dcf_bull=140.0, dcf_bear=80.0,
+                        analyst_consensus_low=90.0, analyst_consensus_mean=120.0, analyst_consensus_high=150.0,
+                        fifty_two_week_low=70.0, fifty_two_week_high=130.0)
+    assert list(ff["methods"]) == ["DCF Scenarios (Bear/Base/Bull)", "Analyst Consensus Target", "52-Week Range"]
+    assert ff["methods"]["DCF Scenarios (Bear/Base/Bull)"] == (80.0, 110.0, 140.0)  # no padded +-5% row
+    bank = football_field("B", 100.0, residual_income=(85.0, 95.0, 110.0), analyst_consensus_low=float("nan"))
+    assert list(bank["methods"]) == ["Residual Income"]  # a NaN target is not a range
