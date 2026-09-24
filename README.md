@@ -43,7 +43,7 @@ Given the ticker universe in `trg_workbench/config.py` and a date, the engine:
 
 ### 🖥️ Live Dashboard
 - Static `index.html` (vanilla JS, Chart.js 4.4.1 and Plotly 2.26 from cdnjs) that fetches `dashboard_data.json` at runtime, hosted on Vercel
-- Top 10 names by research score: price, 6 month price chart, factor radar, risk metrics, DCF football field (bear/base/bull)
+- Top 10 names by research score: price, 6 month price chart, factor radar, risk metrics, and a football field with DCF bear to bull (or residual income for banks), analyst targets and the quoted 52 week range
 - Rating derived from consensus target upside: BUY above +10%, SELL below -10%, HOLD in between
 - Reverse DCF verdict: market implied FCF growth vs consensus +1y revenue growth (STRETCHED / DISCOUNT), plus an implied growth grid across WACC (±2pp) and terminal growth (1.5% to 3.0%)
 - Correlation matrix of the names shown, macro snapshot, and upcoming earnings dates
@@ -212,7 +212,7 @@ The composite score is the equal weighted mean of the four factors. A second pas
 - Shares from the security master (`impliedSharesOutstanding`, all share classes; SEC dei counts one class for GOOGL/META)
 - Financial Services names get net debt = 0 (bank debt and cash are operating balances). Banks, Capital Markets and Insurance get no FCF DCF: `value_ticker` returns None and `value_bank` gives a residual income value instead (JPM and JEF in the current data)
 - 3 scenarios: Bear (growth × 0.7, TGR 1%, WACC +1pp), Base (TGR 2.5%), Bull (growth × 1.3, TGR 3.5%, WACC -0.5pp)
-- Sensitivity matrix: WACC 7% to 12% × terminal growth 1% to 4%, computed but not displayed yet
+- Value grid: the ticker's own WACC ±2pp × terminal growth 1.5% to 3.5%, shown on the dashboard and in the note; its middle cell is the base case
 - Output: intrinsic value per share for each scenario, with the WACC and TGR used
 
 **Reverse DCF:**

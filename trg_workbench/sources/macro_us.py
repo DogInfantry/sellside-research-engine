@@ -5,12 +5,14 @@ Gold, WTI crude oil, S&P 500 index.
 """
 from __future__ import annotations
 
+import io
 import time
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Dict, List, Optional
 
 import pandas as pd
+import requests
 
 try:
     import yfinance as yf
@@ -58,16 +60,21 @@ class USMacroClient:
 
         as_of = as_of_date or datetime.today().strftime("%Y-%m-%d")
         cache = self._cache_path(key, as_of)
-        if cache.exists():
-            return pd.read_csv(cache, parse_dates=["date"])
-
         meta = US_MACRO_TICKERS[key]
+        if cache.exists():
+            cached = pd.read_csv(cache, parse_dates=["date"])
+            # a cache written under the old meaning of a key (ust_2y used to be ^IRX) is refetched
+            if cached.empty or "label" not in cached or (cached["label"] == meta["label"]).all():
+                return cached
+
         start = (datetime.strptime(as_of, "%Y-%m-%d") - timedelta(days=lookback_days)).strftime("%Y-%m-%d")
         end = (datetime.strptime(as_of, "%Y-%m-%d") + timedelta(days=1)).strftime("%Y-%m-%d")
 
         try:
             if "fred" in meta:  # FRED csv, no key; "." marks a holiday. Yahoo has no 2Y Treasury.
-                raw = pd.read_csv(f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={meta['fred']}")
+                resp = requests.get(f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={meta['fred']}", timeout=30)
+                resp.raise_for_status()
+                raw = pd.read_csv(io.StringIO(resp.text))
                 df = pd.DataFrame({"date": pd.to_datetime(raw.iloc[:, 0]), "value": pd.to_numeric(raw.iloc[:, 1], errors="coerce")})
                 df = df[(df["date"] >= start) & (df["date"] < end)].dropna().reset_index(drop=True)
             else:

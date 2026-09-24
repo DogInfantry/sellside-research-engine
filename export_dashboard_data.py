@@ -23,7 +23,7 @@ import pandas as pd
 from trg_workbench.analytics.risk import build_risk_table
 from trg_workbench.analytics.screening import RETURN_WINDOWS, build_research_dataset, top_screen_candidates
 from trg_workbench.analytics.summaries import build_catalyst_calendar
-from trg_workbench.analytics.valuation import BALANCE_SHEET_INDUSTRIES, build_comps_table, reverse_dcf
+from trg_workbench.analytics.valuation import BALANCE_SHEET_INDUSTRIES, build_comps_table, football_field, reverse_dcf
 from trg_workbench.config import CACHE_DIR, NORMALIZED_DIR, US_SECTOR_PROXIES
 from trg_workbench.io_utils import load_dataframe
 from trg_workbench.pipeline_v2 import (
@@ -32,6 +32,7 @@ from trg_workbench.pipeline_v2 import (
     _load_prices,
     _load_quarterly,
     _load_security_master,
+    _market_ranges,
     _prices_wide,
     fetch_data_v2,
     value_bank,
@@ -130,8 +131,9 @@ def quarterly_block(q: pd.DataFrame, bank: bool) -> dict:
     assets, equity = (bs["total_assets"].iloc[-1], bs["equity"].iloc[-1]) if len(bs) else (float("nan"),) * 2
     return {
         "quarters": [{"period": r.period_end.strftime("%Y-%m-%d"), "revenue_b": num(r.revenue, 1e-9), "eps": num(r.eps),
-                      "op_margin": ratio(r.operating_income, r.revenue, 100, 1)} for r in q.itertuples()],
-        "dupont": {"net_margin": ratio(ni, rev, 100, 1), "asset_turnover": ratio(rev, assets),
+                      # a broker's "operating income" leaves out interest expense, its main cost: not comparable
+                      "op_margin": None if bank else ratio(r.operating_income, r.revenue, 100, 1)} for r in q.itertuples()],
+        "dupont": {"net_margin": ratio(ni, rev, 100, 1), "asset_turnover": ratio(rev, assets, nd=3),
                    "equity_multiplier": ratio(assets, equity), "roe": ratio(ni, equity, 100, 1),
                    "through": full["period_end"].iloc[-1].strftime("%Y-%m-%d") if ttm_ok else None},
         "quality": {"cfo_ni": ratio(ocf, ni) if not bank and ni > 0 else None,
@@ -140,8 +142,18 @@ def quarterly_block(q: pd.DataFrame, bank: bool) -> dict:
     }
 
 
+def spread_on_shared_dates(ten: pd.Series, two: pd.Series) -> tuple:
+    """10Y minus 2Y on the last day both have a value, and its change since the previous shared day.
+    FRED's 2Y lags Yahoo's 10Y by a day and each skips days the other has."""
+    both = pd.concat([ten, two], axis=1, sort=True).dropna()
+    if len(both) < 2:
+        return None, None, None
+    s = both.iloc[:, 0] - both.iloc[:, 1]
+    return both.index[-1].strftime("%Y-%m-%d"), round(float(s.iloc[-1]), 3), round(float(s.iloc[-1] - s.iloc[-2]), 4)
+
+
 def ticker_block(row: pd.Series, px: pd.Series, val: dict | None, risk: pd.Series | None,
-                 commentary: dict | None, bank: dict | None = None) -> dict:
+                 commentary: dict | None, bank: dict | None = None, market_ff: dict | None = None) -> dict:
     price = float(px.iloc[-1])
     prev = float(px.iloc[-2]) if len(px) > 1 else price
     upside = num(row.get("target_upside"))
@@ -177,7 +189,7 @@ def ticker_block(row: pd.Series, px: pd.Series, val: dict | None, risk: pd.Serie
             rdcf["stretched"] = rdcf["implied_growth"] > rdcf["consensus_growth"]
 
     r = risk if risk is not None else {}
-    ff = (val or bank or {}).get("football_field")
+    ff = (val or bank or {}).get("football_field") or market_ff
     return {
         "name": row.get("long_name") if isinstance(row.get("long_name"), str) else row.get("company_name"),
         "sector": row.get("sector") if isinstance(row.get("sector"), str) else None,
@@ -240,11 +252,12 @@ def macro_block(as_of: str) -> tuple[dict, dict, dict]:
                "tbill_3m": fmt(chg("tbill_3m"), "bps"),
                "vix": fmt(chg("vix"), ""), "dxy": fmt(chg("dxy"), ""), "wti": fmt(chg("wti"), "%")}
     dates = {k: str(m.at[k, "as_of"]) for k in macro if k in m.index and "as_of" in m}
-    if macro["ust_10y"] is not None and macro["ust_2y"] is not None:
-        macro["spread_2s10s"] = round(macro["ust_10y"] - macro["ust_2y"], 3)
-        # a 1 day change only when both legs moved over the same day
-        if chg("ust_10y") is not None and chg("ust_2y") is not None and dates.get("ust_10y") == dates.get("ust_2y"):
-            changes["spread_2s10s"] = fmt(chg("ust_10y") - chg("ust_2y"), "bps")
+    # the spread on the last day both legs have (never a stale 2Y against today's 10Y), from the series caches
+    legs = [CACHE_DIR / f"us_macro_{k}_{as_of}.csv" for k in ("ust_10y", "ust_2y")]
+    if all(p.exists() for p in legs):
+        ten, two = (load_dataframe(p, parse_dates=["date"]).set_index("date")["value"] for p in legs)
+        dates["spread_2s10s"], macro["spread_2s10s"], change = spread_on_shared_dates(ten, two)
+        changes["spread_2s10s"] = fmt(change, "bps")
 
     fx = _load_ecb(as_of)
     fx = fx.loc[fx["label"] == "EURUSD"].sort_values("date") if not fx.empty else fx
@@ -299,13 +312,18 @@ def build_dashboard(as_of: str, limit: int = 10) -> dict:
     comps["fcf_yield"] = base_fcf / comps["market_cap"].where(comps["market_cap"] > 0)
 
     quarterly = _load_quarterly(as_of)
+    sm_rows = security_master.drop_duplicates("ticker").set_index("ticker")
     blocks = {}
     for _, row in top.iterrows():
         t = row["ticker"]
         if t not in tickers:
             continue
+        bank = value_bank(t, security_master, wide, risk_free_rate=dcf_rf)
+        # analyst and 52 week ranges need no model: keep them when neither valuation applies
+        market = None if vals.get(t) or bank else football_field(
+            t, float(wide[t].dropna().iloc[-1]), **_market_ranges(sm_rows.loc[t].to_dict() if t in sm_rows.index else {}))
         blocks[t] = ticker_block(row, wide[t].dropna(), vals.get(t), risk.loc[t] if t in risk.index else None,
-                                 commentary.get(t), value_bank(t, security_master, wide, risk_free_rate=dcf_rf))
+                                 commentary.get(t), bank, market)
         blocks[t]["vs_sector"] = sector_context(comps, t)
         is_bank = str(row.get("industry", "")).startswith(BALANCE_SHEET_INDUSTRIES)
         blocks[t].update(quarterly_block(quarterly[quarterly["ticker"] == t] if len(quarterly) else quarterly, is_bank))

@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from export_dashboard_data import pe_growth_fit, quarterly_block, sector_block, sector_context, ticker_block
+from export_dashboard_data import pe_growth_fit, quarterly_block, sector_block, sector_context, spread_on_shared_dates, ticker_block
 from trg_workbench.analytics.valuation import build_comps_table
 from trg_workbench.pipeline_v2 import value_bank, value_ticker
 
@@ -98,7 +98,8 @@ def test_pe_growth_fit_recovers_a_line():
 
 def test_value_ticker_grid_centers_on_own_wacc():
     sm = pd.DataFrame([{"ticker": "AAA", "net_income_to_common": 1e9, "shares_outstanding": 1e8, "beta": 1.2,
-                        "target_low": 90.0, "target_mean": 110.0, "target_high": 130.0}])
+                        "target_low": 90.0, "target_mean": 110.0, "target_high": 130.0,
+                        "fifty_two_week_low": 78.5, "fifty_two_week_high": 101.2}])
     px = pd.DataFrame({"AAA": np.linspace(80, 100, 300)}, index=pd.bdate_range("2025-06-02", periods=300))
     val = value_ticker("AAA", sm, pd.DataFrame(columns=["ticker"]), px, risk_free_rate=0.045)
 
@@ -106,7 +107,8 @@ def test_value_ticker_grid_centers_on_own_wacc():
     i, j = axes["wacc"].index(val["inputs"]["wacc"]), axes["tg"].index(0.025)
     assert grid.iat[i, j] == val["scenarios"]["Base Case"]["intrinsic_value_per_share"]  # centre cell is the base DCF
     ff = val["football_field"]["methods"]
-    assert ff["52-Week Range"] == (px["AAA"].tail(252).min(), pytest.approx((px["AAA"].tail(252).min() + 100) / 2), 100.0)
+    assert ff["52-Week Range"] == (78.5, pytest.approx((78.5 + 101.2) / 2), 101.2)  # as quoted, not from adjusted closes
+    assert val["sensitivity_axes"]["wacc"] == [round(val["inputs"]["wacc"] + d, 3) for d in (-0.02, -0.01, 0, 0.01, 0.02)]
     assert ff["Analyst Consensus Target"] == (90.0, 110.0, 130.0)
 
 
@@ -146,6 +148,8 @@ def test_quarterly_block_ttm_dupont_and_quality():
     bank = quarterly_block(q.assign(operating_income=None, capex=None), bank=True)
     assert bank["quality"] == {"cfo_ni": None, "capex_pct_revenue": None, "fcf_margin": None}  # CFO is funding, not earnings
     assert bank["quarters"][-1]["op_margin"] is None and bank["dupont"]["roe"] == 20.0
+    broker = quarterly_block(q, bank=True)  # a broker that does report an operating income line
+    assert all(x["op_margin"] is None for x in broker["quarters"])
     assert d["through"] == "2026-06-30"
     eps_only = pd.DataFrame({"period_end": pd.to_datetime(["2026-09-30"]), "eps": [1.5]})  # Yahoo half filled a quarter
     late = quarterly_block(pd.concat([q, eps_only]), bank=False)
@@ -156,3 +160,14 @@ def test_quarterly_block_ttm_dupont_and_quality():
     short = quarterly_block(q.tail(3), bank=False)
     assert short["dupont"]["roe"] is None and short["quality"]["cfo_ni"] is None  # under 4 quarters: no TTM
     json.dumps(b, allow_nan=False)
+
+
+def test_spread_on_shared_dates():
+    d = pd.to_datetime(["2026-09-18", "2026-09-21", "2026-09-22", "2026-09-23"])
+    ten = pd.Series([4.90, 4.96, None, 5.11], index=d)  # Yahoo skipped 09-22
+    two = pd.Series([4.70, 4.76, 4.71, None], index=d)  # FRED is a day behind
+    date_, level, change = spread_on_shared_dates(ten, two)
+
+    assert date_ == "2026-09-21"  # the last day both have
+    assert level == pytest.approx(0.20) and change == pytest.approx(0.0)  # vs 09-18, the previous shared day
+    assert spread_on_shared_dates(ten.head(1), two.tail(1)) == (None, None, None)

@@ -37,7 +37,7 @@ def estimate_wacc(
     e_weight = 1 / (1 + de)
     d_weight = de / (1 + de)
     wacc = e_weight * cost_of_equity + d_weight * cost_of_debt * (1 - tax_rate)
-    return round(wacc, 4)
+    return round(wacc, 3)  # 0.1pp: the precision it is shown at, so grid labels and the base case agree
 
 
 # ─── DCF engine ──────────────────────────────────────────────────────────────

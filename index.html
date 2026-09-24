@@ -481,7 +481,7 @@ function buildFootball() {
   const d = DATA.tickers[active], F = (d.football||[]).filter(m=>ok(m.low)&&ok(m.high));
   const wrap = document.getElementById('footballWrap');
   if(footballChart){footballChart.destroy();footballChart=null;}
-  if(!F.length){wrap.innerHTML='<div class="signal-box">n/a: no valuation ranges for this ticker</div>';return;}
+  if(!F.length){wrap.innerHTML=`<div class="signal-box">n/a: ${d.football ? 'no valuation ranges for this ticker' : 'not in this data export'}</div>`;return;}
   wrap.innerHTML = '<canvas id="footballChart"></canvas>';
   const lo = Math.min(...F.map(m=>m.low), d.price), hi = Math.max(...F.map(m=>m.high), d.price);
   const hasMid = m => ok(m.mid) && m.method!=='52-Week Range';  // a trading range has no mid
@@ -521,9 +521,9 @@ function buildFootball() {
 // ─── QUARTERLY TREND: reported quarters, revenue bars and operating margin ───
 function buildQuarters() {
   const Q = DATA.tickers[active].quarters || [], note = document.getElementById('quarterNote');
-  if(!Q.length){naBox('quarterWrap','no reported quarters from Yahoo');note.textContent='';return;}
+  if(!Q.length){naBox('quarterWrap', DATA.tickers[active].quarters ? 'no reported quarters from Yahoo' : 'not in this data export');note.textContent='';return;}
   const x = Q.map(q=>new Date(q.period+'T12:00').toLocaleDateString('en-US',{month:'short',year:'2-digit'}));
-  const hasMargin = Q.some(q=>ok(q.op_margin));  // banks report no operating income: no line, no empty axis
+  const hasMargin = Q.some(q=>ok(q.op_margin));  // n/a for banks and brokers: no line, no empty axis
   plot('quarterWrap',[
     {x, y:Q.map(q=>q.revenue_b), type:'bar', name:'Revenue, $B', marker:{color:'rgba(255,255,255,0.22)'},
      customdata:Q.map(q=>ok(q.eps)?'$'+f(q.eps):'n/a'), hovertemplate:'%{x}: revenue $%{y:.1f}B, diluted EPS %{customdata}<extra></extra>'},
@@ -532,18 +532,20 @@ function buildQuarters() {
     {...PLOT_BASE, showlegend:true, legend:{font:PLOT_FONT,bgcolor:'transparent',orientation:'h',y:-0.18},
      margin:{t:8,r:8,b:8,l:8}, xaxis:{...AXIS(''),type:'category'}, yaxis:AXIS('Revenue, $B'),
      ...(hasMargin ? {yaxis2:{...AXIS('Op margin, %'),overlaying:'y',side:'right',showgrid:false}} : {})});
-  const miss = Q.filter(q=>!ok(q.revenue_b)).length;
+  // a quarter with EPS but no revenue has no bar to hover, so its EPS is listed here
+  const miss = Q.filter(q=>!ok(q.revenue_b)).map((q,i)=>`${x[Q.indexOf(q)]}${ok(q.eps)?` (EPS $${f(q.eps)})`:''}`);
   note.textContent = `The ${Q.length} quarters Yahoo reports, labeled by quarter end. Hover for diluted EPS.`
-    + (miss ? ` n/a: revenue missing for ${miss} quarter${miss>1?'s':''}.` : '')
-    + (hasMargin ? '' : ' n/a: operating margin, Yahoo has no operating income line for this company.');
+    + (miss.length ? ` n/a: revenue for ${miss.join(', ')}.` : '')
+    + (hasMargin ? '' : ' n/a: operating margin, not comparable for banks, brokers and insurers or not reported.');
 }
 
 // ─── DUPONT AND EARNINGS QUALITY (TTM) ───────────────────────────────────────
 function buildDupont() {
   const d = DATA.tickers[active], D = d.dupont || {}, Qy = d.quality || {}, x2 = n => ok(n) ? f(n,2)+'×' : 'n/a';
+  if(!d.dupont) return naBox('dupontContent','not in this data export');
   const row = ([label,val]) => `<tr><td>${label}</td><td>${val}</td></tr>`;
   document.getElementById('dupontContent').innerHTML = `<table class="vs-table" style="font-size:13px">
-      ${[['Net margin',pc(D.net_margin,1)],['× Asset turnover',x2(D.asset_turnover)],['× Equity multiplier',x2(D.equity_multiplier)],
+      ${[['Net margin',pc(D.net_margin,1)],['× Asset turnover',ok(D.asset_turnover)?f(D.asset_turnover,3)+'×':'n/a'],['× Equity multiplier',x2(D.equity_multiplier)],
          ['= ROE',pc(D.roe,1)]].map(row).join('')}</table>
     <table class="vs-table" style="font-size:13px;margin-top:12px">
       ${[['CFO / net income',x2(Qy.cfo_ni)],['Capex / revenue',pc(Qy.capex_pct_revenue,1)],
@@ -563,19 +565,20 @@ function buildValueGrid() {
          ['Long run growth',pc(ri.growth,1)],['Justified P/B, (ROE less g) / (r less g)',x2(ri.justified_pb)],['Actual P/B',x2(ri.actual_pb)],
          ['Residual income value',`${dollar(ri.value)} <span class="${sign(gapPct)}">(${pct(gapPct)} vs price)</span>`]]
         .map(([l,v])=>`<tr><td>${l}</td><td>${v}</td></tr>`).join('')}</table>
-      <div class="caption">Single stage residual income (CFA L2): value = book value × justified P/B. The cost of equity uses the live 10Y, a Blume beta and a 5.5% equity premium; the football field moves it 1pp each way.</div>`;
+      <div class="caption">Single stage residual income (CFA L2): value = book value × justified P/B. The cost of equity uses Rf ${pc((DATA.rates||{}).dcf_rf,2)} ${(DATA.rates||{}).dcf_rf_source==='UST 10Y'?'(live 10Y)':'(5.3% default)'}, a Blume beta and a 5.5% equity premium; the football field moves it 1pp each way.</div>`;
     return;
   }
   title.textContent = 'DCF VALUE PER SHARE: WACC × TERMINAL GROWTH';
   const G = d.dcf.grid || [];
-  if(!G.length) return naBox('valueGrid','no FCF DCF for this ticker');
+  if(!G.length) return naBox('valueGrid', d.dcf.grid ? 'no FCF DCF for this ticker' : 'not in this data export');
   const waccs = [...new Set(G.map(c=>c.wacc))], tgs = [...new Set(G.map(c=>c.tg))];
   const tint = v => { if(!ok(v)) return ['rgba(255,255,255,0.03)','#a3a3a3']; const u = (v/d.price-1)*100;
     return u>=20 ? ['rgba(76,175,80,0.30)','#81c784'] : u>=0 ? ['rgba(76,175,80,0.15)','#81c784']
       : u>-20 ? ['rgba(229,115,115,0.18)','#ef9a9a'] : ['rgba(229,115,115,0.35)','#ffcdd2']; };
   box.innerHTML = `<table class="heat" style="width:100%"><tr><th>TG / WACC</th>${waccs.map(w=>`<th class="num">${f(w,1)}%</th>`).join('')}</tr>
-    ${tgs.map(t=>`<tr><td style="font-family:var(--mono)">${f(t,1)}%</td>${waccs.map(w=>{
-      const v = G.find(c=>c.wacc===w&&c.tg===t)?.value, [bg,col] = tint(v), base = w===d.dcf.wacc&&t===2.5;
+    ${tgs.map(t=>`<tr><td style="font-family:var(--mono)">${f(t,1)}%</td>${waccs.map((w,i)=>{
+      // the grid is centred on the ticker's own WACC: the base case is the middle column at 2.5%
+      const v = G.find(c=>c.wacc===w&&c.tg===t)?.value, [bg,col] = tint(v), base = i===Math.floor(waccs.length/2)&&t===2.5;
       return `<td class="num" style="background:${bg};color:${col};${base?'outline:1px solid #e8e6e0;outline-offset:-1px;':''}">${ok(v)?'$'+Math.round(v):'n/a'}</td>`;}).join('')}</tr>`).join('')}</table>
     <div class="caption">Value per share against today's $${f(d.price,0)}: green above, red below, strong at 20% or more. Outlined: the base case at its own WACC and 2.5% terminal growth. WACC uses Rf ${pc(d.dcf.rf,2)}.</div>`;
 }
@@ -592,7 +595,7 @@ function buildDrawdown() {
     return Math.sqrt(w.reduce((a,v)=>a+(v-m)**2,0)/20*252)*100; });
   plot('drawdownWrap',[
     {x, y:dd, type:'scatter', mode:'lines', fill:'tozeroy', line:{color:'#E57373',width:1}, fillcolor:'rgba(229,115,115,0.18)',
-     hovertemplate:'%{x|%b %d}: %{y:.1f}% below the high<extra></extra>'},
+     hovertemplate:'%{x|%b %d}: %{y:.1f}% from the high<extra></extra>'},
     {x, y:vol, type:'scatter', mode:'lines', yaxis:'y2', line:{color:'#e8e6e0',width:1.5},
      hovertemplate:'%{x|%b %d}: 21D vol %{y:.1f}%<extra></extra>'}],
     {...PLOT_BASE, margin:{t:8,r:8,b:8,l:8}, xaxis:{...AXIS(''),tickformat:'%b %d',nticks:5,anchor:'y2'},
@@ -835,10 +838,14 @@ function buildCorr() {
 function buildMacro() {
   const m=DATA.macro, c=DATA.macro_chg||{}, A=DATA.macro_as_of||{};
   const dt = k => A[k]&&A.ust_10y&&A[k]!==A.ust_10y ? ` (${new Date(A[k]+'T12:00').toLocaleDateString('en-US',{month:'short',day:'numeric'}).toUpperCase()})` : '';
+  const legacy = !('tbill_3m' in m);  // older exports carried the 3M bill (^IRX) under ust_2y
   const rows=[
     // the 2Y is FRED DGS2 and can lag Yahoo's 10Y by a day: show its date then
-    ['10Y UST',pc(m.ust_10y),c.ust_10y],[`2Y UST${dt('ust_2y')}`,pc(m.ust_2y),c.ust_2y],['3M T-BILL',pc(m.tbill_3m),c.tbill_3m],
-    ['2Y/10Y',pc(m.spread_2s10s),c.spread_2s10s],['VIX',f(m.vix,1),c.vix],
+    ['10Y UST',pc(m.ust_10y),c.ust_10y],
+    ...(legacy ? [['3M T-BILL',pc(m.ust_2y),c.ust_2y],['3M/10Y',pc(m.spread_2s10s),c.spread_2s10s]]
+      : [[`2Y UST${dt('ust_2y')}`,pc(m.ust_2y),c.ust_2y],['3M T-BILL',pc(m.tbill_3m),c.tbill_3m],
+         [`2Y/10Y${dt('spread_2s10s')}`,pc(m.spread_2s10s),c.spread_2s10s]]),
+    ['VIX',f(m.vix,1),c.vix],
     ['DXY',f(m.dxy,1),c.dxy],['WTI',dollar(m.wti),c.wti],
     ['EUR/USD',f(m.eurusd,4),c.eurusd]
   ].map(([label,val,chg])=>[label,val,chg??'',!String(chg??'').startsWith('-')]);

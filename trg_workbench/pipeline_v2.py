@@ -159,12 +159,12 @@ def fetch_data_v2(as_of: str) -> Dict[str, Any]:
 RI_GROWTH = 0.025  # residual income long run growth, the same as the DCF base terminal growth
 
 
-def _market_ranges(ticker: str, sm_row: Dict, prices_wide: pd.DataFrame) -> Dict[str, Optional[float]]:
-    """Analyst target range and the 52 week (252 session) trading range, for the football field."""
-    px = prices_wide[ticker].dropna().tail(252) if ticker in prices_wide.columns else pd.Series(dtype=float)
+def _market_ranges(sm_row: Dict) -> Dict[str, Optional[float]]:
+    """Analyst target range and Yahoo's quoted 52 week range (traded prices, not the dividend adjusted closes
+    in the price history, and a calendar year rather than a row count), for the football field."""
     return {"analyst_consensus_low": sm_row.get("target_low"), "analyst_consensus_mean": sm_row.get("target_mean"),
             "analyst_consensus_high": sm_row.get("target_high"),
-            "fifty_two_week_low": float(px.min()) if len(px) else None, "fifty_two_week_high": float(px.max()) if len(px) else None}
+            "fifty_two_week_low": sm_row.get("fifty_two_week_low"), "fifty_two_week_high": sm_row.get("fifty_two_week_high")}
 
 
 def value_bank(
@@ -197,7 +197,7 @@ def value_bank(
         "ticker": ticker, "cost_of_equity": r, "growth": RI_GROWTH, "roe": roe, "book_value": bv,
         "justified_pb": runs[1]["justified_pb"], "actual_pb": price / bv, "value_per_share": mid,
         "football_field": football_field(ticker, price, residual_income=(low, mid, high),
-                                         **_market_ranges(ticker, sm_row, prices_wide)),
+                                         **_market_ranges(sm_row)),
     }
 
 
@@ -231,7 +231,7 @@ def value_ticker(
 
     scenarios = scenario_analysis(inputs["base_fcf"], inputs["base_growth"], inputs["wacc"], inputs["net_debt"], inputs["shares_outstanding"])
     # value grid centred on the ticker's own WACC, so the middle cell is the base case
-    axes = {"wacc": [round(inputs["wacc"] + d, 4) for d in (-0.02, -0.01, 0.0, 0.01, 0.02)],
+    axes = {"wacc": [round(inputs["wacc"] + d, 3) for d in (-0.02, -0.01, 0.0, 0.01, 0.02)],
             "tg": [0.015, 0.02, 0.025, 0.03, 0.035]}
     sensitivity_df = dcf_sensitivity(inputs["base_fcf"], [inputs["base_growth"] * (0.85 ** i) for i in range(5)],
                                      inputs["net_debt"], inputs["shares_outstanding"], axes["wacc"], axes["tg"])
@@ -241,7 +241,7 @@ def value_ticker(
                         dcf_base=scenarios["Base Case"]["intrinsic_value_per_share"],
                         dcf_bull=scenarios["Bull Case"]["intrinsic_value_per_share"],
                         dcf_bear=scenarios["Bear Case"]["intrinsic_value_per_share"],
-                        **_market_ranges(ticker, sm_row, prices_wide))
+                        **_market_ranges(sm_row))
 
     reverse_dcf_result = None
     if current_price > 0:

@@ -86,6 +86,7 @@ class MarketDataClient:
                 "enterprise_value",
                 "ebitda",
                 "book_value",
+                "fifty_two_week_low",
             }
             if required_columns.issubset(cached.columns):
                 return cached
@@ -140,6 +141,9 @@ class MarketDataClient:
                     "enterprise_value": info.get("enterpriseValue"),
                     "ebitda": info.get("ebitda"),
                     "book_value": info.get("bookValue"),  # per share
+                    # as quoted: traded prices, not the dividend adjusted closes in the price history
+                    "fifty_two_week_low": info.get("fiftyTwoWeekLow"),
+                    "fifty_two_week_high": info.get("fiftyTwoWeekHigh"),
                     "beta": info.get("beta"),
                     "trailing_pe": info.get("trailingPE"),
                     "forward_pe": info.get("forwardPE"),
@@ -163,19 +167,21 @@ class MarketDataClient:
         cache_path = self.cache_dir / f"quarterly_{as_of_date.isoformat()}.csv"
         if cache_path.exists() and not refresh:
             return pd.read_csv(cache_path, parse_dates=["period_end"])
-        frames = []
+        frames, failed = [], False
         for ticker in DEFAULT_US_TICKERS:
             try:
                 t = yf.Ticker(ticker)
                 q = pd.concat([t.quarterly_income_stmt, t.quarterly_cashflow, t.quarterly_balance_sheet])
             except Exception:  # noqa: BLE001  a missing statement leaves that ticker's quarters n/a
+                failed = True
                 continue
             q = q[~q.index.duplicated()].reindex(list(QUARTERLY_ROWS)).T.rename(columns=QUARTERLY_ROWS)
             frames.append(q.rename_axis("period_end").reset_index().assign(ticker=ticker))
             time.sleep(0.1)
         cols = ["ticker", "period_end", *QUARTERLY_ROWS.values()]
         out = pd.concat(frames, ignore_index=True)[cols] if frames else pd.DataFrame(columns=cols)
-        out.to_csv(cache_path, index=False)
+        if frames and not failed:  # a partial or empty pull is not cached, so the next run retries
+            out.to_csv(cache_path, index=False)
         return out
 
     def build_market_dataset(
