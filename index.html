@@ -273,6 +273,21 @@ tr.active-row td{background:rgba(201,168,76,0.06)}
   </div>
 </div>
 
+<!-- SENTIMENT AND POSITIONING: estimate revisions, surprises, ratings, short interest, insiders -->
+<div class="rowpair">
+  <div class="card">
+    <div class="card-title">ESTIMATE REVISIONS AND EARNINGS SURPRISES</div>
+    <div id="revisionContent"></div>
+    <div style="position:relative;height:170px;margin-top:10px" id="surpriseWrap"></div>
+    <div class="caption" id="surpriseNote"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">ANALYST RATINGS AND POSITIONING</div>
+    <div style="position:relative;height:190px" id="ratingWrap"></div>
+    <div id="positionContent" style="margin-top:10px"></div>
+  </div>
+</div>
+
 </section>
 
 <section id="peers">
@@ -1009,6 +1024,51 @@ function buildExcess() {
     {...PLOT_BASE,margin:{t:4,r:12,b:8,l:8},xaxis:AXIS('pp'),yaxis:{...AXIS(''),tickfont:{...PLOT_FONT,color:'#e8e6e0'}}});
 }
 
+// ─── SENTIMENT: next FY EPS revisions and the last 4 earnings surprises ───────
+function buildRevisions() {
+  const S = DATA.tickers[active].sentiment, note = document.getElementById('surpriseNote');
+  if(!S){ naBox('revisionContent','not in this data export'); naBox('surpriseWrap','not in this data export'); note.textContent=''; return; }
+  const n = v => ok(v) ? v : 'n/a', sg = v => ok(v)&&Math.abs(v)>=0.05 ? sign(v) : '';  // a flat 0.0% is not a signal
+  document.getElementById('revisionContent').innerHTML = `<table class="vs-table" style="font-size:13px">
+    <tr><td>Next fiscal year EPS, consensus</td><td>${dollar(S.eps_next_fy)}</td></tr>
+    <tr><td>Change over 30 days</td><td class="${sg(S.rev_30d)}">${pct(S.rev_30d)}</td></tr>
+    <tr><td>Change over 90 days</td><td class="${sg(S.rev_90d)}">${pct(S.rev_90d)}</td></tr>
+    <tr><td>Analysts revising up / down, 30 days</td><td>${n(S.up_30d)} / ${n(S.down_30d)}</td></tr></table>`;
+  const Q = (S.surprises||[]).filter(q=>ok(q.surprise_pct));
+  if(!Q.length){ naBox('surpriseWrap','no earnings surprises from Yahoo'); note.textContent=''; return; }
+  const x = Q.map(q=>new Date(q.quarter+'T12:00').toLocaleDateString('en-US',{month:'short',year:'2-digit'}));
+  // pad the range so labels outside the bars never sit on the date labels
+  const ys = Q.map(q=>q.surprise_pct), lo = Math.min(0,...ys), hi = Math.max(0,...ys), pad = (hi-lo)*0.2 || 1;
+  plot('surpriseWrap',[{type:'bar', x, y:Q.map(q=>q.surprise_pct), text:Q.map(q=>pct(q.surprise_pct)), textposition:'outside',
+    cliponaxis:false, textfont:PLOT_FONT, marker:{color:Q.map(q=>q.surprise_pct>=0?'rgba(76,175,80,0.7)':'rgba(229,115,115,0.7)')},
+    customdata:Q.map(q=>[dollar(q.actual),dollar(q.estimate)]),
+    hovertemplate:'%{x}: EPS %{customdata[0]} vs %{customdata[1]} expected<extra></extra>'}],
+    {...PLOT_BASE, margin:{t:18,r:8,b:8,l:8}, xaxis:{...AXIS(''),type:'category'}, yaxis:{...AXIS('Surprise, %'),range:[lo-pad,hi+pad]}});
+  note.textContent = 'Actual EPS as Yahoo reports it against the consensus estimate, labeled by quarter end; one off gains or charges can make a surprise very large. Revisions track the next fiscal year consensus; n/a when the older estimate is not positive.';
+}
+
+// ─── POSITIONING: recommendation trend, short interest, insider activity ─────
+function buildPositioning() {
+  const S = DATA.tickers[active].sentiment;
+  if(!S){ naBox('ratingWrap','not in this data export'); naBox('positionContent','not in this data export'); return; }
+  const R = [...(S.recommendations||[])].sort((a,b)=>parseInt(a.period)-parseInt(b.period));  // -3m ... 0m
+  if(R.length){
+    const K = [['strongBuy','Strong buy','#4CAF50'],['buy','Buy','rgba(76,175,80,0.5)'],['hold','Hold','rgba(255,255,255,0.28)'],
+               ['sell','Sell','rgba(229,115,115,0.55)'],['strongSell','Strong sell','#E57373']];
+    const x = R.map(r=>r.period==='0m' ? 'Now' : `${-parseInt(r.period)}M ago`);
+    plot('ratingWrap', K.map(([k,name,color])=>({type:'bar', name, x, y:R.map(r=>r[k]), marker:{color},
+      hovertemplate:`%{x}: %{y} ${name.toLowerCase()}<extra></extra>`})),
+      {...PLOT_BASE, barmode:'stack', showlegend:true, legend:{font:PLOT_FONT,bgcolor:'transparent',orientation:'h',y:-0.22,traceorder:'normal'},
+       margin:{t:8,r:8,b:8,l:8}, xaxis:{...AXIS(''),type:'category'}, yaxis:AXIS('Analysts')});
+  } else naBox('ratingWrap','no recommendation counts from Yahoo');
+  const sh = S.short || {}, ins = S.insider || {}, cnt = v => ok(v) ? Number(v).toLocaleString('en-US') : 'n/a';
+  document.getElementById('positionContent').innerHTML = `<table class="vs-table" style="font-size:13px">
+    ${[['Short interest, % of float',pc(sh.pct_float,2)],['Days to cover',ok(sh.days_to_cover)?f(sh.days_to_cover,1):'n/a'],
+       ['Shares short vs prior month',pct(sh.change_pct)],['Insider net shares, 6 months',cnt(ins.net_shares)],
+       ['Insider net, % of insider holdings',pct(ins.net_pct)]].map(([l,v])=>`<tr><td>${l}</td><td>${v}</td></tr>`).join('')}</table>
+    <div class="caption">Short interest as last reported to the exchanges (twice a month). Insider buys and sells from Form 4 filings over the last 6 months, as summarized by Yahoo.</div>`;
+}
+
 // ─── RENDER ALL ───────────────────────────────────────────────────────────────
 function renderAll() {
   buildStrip();
@@ -1025,6 +1085,8 @@ function renderAll() {
   buildDupont();
   buildValueGrid();
   buildDrawdown();
+  buildRevisions();
+  buildPositioning();
   buildComps();
   buildPeerCharts();
   buildFactorHeat();
