@@ -32,6 +32,7 @@ from trg_workbench.pipeline_v2 import (
     _load_prices,
     _load_quarterly,
     _load_security_master,
+    _load_sentiment,
     _market_ranges,
     _prices_wide,
     fetch_data_v2,
@@ -150,6 +151,35 @@ def spread_on_shared_dates(ten: pd.Series, two: pd.Series) -> tuple:
         return None, None, None
     s = both.iloc[:, 0] - both.iloc[:, 1]
     return both.index[-1].strftime("%Y-%m-%d"), round(float(s.iloc[-1]), 3), round(float(s.iloc[-1] - s.iloc[-2]), 4)
+
+
+def sentiment_block(s: dict | None, sm_row: dict) -> dict:
+    """Next fiscal year EPS revisions, the last 4 earnings surprises, the recommendation trend, 6 month insider
+    activity and short interest. Missing pieces stay None (n/a); a % change needs a positive base."""
+    s = s or {}
+    chg = lambda a, b: num((a / b - 1) * 100, nd=1) if num(a) is not None and num(b) is not None and b > 0 else None
+    count = lambda v: int(v) if num(v) is not None else None
+    trend = (s.get("eps_trend") or {}).get("+1y") or {}
+    revs = (s.get("eps_revisions") or {}).get("+1y") or {}
+    ins = s.get("insider") or {}
+    net, held = num(ins.get("net_shares")), num(ins.get("held"))
+    before = held - net if net is not None and held is not None else None  # insider holdings 6 months ago
+    return {
+        "eps_next_fy": num(trend.get("current")),
+        "rev_30d": chg(trend.get("current"), trend.get("30daysAgo")),
+        "rev_90d": chg(trend.get("current"), trend.get("90daysAgo")),
+        "up_30d": count(revs.get("upLast30days")), "down_30d": count(revs.get("downLast30days")),
+        "surprises": [{"quarter": q.get("quarter"), "actual": num(q.get("actual")), "estimate": num(q.get("estimate")),
+                       "surprise_pct": num(q.get("surprise_pct"), 100, 1)} for q in (s.get("surprises") or [])][-4:],
+        "recommendations": [{"period": r.get("period"), **{k: count(r.get(k)) for k in ("strongBuy", "buy", "hold", "sell", "strongSell")}}
+                            for r in (s.get("recommendations") or [])],
+        "insider": {"purchases": count(ins.get("purchases")), "sales": count(ins.get("sales")),
+                    "net_shares": count(ins.get("net_shares")),
+                    # computed here: Yahoo's own % can carry the wrong sign
+                    "net_pct": num(net / before * 100, nd=1) if before and before > 0 else None},
+        "short": {"pct_float": num(sm_row.get("short_pct_float"), 100, 2), "days_to_cover": num(sm_row.get("short_ratio"), nd=1),
+                  "change_pct": chg(sm_row.get("shares_short"), sm_row.get("shares_short_prior"))},
+    }
 
 
 def ticker_block(row: pd.Series, px: pd.Series, val: dict | None, risk: pd.Series | None,
@@ -313,6 +343,7 @@ def build_dashboard(as_of: str, limit: int = 10) -> dict:
 
     quarterly = _load_quarterly(as_of)
     sm_rows = security_master.drop_duplicates("ticker").set_index("ticker")
+    sentiment = _load_sentiment(as_of)
     blocks = {}
     for _, row in top.iterrows():
         t = row["ticker"]
@@ -326,6 +357,7 @@ def build_dashboard(as_of: str, limit: int = 10) -> dict:
                                  commentary.get(t), bank, market)
         blocks[t]["vs_sector"] = sector_context(comps, t)
         is_bank = str(row.get("industry", "")).startswith(BALANCE_SHEET_INDUSTRIES)
+        blocks[t]["sentiment"] = sentiment_block(sentiment.get(t), sm_rows.loc[t].to_dict() if t in sm_rows.index else {})
         blocks[t].update(quarterly_block(quarterly[quarterly["ticker"] == t] if len(quarterly) else quarterly, is_bank))
 
     # same shape and window as price_history, so the page can rebase stock, sector and market together

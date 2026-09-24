@@ -49,6 +49,7 @@ Given the ticker universe in `trg_workbench/config.py` and a date, the engine:
 - Correlation matrix of the names shown, macro snapshot, and upcoming earnings dates
 - Three sections behind a sticky Company | Peers | Sector nav (plain anchors, no tab JS)
 - Company depth: the quarters Yahoo reports (revenue, operating margin, diluted EPS), TTM DuPont ROE, CFO/net income, capex intensity, drawdown and 21 day volatility
+- Sentiment and positioning: next fiscal year EPS revisions (30 and 90 days, analysts up vs down), the last earnings surprises, the 4 month recommendation trend, short interest and 6 month insider activity
 - Peers: comps table vs the sector peer median, forward P/E vs consensus revenue growth with a least squares line, risk vs return, and factor scores for the whole universe
 - Sector: sector ETF returns (1D to YTD) next to the S&P 500, a rotation view (each ETF vs the S&P, 3M to 1M ago against the last month), and each stock's 3M return against its own sector ETF
 - Management commentary panel: empty on the live site, because CI has no cached transcripts, so every ticker shows "n/a: no cached earnings call transcript"

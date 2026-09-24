@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import time
 from datetime import date as date_type
 from datetime import date, timedelta
@@ -87,6 +88,7 @@ class MarketDataClient:
                 "ebitda",
                 "book_value",
                 "fifty_two_week_low",
+                "short_pct_float",
             }
             if required_columns.issubset(cached.columns):
                 return cached
@@ -144,6 +146,10 @@ class MarketDataClient:
                     # as quoted: traded prices, not the dividend adjusted closes in the price history
                     "fifty_two_week_low": info.get("fiftyTwoWeekLow"),
                     "fifty_two_week_high": info.get("fiftyTwoWeekHigh"),
+                    "short_pct_float": info.get("shortPercentOfFloat"),
+                    "short_ratio": info.get("shortRatio"),  # days to cover
+                    "shares_short": info.get("sharesShort"),
+                    "shares_short_prior": info.get("sharesShortPriorMonth"),
                     "beta": info.get("beta"),
                     "trailing_pe": info.get("trailingPE"),
                     "forward_pe": info.get("forwardPE"),
@@ -182,6 +188,44 @@ class MarketDataClient:
         out = pd.concat(frames, ignore_index=True)[cols] if frames else pd.DataFrame(columns=cols)
         if frames and not failed:  # a partial or empty pull is not cached, so the next run retries
             out.to_csv(cache_path, index=False)
+        return out
+
+    def fetch_sentiment(self, as_of_date: date, refresh: bool = False) -> dict[str, Any]:
+        """Per US stock: EPS trend and revisions, earnings surprises, the 4 month recommendation counts and 6 month
+        insider activity from Yahoo. Each part is n/a on its own when Yahoo has none."""
+        cache_path = self.cache_dir / f"sentiment_{as_of_date.isoformat()}.json"
+        if cache_path.exists() and not refresh:
+            return read_json(cache_path)
+        plain = lambda df, **kw: json.loads(df.drop(columns="currency", errors="ignore").to_json(date_format="iso", **kw))
+
+        def part(fn):
+            try:
+                return fn()
+            except Exception:  # noqa: BLE001  a missing table leaves that part n/a
+                return None
+
+        out = {}
+        for ticker in DEFAULT_US_TICKERS:
+            t = yf.Ticker(ticker)
+            ins = part(lambda: pd.to_numeric(t.insider_purchases.set_index(t.insider_purchases.columns[0])["Shares"],
+                                             errors="coerce"))  # Yahoo mixes <NA> into this column
+            out[ticker] = {
+                "eps_trend": part(lambda: plain(t.eps_trend, orient="index")),
+                "eps_revisions": part(lambda: plain(t.eps_revisions, orient="index")),
+                "surprises": part(lambda: [{**r, "quarter": r["quarter"][:10]} for r in plain(
+                    t.earnings_history.rename_axis("quarter").reset_index()
+                    .rename(columns={"epsActual": "actual", "epsEstimate": "estimate", "surprisePercent": "surprise_pct"})
+                    [["quarter", "actual", "estimate", "surprise_pct"]], orient="records")]),
+                "recommendations": part(lambda: plain(t.recommendations, orient="records")),
+                "insider": part(lambda: json.loads(pd.Series({
+                    "purchases": ins.get("Purchases"), "sales": ins.get("Sales"),
+                    "net_shares": ins.get("Net Shares Purchased (Sold)"), "held": ins.get("Total Insider Shares Held"),
+                }, dtype="Float64").to_json())) if ins is not None else None,  # nullable: <NA> becomes null
+            }
+            time.sleep(0.1)
+        # ponytail: every US stock has an EPS trend, so a pull missing one is treated as failed and not cached
+        if all(v["eps_trend"] for v in out.values()):
+            write_json(cache_path, out)
         return out
 
     def build_market_dataset(

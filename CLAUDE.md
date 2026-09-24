@@ -30,7 +30,7 @@ python main_v2.py build-report --as-of D  -> outputs/research_note_D.html (gitig
 | `trg_workbench/analytics/summaries.py` | `build_catalyst_calendar` and report summaries |
 | `trg_workbench/llm/` | Transcript fetch + heuristic commentary (`build_management_commentary`) |
 | `trg_workbench/reporting/` | Charts, HTML/PDF/Markdown renderers, Jinja templates |
-| `trg_workbench/sources/` | Market (yfinance; also writes debt, cash, beta to the security master; `fetch_quarterly` for reported quarters), SEC, ECB, US macro (Yahoo, plus FRED for the 2Y) |
+| `trg_workbench/sources/` | Market (yfinance; also writes debt, cash, beta and short interest to the security master; `fetch_quarterly` for reported quarters, `fetch_sentiment` for EPS revisions, surprises, recommendations and insider activity), SEC, ECB, US macro (Yahoo, plus FRED for the 2Y) |
 | `export_dashboard_data.py` | Builds `dashboard_data.json` from normalized data |
 | `index.html` | Dashboard (single file, JSON loaded at runtime) |
 | `vercel.json` | Static build of `index.html` + `dashboard_data.json`, filesystem first, then SPA fallback |
