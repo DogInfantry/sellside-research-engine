@@ -51,7 +51,9 @@ td,.kpi-val,.tick-price,.tick-chg,.risk-val,.corr-cell,.num{font-family:var(--mo
 .row3{display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:10px;padding:0 24px;margin-bottom:10px}
 .row5{display:grid;grid-template-columns:1.6fr 1fr 1.2fr;gap:10px;padding:0 24px;margin-bottom:32px}
 .rowrel{display:grid;grid-template-columns:1.8fr 1fr;gap:10px;padding:0 24px;margin-bottom:10px}
-.row2>*,.row3>*,.row5>*,.rowrel>*,.kpi-grid>*{min-width:0}
+.rowpair{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 24px;margin-bottom:10px}
+.rowtri{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:10px;padding:0 24px;margin-bottom:10px}
+.row2>*,.row3>*,.row5>*,.rowrel>*,.rowpair>*,.rowtri>*,.kpi-grid>*{min-width:0}
 .vs-table td,.vs-table th{padding:6px 8px;border-bottom:1px solid var(--border2)}
 .vs-table th{text-align:right}.vs-table th:first-child{text-align:left}
 .vs-table td{text-align:right}.vs-table td:first-child{text-align:left;font-family:var(--sans);color:var(--t2)}
@@ -72,7 +74,30 @@ td,.kpi-val,.tick-price,.tick-chg,.risk-val,.corr-cell,.num{font-family:var(--mo
 .pill-sell{background:rgba(229,115,115,.12);color:var(--red);border:1px solid rgba(229,115,115,.3)}
 
 /* SCREENER TABLE */
-.screener-wrap{padding:0 24px;margin-bottom:10px}
+.fullrow{padding:0 24px;margin-bottom:10px}
+
+/* SECTION NAV: plain anchors, the browser does the scrolling */
+.secnav{position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:2px;padding:0 24px;background:var(--bg);border-bottom:1px solid var(--border)}
+.secnav a{padding:11px 12px;font-size:13px;color:var(--t2);text-decoration:none}
+.secnav a:hover{color:var(--t1)}
+.secnav a:focus-visible{outline:1px solid var(--gold);outline-offset:-1px}
+#navSym{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--gold);margin-right:10px}
+section{scroll-margin-top:48px}
+.sec-head{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 12px;padding:22px 24px 10px}
+.sec-head h2{font-size:16px;font-weight:600;color:var(--t1)}
+.sec-head span{font-size:13px;color:var(--t2)}
+
+/* COMPS AND HEATMAPS */
+#compsTable{min-width:900px}
+#compsTable th:not(:first-child),#compsTable td:not(:first-child){text-align:right}
+tr.agg td{color:var(--t2)}
+tr.agg.first td{border-top:1px solid var(--border)}
+tr.agg td:first-child{font-family:var(--sans)}
+.heat{border-collapse:separate;border-spacing:2px;font-size:12px}
+.heat th{padding:3px 6px;text-align:center}
+.heat td{padding:4px 6px;text-align:center;border:0;border-radius:3px}
+.heat td:first-child{text-align:left;font-family:var(--sans);color:var(--t2);padding-left:0}
+.caption{margin-top:8px;font-size:12px;color:var(--t3);line-height:1.5}
 .sec-label{font-size:12px;font-weight:500;letter-spacing:.06em;color:var(--t2);text-transform:uppercase;margin-bottom:8px}
 .table-scroll{overflow-x:auto}
 #screenerTable{min-width:980px}
@@ -132,13 +157,13 @@ tr.active-row td{background:rgba(201,168,76,0.06)}
 /* NARROW SCREENS: one column, KPIs in pairs, tables scroll inside their card */
 @media (max-width:900px){
   .kpi-grid{grid-template-columns:repeat(2,1fr);padding:12px 16px}
-  .row2,.row3,.row5,.rowrel{grid-template-columns:1fr;padding:0 16px}
-  .brand-row,.ticker-strip,.screener-wrap,.footer{padding-left:16px;padding-right:16px}
+  .row2,.row3,.row5,.rowrel,.rowpair,.rowtri{grid-template-columns:1fr;padding:0 16px}
+  .brand-row,.ticker-strip,.fullrow,.footer,.secnav,.sec-head{padding-left:16px;padding-right:16px}
   .kpi-val{font-size:20px}
   .sep{display:none}
 }
 /* wide grids scroll inside their card at any width instead of spilling into the next card */
-#corrContent,#rdcfContent{overflow-x:auto}
+#corrContent,#rdcfContent,#factorContent,#sectorHeat{overflow-x:auto}
 </style>
 </head>
 <body>
@@ -166,6 +191,13 @@ tr.active-row td{background:rgba(201,168,76,0.06)}
   </div>
   <div class="ticker-strip" id="tickerStrip"></div>
 </div>
+
+<nav class="secnav" aria-label="Sections">
+  <span id="navSym"></span><a href="#company">Company</a><a href="#peers">Peers</a><a href="#sector">Sector</a>
+</nav>
+
+<section id="company">
+<div class="sec-head"><h2>Company</h2><span id="companyHead"></span></div>
 
 <!-- KPI ROW -->
 <div class="kpi-grid" id="kpiGrid"></div>
@@ -216,8 +248,37 @@ tr.active-row td{background:rgba(201,168,76,0.06)}
   </div>
 </div>
 
+</section>
+
+<section id="peers">
+<div class="sec-head"><h2>Peers</h2><span id="peersHead"></span></div>
+
+<!-- COMPS: the stock, its sector peers in the universe, peer median and the gap -->
+<div class="fullrow">
+  <div class="sec-label" id="compsLabel">COMPS</div>
+  <div class="card table-scroll" style="padding:0" id="compsContent"></div>
+</div>
+
+<div class="rowpair">
+  <div class="card">
+    <div class="card-title">FORWARD P/E VS CONSENSUS REVENUE GROWTH</div>
+    <div style="position:relative;height:300px" id="peGrowthWrap"></div>
+    <div class="caption" id="peGrowthNote"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">RISK VS RETURN, LAST 3 MONTHS</div>
+    <div style="position:relative;height:300px" id="riskReturnWrap"></div>
+    <div class="caption">Volatility over 63 trading days, annualized; return over the same 3 months. Colors as in the P/E chart.</div>
+  </div>
+</div>
+
+<div class="fullrow">
+  <div class="sec-label" id="factorLabel">FACTOR SCORES</div>
+  <div class="card"><div id="factorContent"></div></div>
+</div>
+
 <!-- SCREENER TABLE -->
-<div class="screener-wrap">
+<div class="fullrow">
   <div class="sec-label">SCREENER: WATCHLIST RANKING</div>
   <div class="card table-scroll" style="padding:0">
     <table id="screenerTable">
@@ -228,6 +289,28 @@ tr.active-row td{background:rgba(201,168,76,0.06)}
       </tr></thead>
       <tbody id="screenerBody"></tbody>
     </table>
+  </div>
+</div>
+
+</section>
+
+<section id="sector">
+<div class="sec-head"><h2>Sector</h2><span id="sectorHead"></span></div>
+
+<div class="rowtri">
+  <div class="card">
+    <div class="card-title">SECTOR ETF RETURNS</div>
+    <div id="sectorHeat"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">SECTOR ROTATION VS THE S&amp;P 500</div>
+    <div style="position:relative;height:280px" id="rotationWrap"></div>
+    <div class="caption">Right of zero: the ETF beat the S&amp;P from 3 months to 1 month ago. Above zero: it beat the S&amp;P over the last month.</div>
+  </div>
+  <div class="card">
+    <div class="card-title">3M RETURN VS OWN SECTOR ETF</div>
+    <div style="position:relative;height:280px" id="excessWrap"></div>
+    <div class="caption" id="excessNote"></div>
   </div>
 </div>
 
@@ -246,6 +329,7 @@ tr.active-row td{background:rgba(201,168,76,0.06)}
     <div id="catalystContent"></div>
   </div>
 </div>
+</section>
 
 <div class="footer">
   <span>SELLSIDE RESEARCH ENGINE · <span class="gold">DogInfantry</span> · <a href="https://github.com/DogInfantry/sellside-research-engine">github.com/DogInfantry/sellside-research-engine</a></span>
@@ -272,6 +356,16 @@ const scoreColor = v => v>=80?'#4CAF50':v>=65?'#C9A84C':'#E57373';
 const toneColor = t => t==='POSITIVE'?'#4CAF50':t==='CAUTIOUS'?'#E57373':'#FFB300';
 const sign = n => ok(n) ? (n>=0?'pos':'neg') : '';
 const times = n => ok(n) ? f(n,1)+'×' : 'n/a';
+const gap = (a,b) => ok(a)&&ok(b) ? a-b : null;
+const pp = n => ok(n) ? (n>=0?'+':'')+f(n,1)+' pp' : 'n/a';
+const ret = (a,n) => a && a.length>n ? (a[a.length-1]/a[a.length-1-n]-1)*100 : null;  // % over n trading days
+// comps metrics: label, key, format, vs the peer median (% for multiples, gap for rates and leverage)
+const vsRatio = (a,b) => ok(a)&&ok(b)&&b>0 ? pct((a/b-1)*100) : 'n/a';
+const vsGap = (a,b) => pp(gap(a,b));
+const vsTurns = (a,b) => ok(gap(a,b)) ? (a>=b?'+':'')+f(a-b,1)+'×' : 'n/a';
+const COMPS = [['Fwd P/E','fwd_pe',times,vsRatio],['EV/EBITDA','ev_ebitda',times,vsRatio],['EV/Sales','ev_sales',times,vsRatio],
+  ['PEG','peg',n=>f(n,2),vsRatio],['FCF yield','fcf_yield',n=>pc(n,1),vsGap],['Rev growth +1y','growth',n=>pc(n,1),vsGap],
+  ['Net margin','margin',n=>pc(n,1),vsGap],['ROE','roe',n=>pc(n,1),vsGap],['Net debt/EBITDA','net_debt_ebitda',times,vsTurns]];
 // market implied growth vs consensus revenue growth; no verdict without both numbers
 const rdcfVerdict = r => !ok(r.implied_growth)||!ok(r.consensus_growth) ? ['n/a','var(--t2)']
   : r.stretched ? ['STRETCHED','#E57373'] : ['DISCOUNT','#4CAF50'];
@@ -281,6 +375,10 @@ const MONO = "'IBM Plex Mono', ui-monospace, monospace";
 Chart.defaults.font.family = MONO; Chart.defaults.font.size = 12; Chart.defaults.color = '#a3a3a3';
 Chart.defaults.animation = false;  // data terminal: charts draw final state at once, also on ticker switch
 const PLOT_FONT = {family:MONO, size:12, color:'#a3a3a3'};
+const PLOT_BASE = {paper_bgcolor:'transparent',plot_bgcolor:'transparent',font:PLOT_FONT,showlegend:false,
+  hoverlabel:{bgcolor:'#1a1d24',bordercolor:'rgba(255,255,255,0.1)',font:{...PLOT_FONT,color:'#e8e6e0',size:13}}};
+const AXIS = t => ({title:{text:t,font:PLOT_FONT},tickfont:PLOT_FONT,gridcolor:'rgba(255,255,255,0.05)',zerolinecolor:'rgba(255,255,255,0.2)',automargin:true});
+const naBox = (id,msg) => { document.getElementById(id).innerHTML = `<div class="signal-box">n/a: ${msg}</div>`; };
 
 // ─── TICKER STRIP ────────────────────────────────────────────────────────────
 function buildStrip() {
@@ -424,16 +522,22 @@ function buildRDCF() {
 }
 
 // ─── RELATIVE PERFORMANCE: stock vs sector ETF vs S&P, same start = 100 ──────
-function buildRelative() {
-  const d = DATA.tickers[active], v = d.vs_sector || {}, B = DATA.benchmarks || {};
+// stock, its sector ETF and the S&P on the dates all three have (Yahoo drops single days per series),
+// so every window starts on the same day; the excess bars reuse it and match this card
+function relSeries(t) {
+  const d = DATA.tickers[t], v = d.vs_sector || {}, B = DATA.benchmarks || {};
   const byDate = s => Object.fromEntries((s||[]).map(p=>[p.date,p.price]));
   const sec = v.etf && B[v.etf] ? byDate(B[v.etf]) : null, spx = B.SPX ? byDate(B.SPX) : null;
-  // keep only dates every line has, so all start at 100 on the same day
   const rows = d.price_history.filter(p=>ok(p.price)&&[sec,spx].every(m=>!m||ok(m[p.date])));
+  return {rows, stock:rows.map(p=>p.price), sv:sec&&rows.map(p=>sec[p.date]), mv:spx&&rows.map(p=>spx[p.date])};
+}
+
+function buildRelative() {
+  const d = DATA.tickers[active], v = d.vs_sector || {};
+  const {rows, stock, sv, mv} = relSeries(active);
   const wrap = document.getElementById('relChartWrap'), box = document.getElementById('vsSector');
   if(rows.length<2){wrap.innerHTML='<div class="signal-box">n/a: no benchmark history</div>';box.innerHTML='';return;}
   const dates = rows.map(p=>p.date), rebase = a => a.map(x=>x/a[0]*100);
-  const stock = rows.map(p=>p.price), sv = sec&&rows.map(p=>sec[p.date]), mv = spx&&rows.map(p=>spx[p.date]);
   const ma = rebase(stock).map((_,i,a)=>i<49?null:a.slice(i-49,i+1).reduce((s,x)=>s+x,0)/50);
   const line = (y,name,color,dash,width=1.5)=>({x:dates,y,name,type:'scatter',mode:'lines',line:{color,width,dash}});
   wrap.innerHTML = '<div id="relChart" style="width:100%;height:100%"></div>';
@@ -451,14 +555,11 @@ function buildRelative() {
   },{displayModeBar:false,responsive:true});
 
   // returns over trading day windows, and the gap to the sector ETF
-  const ret = (a,n) => a && a.length>n ? (a[a.length-1]/a[a.length-1-n]-1)*100 : null;
-  const gap = (a,b) => ok(a)&&ok(b) ? a-b : null;
   const wins = [['1M',21],['3M',63],['6M',stock.length-1]];
-  const pp = n => ok(n) ? (n>=0?'+':'')+f(n,1)+' pp' : 'n/a';
   const retRows = wins.map(([k,n])=>{const s=ret(stock,n),e=ret(sv,n),m=ret(mv,n),x=gap(s,e);
     return `<tr><td>${k} return</td><td class="${sign(s)}">${pct(s)}</td><td>${pct(e)}</td><td>${pct(m)}</td><td class="${sign(x)}">${pp(x)}</td></tr>`;}).join('');
-  const fund = [['Fwd P/E','fwd_pe',n=>ok(n)?f(n,1)+'×':'n/a',(a,b)=>ok(a)&&ok(b)&&b?pct((a/b-1)*100):'n/a'],
-    ['Net margin','margin',n=>pc(n,1),(a,b)=>pp(gap(a,b))],['Rev growth +1y','growth',n=>pc(n,1),(a,b)=>pp(gap(a,b))]]
+  // same formatters as the comps table, so the two gaps always match
+  const fund = COMPS.filter(c=>['fwd_pe','margin','growth'].includes(c[1]))
     .map(([label,k,fmt,diff])=>`<tr><td>${label}</td><td>${fmt(v[k])}</td><td>${fmt(v[k+'_median'])}</td><td>${diff(v[k],v[k+'_median'])}</td></tr>`).join('');
   box.innerHTML = `<table class="vs-table" style="font-size:13px">
       <tr><th></th><th>${active}</th><th>${v.etf??'Sector'}</th><th>S&P</th><th>vs sector</th></tr>${retRows}</table>
@@ -650,9 +751,144 @@ function buildCatalysts() {
   }).join('');
 }
 
+// ─── SECTION HEADS AND NAV ───────────────────────────────────────────────────
+function buildHeads() {
+  const d = DATA.tickers[active], C = DATA.comps || {}, sector = C[active]?.sector ?? d.sector;
+  const n = Object.values(C).filter(c=>sector&&c.sector===sector).length - 1, u = Object.keys(C).length;
+  document.getElementById('navSym').textContent = active;
+  document.getElementById('companyHead').textContent = [d.name, d.sector].filter(Boolean).join(', ');
+  document.getElementById('peersHead').textContent = !DATA.comps ? 'n/a: no comps in this data file'
+    : n>0 ? `${active} against ${n} other ${sector} name${n>1?'s':''} in the ${u} stock universe`
+    : `${active} is the only ${sector??'n/a sector'} name in the ${u} stock universe`;
+  const S = DATA.sectors;
+  document.getElementById('sectorHead').textContent = S&&S.as_of
+    ? `Sector ETFs against the S&P 500, returns through ${new Date(S.as_of+'T12:00').toLocaleDateString('en-US',{month:'short',day:'numeric'})}`
+    : 'n/a: no sector returns in this data file';
+}
+
+// ─── COMPS TABLE: stock, sector peers, peer median and the gap ───────────────
+function buildComps() {
+  const C = DATA.comps, v = DATA.tickers[active].vs_sector || {}, box = document.getElementById('compsContent');
+  if(!C||!C[active]){box.innerHTML='<div class="signal-box" style="margin:12px">n/a: no comps for this ticker in this data file</div>';return;}
+  const sector = C[active].sector, peers = Object.keys(C).filter(t=>t!==active&&sector&&C[t].sector===sector).sort();
+  document.getElementById('compsLabel').textContent = `COMPS: ${(sector??'n/a').toUpperCase()}`;
+  const tr = (cls,label,cells) => `<tr class="${cls}"><td>${label}</td>${cells.map(c=>`<td>${c}</td>`).join('')}</tr>`;
+  const vals = t => COMPS.map(([,k,fmt])=>fmt(C[t][k]));
+  box.innerHTML = `<table id="compsTable"><thead><tr><th>TICKER</th>${COMPS.map(c=>`<th>${c[0].toUpperCase()}</th>`).join('')}</tr></thead><tbody>
+    ${tr('active-row',`<span class="gold" style="font-weight:600">${active}</span>`,vals(active))}
+    ${peers.map(t=>tr('',t,vals(t))).join('')}
+    ${peers.length ? tr('agg first',`Peer median, ex ${active}`,COMPS.map(([,k,fmt])=>fmt(v[k+'_median'])))
+      + tr('agg',`${active} vs median`,COMPS.map(([,k,,vs])=>vs(v[k],v[k+'_median']))) : ''}
+    </tbody></table>
+    ${peers.length ? '' : `<div class="signal-box" style="margin:12px">n/a: no other ${sector??''} names in the universe, so no peer median</div>`}
+    <div class="caption" style="padding:0 12px 12px">EV multiples, net debt/EBITDA and FCF yield are n/a for banks, brokers and insurers. FCF yield is the DCF proxy (net income × 0.8) over market cap. PEG uses consensus EPS growth +1y, n/a when it is not positive.</div>`;
+}
+
+// ─── UNIVERSE SCATTERS: gold = selected, white = sector peers (labeled), grey = the rest ─
+function peerScatter(id, xk, yk, xt, yt, fit) {
+  const C = DATA.comps || {}, sector = C[active]?.sector;
+  const pts = Object.entries(C).filter(([,c])=>ok(c[xk])&&ok(c[yk])&&(yk!=='fwd_pe'||c[yk]>0));
+  if(pts.length<3) return naBox(id,'too few names with both values');
+  const grp = t => t===active ? 0 : sector&&C[t].sector===sector ? 1 : 2;
+  const style = [['#C9A84C',11],['#e8e6e0',8],['#8a8a8a',7]];
+  const traces = [2,1,0].map(g=>{const q=pts.filter(([t])=>grp(t)===g); return {
+    x:q.map(([,c])=>c[xk]), y:q.map(([,c])=>c[yk]), text:q.map(([t])=>t), type:'scatter', cliponaxis:false,
+    mode:g<2?'markers+text':'markers', textposition:'top center', textfont:{...PLOT_FONT,color:style[g][0]},
+    marker:{color:style[g][0],size:style[g][1]}, hovertemplate:`%{text}<br>${xt}: %{x:.1f}<br>${yt}: %{y:.1f}<extra></extra>`};});
+  if(fit){const xs=pts.map(([,c])=>c[xk]), lo=Math.min(...xs), hi=Math.max(...xs);
+    traces.unshift({x:[lo,hi],y:[fit.intercept+fit.slope*lo,fit.intercept+fit.slope*hi],type:'scatter',mode:'lines',
+      line:{color:'rgba(255,255,255,0.45)',width:1,dash:'dash'},hoverinfo:'skip'});}
+  document.getElementById(id).innerHTML = `<div id="${id}P" style="width:100%;height:100%"></div>`;
+  Plotly.newPlot(id+'P', traces, {...PLOT_BASE,margin:{t:18,r:12,b:8,l:8},xaxis:AXIS(xt),yaxis:AXIS(yt)}, {displayModeBar:false,responsive:true});
+}
+
+function buildPeerCharts() {
+  const fit = DATA.pe_growth_fit;
+  peerScatter('peGrowthWrap','growth','fwd_pe','Consensus revenue growth +1y, %','Forward P/E, ×',fit);
+  document.getElementById('peGrowthNote').textContent = 'Gold: selected stock. White, labeled: its sector peers. Grey: the rest of the universe. '
+    + (fit ? `Dashed: least squares line over ${fit.n} names, P/E = ${f(fit.intercept,1)} + ${f(fit.slope,2)} × growth, R² ${f(fit.r2,2)}.`
+      + (fit.r2<0.1 ? ' Growth explains almost none of the P/E spread across these names.' : '')
+    : 'n/a: too few names for a fitted line.');
+  peerScatter('riskReturnWrap','vol_63d','ret_3m','Volatility 63D, annualized %','Return 3M, %');
+}
+
+// ─── FACTOR HEATMAP: universe x 5 factor percentiles, sorted by composite ─────
+function buildFactorHeat() {
+  const C = DATA.comps;
+  if(!C) return naBox('factorContent','no factor scores in this data file');
+  const F = [['VAL','valuation'],['GROWTH','growth'],['QUALITY','quality'],['MOM','momentum'],['CONSENSUS','consensus']];
+  const sector = C[active]?.sector, names = Object.keys(C).sort((a,b)=>(C[b].composite??-1)-(C[a].composite??-1));
+  const head = t => t===active ? 'var(--gold)' : sector&&C[t].sector===sector ? 'var(--t1)' : 'var(--t3)';
+  const tint = v => !ok(v) ? ['rgba(255,255,255,0.03)','#a3a3a3'] : v>=80 ? ['rgba(76,175,80,0.30)','#81c784']
+    : v>=60 ? ['rgba(76,175,80,0.15)','#81c784'] : v>=40 ? ['rgba(255,255,255,0.04)','#e8e6e0']
+    : v>=20 ? ['rgba(229,115,115,0.18)','#ef9a9a'] : ['rgba(229,115,115,0.35)','#ffcdd2'];
+  const cell = v => {const [bg,col]=tint(v); return `<td class="num" style="background:${bg};color:${col}">${v??'n/a'}</td>`;};
+  document.getElementById('factorLabel').textContent = `FACTOR SCORES, ${names.length} STOCK UNIVERSE`;
+  document.getElementById('factorContent').innerHTML = `<table class="heat">
+    <tr><th></th>${names.map(t=>`<th class="num" style="color:${head(t)}">${t}</th>`).join('')}</tr>
+    <tr><td>COMPOSITE</td>${names.map(t=>`<td class="num" style="color:var(--t1)">${C[t].composite??'n/a'}</td>`).join('')}</tr>
+    ${F.map(([label,k])=>`<tr><td>${label}</td>${names.map(t=>cell(C[t].factors[k])).join('')}</tr>`).join('')}</table>
+    <div class="caption">Percentile vs the universe, 0 to 100, sorted by composite. Green 60 and up, red below 40. Gold: selected stock, white: its sector peers.</div>`;
+}
+
+// ─── SECTOR HEATMAP: ETF and S&P returns on shared trading days ───────────────
+function buildSectorHeat() {
+  const S = DATA.sectors;
+  if(!S||!S.rows.length) return naBox('sectorHeat','no sector ETF prices in this data file');
+  const W = [['1D','ret_1d'],['1W','ret_1w'],['1M','ret_1m'],['3M','ret_3m'],['YTD','ret_ytd']];
+  const mine = DATA.tickers[active].vs_sector?.etf;
+  const big = Object.fromEntries(W.map(([,k])=>[k,Math.max(...S.rows.map(r=>ok(r[k])?Math.abs(r[k]):0))]));
+  // strong tint when the move is at least half the column's largest, so 1D and YTD read on their own scales
+  const tint = (v,k) => !ok(v)||v===0 ? ['rgba(255,255,255,0.03)','#a3a3a3'] : Math.abs(v)>=big[k]/2
+    ? (v>0 ? ['rgba(76,175,80,0.30)','#81c784'] : ['rgba(229,115,115,0.35)','#ffcdd2'])
+    : (v>0 ? ['rgba(76,175,80,0.15)','#81c784'] : ['rgba(229,115,115,0.18)','#ef9a9a']);
+  const label = r => r.etf==='SPX' ? '<span style="color:var(--t1);font-weight:600">S&amp;P 500</span>'
+    : `<span class="num" style="color:${r.etf===mine?'var(--gold)':'var(--t1)'};font-weight:600">${r.etf}</span> ${r.name}`;
+  const row = r => `<tr><td>${label(r)}</td>${W.map(([,k])=>{const [bg,col]=tint(r[k],k);
+    return `<td class="num" style="background:${bg};color:${col}">${f(r[k],1)}</td>`;}).join('')}</tr>`;
+  const etfs = S.rows.filter(r=>r.etf!=='SPX').sort((a,b)=>(b.ret_3m??-1e9)-(a.ret_3m??-1e9));
+  document.getElementById('sectorHeat').innerHTML = `<table class="heat" style="width:100%">
+    <tr><th></th>${W.map(([l])=>`<th class="num">${l}</th>`).join('')}</tr>
+    ${etfs.map(row).join('')}${S.rows.filter(r=>r.etf==='SPX').map(row).join('')}</table>
+    <div class="caption">Returns in %, sorted by 3M, on days every ETF and the S&amp;P traded. Strong tint: at least half the column's largest move. ${mine ? `Gold: ${active}'s sector ETF.` : `${active} has no sector ETF in this set.`}</div>`;
+}
+
+// ─── ROTATION: each ETF vs the S&P over two back to back windows ─────────────
+function buildRotation() {
+  const S = DATA.sectors, spx = S && S.rows.find(r=>r.etf==='SPX');
+  if(!spx||!ok(spx.prior_2m)||!ok(spx.ret_1m)) return naBox('rotationWrap','no S&P 500 series to measure against');
+  const mine = DATA.tickers[active].vs_sector?.etf;
+  const pts = S.rows.filter(r=>r.etf!=='SPX'&&ok(r.prior_2m)&&ok(r.ret_1m)), col = pts.map(r=>r.etf===mine?'#C9A84C':'#a3a3a3');
+  document.getElementById('rotationWrap').innerHTML = '<div id="rotationP" style="width:100%;height:100%"></div>';
+  Plotly.newPlot('rotationP',[{x:pts.map(r=>r.prior_2m-spx.prior_2m), y:pts.map(r=>r.ret_1m-spx.ret_1m), text:pts.map(r=>r.etf),
+    customdata:pts.map(r=>r.name), type:'scatter', mode:'markers+text', textposition:'top center', cliponaxis:false,
+    textfont:{...PLOT_FONT,color:col}, marker:{color:col,size:9},
+    hovertemplate:'%{text} %{customdata}<br>3M to 1M ago: %{x:+.1f} pp<br>Last 1M: %{y:+.1f} pp<extra></extra>'}],
+    {...PLOT_BASE,margin:{t:18,r:12,b:8,l:8},xaxis:AXIS('3M to 1M ago vs S&P, pp'),yaxis:AXIS('Last 1M vs S&P, pp')},
+    {displayModeBar:false,responsive:true});
+}
+
+// ─── EXCESS BARS: each dashboard stock vs its own sector ETF, 3M ─────────────
+function buildExcess() {
+  const all = Object.keys(DATA.tickers).map(t=>{const {stock,sv}=relSeries(t);
+    return {t, etf:DATA.tickers[t].vs_sector?.etf, x:gap(ret(stock,63),ret(sv,63))};});
+  const have = all.filter(r=>ok(r.x)).sort((a,b)=>a.x-b.x), miss = all.filter(r=>!ok(r.x)).map(r=>r.t);
+  document.getElementById('excessNote').textContent = 'Stock return minus its sector ETF over the last 63 trading days, on the same dates as Vs sector and market.'
+    + (miss.length ? ` n/a: ${miss.join(', ')} (no sector ETF history).` : '');
+  if(!have.length) return naBox('excessWrap','no stock has sector ETF history');
+  document.getElementById('excessWrap').innerHTML = '<div id="excessP" style="width:100%;height:100%"></div>';
+  Plotly.newPlot('excessP',[{type:'bar', orientation:'h', y:have.map(r=>`${r.t} vs ${r.etf}  ${pp(r.x)}`), x:have.map(r=>r.x),
+    marker:{color:have.map(r=>r.x>=0?'rgba(76,175,80,0.7)':'rgba(229,115,115,0.7)'),
+      line:{color:have.map(r=>r.t===active?'#C9A84C':'rgba(0,0,0,0)'),width:2}},
+    hovertemplate:'%{y}<extra></extra>'}],
+    {...PLOT_BASE,margin:{t:4,r:12,b:8,l:8},xaxis:AXIS('pp'),yaxis:{...AXIS(''),tickfont:{...PLOT_FONT,color:'#e8e6e0'}}},
+    {displayModeBar:false,responsive:true});
+}
+
 // ─── RENDER ALL ───────────────────────────────────────────────────────────────
 function renderAll() {
   buildStrip();
+  buildHeads();
   buildKPIs();
   buildPriceChart();
   buildFootball();
@@ -661,7 +897,13 @@ function renderAll() {
   buildRadar();
   buildRisk();
   buildCommentary();
+  buildComps();
+  buildPeerCharts();
+  buildFactorHeat();
   buildScreener();
+  buildSectorHeat();
+  buildRotation();
+  buildExcess();
   buildCorr();
   buildMacro();
   buildCatalysts();

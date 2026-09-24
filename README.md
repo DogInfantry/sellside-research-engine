@@ -25,7 +25,7 @@ Given the ticker universe in `trg_workbench/config.py` and a date, the engine:
 2. **Screens** stocks across valuation, growth, quality and momentum factors, plus a forward view from analyst consensus
 3. **Values** top candidates using a bear/base/bull DCF and a **reverse DCF** that solves for the growth rate priced in (top 3 names in the note, top 10 on the dashboard)
 4. **Analyzes** cached SEC 8-K earnings exhibits for tone, guidance, risks and catalysts via a **keyword heuristic** (no LLM)
-5. **Quantifies risk**: VaR, CVaR, Sharpe/Sortino ratios, volatility, max drawdown, correlation matrices, and 63 day beta vs the S&P 500; the dashboard also shows each stock against its sector ETF and the S&P
+5. **Quantifies risk**: VaR, CVaR, Sharpe/Sortino ratios, volatility, max drawdown, correlation matrices, and 63 day beta vs the S&P 500; the dashboard also shows each stock against its sector ETF and the S&P, its sector peers (comps) and sector ETF rotation
 6. **Renders** an HTML research note plus PDF and Markdown, and exports `dashboard_data.json` for the live dashboard
 
 ---
@@ -38,7 +38,7 @@ Given the ticker universe in `trg_workbench/config.py` and a date, the engine:
 - **Reverse DCF**: solves for the constant 10 year FCF growth rate implied by the current price (FCF proxy = net income × 0.8)
 - Earnings date calendar (Yahoo Finance) on the dashboard
 - Optional discretionary analyst overlays via CSV (thesis, conviction, catalysts, risks, client angle). They apply only to the v1 `main.py` daily/weekly reports; the v2 note and the dashboard ignore them
-- Peer comps (CCA) are planned ([#24](https://github.com/DogInfantry/sellside-research-engine/issues/24)); `build_comps_table` exists in `valuation.py` but is not wired in
+- Peer comps on the dashboard: forward P/E, EV/EBITDA, EV/Sales, PEG, FCF yield, growth, margin, ROE and net debt/EBITDA against the median of the stock's sector peers in the 21 stock universe (`build_comps_table`). EV multiples are n/a for banks, brokers and insurers. Historical multiple bands are planned ([#24](https://github.com/DogInfantry/sellside-research-engine/issues/24))
 
 ### 🖥️ Live Dashboard
 - Static `index.html` (vanilla JS, Chart.js 4.4.1 and Plotly 2.26 from cdnjs) that fetches `dashboard_data.json` at runtime, hosted on Vercel
@@ -46,6 +46,9 @@ Given the ticker universe in `trg_workbench/config.py` and a date, the engine:
 - Rating derived from consensus target upside: BUY above +10%, SELL below -10%, HOLD in between
 - Reverse DCF verdict: market implied FCF growth vs consensus +1y revenue growth (STRETCHED / DISCOUNT), plus an implied growth grid across WACC (±2pp) and terminal growth (1.5% to 3.0%)
 - Correlation matrix of the names shown, macro snapshot, and upcoming earnings dates
+- Three sections behind a sticky Company | Peers | Sector nav (plain anchors, no tab JS)
+- Peers: comps table vs the sector peer median, forward P/E vs consensus revenue growth with a least squares line, risk vs return, and factor scores for the whole universe
+- Sector: sector ETF returns (1D to YTD) next to the S&P 500, a rotation view (each ETF vs the S&P, 3M to 1M ago against the last month), and each stock's 3M return against its own sector ETF
 - Management commentary panel: empty on the live site, because CI has no cached transcripts, so every ticker shows "n/a: no cached earnings call transcript"
 
 ### 🎙️ Management Commentary (keyword heuristic)
