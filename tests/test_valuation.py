@@ -1,6 +1,7 @@
+import pandas as pd
 import pytest
 
-from trg_workbench.analytics.valuation import dcf_valuation, derive_dcf_inputs, estimate_wacc, reverse_dcf
+from trg_workbench.analytics.valuation import build_comps_table, dcf_valuation, derive_dcf_inputs, estimate_wacc, reverse_dcf
 
 
 def test_reverse_dcf_recovers_known_growth_rate():
@@ -68,3 +69,32 @@ def test_derive_dcf_inputs_prefers_consensus_growth_and_all_class_shares():
     assert inputs["base_growth"] == pytest.approx(-0.068)
     assert inputs["consensus_growth"] == pytest.approx(-0.068)
     assert inputs["shares_outstanding"] == 12.1
+
+
+def test_build_comps_table_multiples_and_balance_sheet_names():
+    eq = {"instrument_group": "us_equity", "sector": "Technology"}
+    sm = pd.DataFrame([
+        {**eq, "ticker": "AAA", "industry": "Semiconductors", "forward_pe": 20.0, "enterprise_value": 1000.0,
+         "ebitda": 100.0, "total_revenue": 400.0, "eps_growth_next_year": 0.25, "revenue_growth_next_year": 0.2,
+         "profit_margins": 0.3, "return_on_equity": 0.4, "total_debt": 300.0, "total_cash": 100.0},
+        {**eq, "ticker": "BNK", "sector": "Financial Services", "industry": "Banks - Diversified", "forward_pe": 12.0,
+         "enterprise_value": 50.0, "ebitda": None, "total_revenue": 100.0, "eps_growth_next_year": -0.1,
+         "total_debt": 900.0, "total_cash": 10.0},
+        {**eq, "ticker": "AM", "sector": "Financial Services", "industry": "Asset Management",
+         "enterprise_value": 200.0, "ebitda": 20.0, "total_revenue": 50.0},
+        {"ticker": "XLK", "instrument_group": "sector_proxy", "forward_pe": 99.0},
+    ])
+    c = build_comps_table(sm).set_index("ticker")
+
+    assert list(c.index) == ["AAA", "BNK", "AM"]  # ETF rows are not comps
+    a = c.loc["AAA"]
+    assert (a.fwd_pe, a.ev_ebitda, a.ev_sales, a.net_debt_ebitda) == (20, 10, 2.5, 2)
+    assert a.peg == pytest.approx(0.8)  # 20x over 25% EPS growth
+    assert (a.growth, a.margin, a.roe) == (0.2, 0.3, 0.4)
+    # a bank's EV is not an enterprise value, and falling EPS has no PEG
+    assert c.loc["BNK", ["ev_ebitda", "ev_sales", "net_debt_ebitda", "peg"]].isna().all()
+    assert c.loc["BNK", "fwd_pe"] == 12
+    assert c.loc["AM", "ev_ebitda"] == 10  # asset managers keep EV multiples
+    assert pd.isna(c.loc["AM", "fwd_pe"])  # missing stays missing
+    old_cache = build_comps_table(pd.DataFrame([{"ticker": "Z", "instrument_group": "us_equity"}]))
+    assert old_cache[["fwd_pe", "ev_ebitda"]].isna().all(axis=None)  # no new columns yet: n/a, not KeyError
