@@ -1,1 +1,1 @@
-{"version":2,"builds":[{"src":"index.html","use":"@vercel/static"},{"src":"dashboard_data.json","use":"@vercel/static"}],"routes":[{"handle":"filesystem"},{"src":"/(.*)","dest":"/index.html"}]}
+{"version":2,"builds":[{"src":"index.html","use":"@vercel/static"},{"src":"dashboard_data.json","use":"@vercel/static"},{"src":"robots.txt","use":"@vercel/static"},{"src":"sitemap.xml","use":"@vercel/static"},{"src":"llms.txt","use":"@vercel/static"},{"src":"docs/img/og.png","use":"@vercel/static"}],"routes":[{"handle":"filesystem"},{"src":"/(.*)","dest":"/index.html"}]}

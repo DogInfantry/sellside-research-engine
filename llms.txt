@@ -1,0 +1,18 @@
+# Sellside Research Engine
+
+> Open source equity research dashboard and Python pipeline. It screens 21 US stocks on valuation, growth, quality and momentum, values the top 10 with a bear/base/bull DCF, a reverse DCF (the growth the price implies) or, for banks and brokers, residual income, and adds peer comps, risk metrics, sentiment and sector rotation. Data comes from SEC EDGAR XBRL, Yahoo Finance, FRED and the ECB, and is refreshed every weekday at 22:00 UTC by GitHub Actions. Missing values are null in the JSON and n/a on the page, never invented. Research and education tool, not investment advice.
+
+## Live
+
+- [Dashboard](https://sellside-research-engine.vercel.app/): Company, Peers and Sector views for the current top 10 names
+- [Dashboard data (JSON)](https://sellside-research-engine.vercel.app/dashboard_data.json): every number on the page. Top level keys: generated_at, as_of, macro, macro_chg, macro_as_of, rates, tickers, benchmarks, comps, pe_growth_fit, sectors, correlation_matrix, catalysts
+
+## Source
+
+- [Repository](https://github.com/DogInfantry/sellside-research-engine): Apache 2.0 licensed code
+- [README](https://github.com/DogInfantry/sellside-research-engine/blob/main/README.md): features, quick start, methodology and FAQ
+- [License](https://github.com/DogInfantry/sellside-research-engine/blob/main/LICENSE)
+
+## Optional
+
+- [Contributing guide](https://github.com/DogInfantry/sellside-research-engine/blob/main/CONTRIBUTING.md)
