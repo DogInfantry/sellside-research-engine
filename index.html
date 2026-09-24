@@ -50,7 +50,11 @@ td,.kpi-val,.tick-price,.tick-chg,.risk-val,.corr-cell,.num{font-family:var(--mo
 .row2{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:10px;padding:0 24px;margin-bottom:10px}
 .row3{display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:10px;padding:0 24px;margin-bottom:10px}
 .row5{display:grid;grid-template-columns:1.6fr 1fr 1.2fr;gap:10px;padding:0 24px;margin-bottom:32px}
-.row2>*,.row3>*,.row5>*,.kpi-grid>*{min-width:0}
+.rowrel{display:grid;grid-template-columns:1.8fr 1fr;gap:10px;padding:0 24px;margin-bottom:10px}
+.row2>*,.row3>*,.row5>*,.rowrel>*,.kpi-grid>*{min-width:0}
+.vs-table td,.vs-table th{padding:6px 8px;border-bottom:1px solid var(--border2)}
+.vs-table th{text-align:right}.vs-table th:first-child{text-align:left}
+.vs-table td{text-align:right}.vs-table td:first-child{text-align:left;font-family:var(--sans);color:var(--t2)}
 
 /* CARD */
 .card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px 16px}
@@ -128,7 +132,7 @@ tr.active-row td{background:rgba(201,168,76,0.06)}
 /* NARROW SCREENS: one column, KPIs in pairs, tables scroll inside their card */
 @media (max-width:900px){
   .kpi-grid{grid-template-columns:repeat(2,1fr);padding:12px 16px}
-  .row2,.row3,.row5{grid-template-columns:1fr;padding:0 16px}
+  .row2,.row3,.row5,.rowrel{grid-template-columns:1fr;padding:0 16px}
   .brand-row,.ticker-strip,.screener-wrap,.footer{padding-left:16px;padding-right:16px}
   .kpi-val{font-size:20px}
   .sep{display:none}
@@ -179,6 +183,18 @@ tr.active-row td{background:rgba(201,168,76,0.06)}
   <div class="card" id="rdcfCard">
     <div class="card-title">REVERSE DCF: IMPLIED GROWTH SENSITIVITY</div>
     <div id="rdcfContent"></div>
+  </div>
+</div>
+
+<!-- RELATIVE: stock vs its sector ETF vs the S&P 500 -->
+<div class="rowrel">
+  <div class="card">
+    <div class="card-title">RELATIVE PERFORMANCE, REBASED TO 100</div>
+    <div style="position:relative;height:290px" id="relChartWrap"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">VS SECTOR AND MARKET</div>
+    <div id="vsSector"></div>
   </div>
 </div>
 
@@ -407,6 +423,51 @@ function buildRDCF() {
   document.getElementById('rdcfContent').innerHTML=html;
 }
 
+// ─── RELATIVE PERFORMANCE: stock vs sector ETF vs S&P, same start = 100 ──────
+function buildRelative() {
+  const d = DATA.tickers[active], v = d.vs_sector || {}, B = DATA.benchmarks || {};
+  const byDate = s => Object.fromEntries((s||[]).map(p=>[p.date,p.price]));
+  const sec = v.etf && B[v.etf] ? byDate(B[v.etf]) : null, spx = B.SPX ? byDate(B.SPX) : null;
+  // keep only dates every line has, so all start at 100 on the same day
+  const rows = d.price_history.filter(p=>ok(p.price)&&[sec,spx].every(m=>!m||ok(m[p.date])));
+  const wrap = document.getElementById('relChartWrap'), box = document.getElementById('vsSector');
+  if(rows.length<2){wrap.innerHTML='<div class="signal-box">n/a: no benchmark history</div>';box.innerHTML='';return;}
+  const dates = rows.map(p=>p.date), rebase = a => a.map(x=>x/a[0]*100);
+  const stock = rows.map(p=>p.price), sv = sec&&rows.map(p=>sec[p.date]), mv = spx&&rows.map(p=>spx[p.date]);
+  const ma = rebase(stock).map((_,i,a)=>i<49?null:a.slice(i-49,i+1).reduce((s,x)=>s+x,0)/50);
+  const line = (y,name,color,dash,width=1.5)=>({x:dates,y,name,type:'scatter',mode:'lines',line:{color,width,dash}});
+  wrap.innerHTML = '<div id="relChart" style="width:100%;height:100%"></div>';
+  Plotly.newPlot('relChart',[
+    line(rebase(stock),active,'#C9A84C','solid',2),
+    ...(sv?[line(rebase(sv),`${v.etf} sector`,'#81c784','solid')]:[]),
+    ...(mv?[line(rebase(mv),'S&P 500','#a3a3a3','dot')]:[]),
+    line(ma,'50D MA','rgba(201,168,76,0.5)','dash',1)
+  ],{
+    paper_bgcolor:'transparent',plot_bgcolor:'transparent',margin:{t:4,r:8,b:34,l:44},font:PLOT_FONT,
+    xaxis:{showgrid:false,tickfont:PLOT_FONT,tickformat:'%b %d',nticks:5},
+    yaxis:{showgrid:true,gridcolor:'rgba(255,255,255,0.05)',tickfont:PLOT_FONT},
+    legend:{font:PLOT_FONT,bgcolor:'transparent',orientation:'h',y:-0.26},hovermode:'x unified',
+    hoverlabel:{bgcolor:'#1a1d24',bordercolor:'rgba(255,255,255,0.1)',font:{...PLOT_FONT,color:'#e8e6e0',size:13}}
+  },{displayModeBar:false,responsive:true});
+
+  // returns over trading day windows, and the gap to the sector ETF
+  const ret = (a,n) => a && a.length>n ? (a[a.length-1]/a[a.length-1-n]-1)*100 : null;
+  const gap = (a,b) => ok(a)&&ok(b) ? a-b : null;
+  const wins = [['1M',21],['3M',63],['6M',stock.length-1]];
+  const pp = n => ok(n) ? (n>=0?'+':'')+f(n,1)+' pp' : 'n/a';
+  const retRows = wins.map(([k,n])=>{const s=ret(stock,n),e=ret(sv,n),m=ret(mv,n),x=gap(s,e);
+    return `<tr><td>${k} return</td><td class="${sign(s)}">${pct(s)}</td><td>${pct(e)}</td><td>${pct(m)}</td><td class="${sign(x)}">${pp(x)}</td></tr>`;}).join('');
+  const fund = [['Fwd P/E','fwd_pe',n=>ok(n)?f(n,1)+'×':'n/a',(a,b)=>ok(a)&&ok(b)&&b?pct((a/b-1)*100):'n/a'],
+    ['Net margin','margin',n=>pc(n,1),(a,b)=>pp(gap(a,b))],['Rev growth +1y','growth',n=>pc(n,1),(a,b)=>pp(gap(a,b))]]
+    .map(([label,k,fmt,diff])=>`<tr><td>${label}</td><td>${fmt(v[k])}</td><td>${fmt(v[k+'_median'])}</td><td>${diff(v[k],v[k+'_median'])}</td></tr>`).join('');
+  box.innerHTML = `<table class="vs-table" style="font-size:13px">
+      <tr><th></th><th>${active}</th><th>${v.etf??'Sector'}</th><th>S&P</th><th>vs sector</th></tr>${retRows}</table>
+    <table class="vs-table" style="font-size:13px;margin-top:12px">
+      <tr><th></th><th>${active}</th><th>Peer median</th><th>Gap</th></tr>${fund}</table>
+    <div style="margin-top:8px;font-size:12px;color:var(--t3)">${v.peers
+      ? `Peers: ${v.peers} other ${d.sector??''} names in the fetched universe.` : 'n/a: no sector peers in the fetched universe.'}</div>`;
+}
+
 // ─── FACTOR RADAR (Chart.js) ─────────────────────────────────────────────────
 function buildRadar() {
   const f_ = DATA.tickers[active].factors;
@@ -450,7 +511,7 @@ function buildRisk() {
   };
   const metrics=[
     ['var_95','VaR 95% (1D)',`${pc(r.var_95)}`],['cvar','CVaR (ES)',`${pc(r.cvar)}`],
-    ['beta','Beta',f(r.beta)],['sharpe','Sharpe Ratio',f(r.sharpe)],
+    ['beta','Beta 63D vs S&P',f(r.beta)],['sharpe','Sharpe Ratio',f(r.sharpe)],
     ['sortino','Sortino Ratio',f(r.sortino)],['max_drawdown','Max Drawdown',`${pc(r.max_drawdown)}`],
     ['vol_21d','Volatility 21D',`${pc(r.vol_21d)}`],['vol_63d','Volatility 63D',`${pc(r.vol_63d)}`]
   ];
@@ -596,6 +657,7 @@ function renderAll() {
   buildPriceChart();
   buildFootball();
   buildRDCF();
+  buildRelative();
   buildRadar();
   buildRisk();
   buildCommentary();

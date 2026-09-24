@@ -2,7 +2,7 @@ import json
 
 import pandas as pd
 
-from export_dashboard_data import ticker_block
+from export_dashboard_data import sector_context, ticker_block
 from trg_workbench.pipeline_v2 import value_ticker
 
 
@@ -35,3 +35,20 @@ def test_value_ticker_skips_banks():
                         "net_income_to_common": 1e9, "shares_outstanding": 1e8}])
     fundamentals = pd.DataFrame([{"ticker": "BNK", "net_income": 1e9, "shares_outstanding": 1e8}])
     assert value_ticker("BNK", sm, fundamentals, pd.DataFrame({"BNK": [10.0, 11.0]})) is None
+
+
+def test_sector_context_compares_with_peer_medians():
+    eq = {"instrument_group": "us_equity", "sector": "Technology"}
+    sm = pd.DataFrame([
+        {**eq, "ticker": "AAA", "forward_pe": 30.0, "profit_margins": 0.5, "revenue_growth_next_year": 0.2},
+        {**eq, "ticker": "BBB", "forward_pe": 20.0, "profit_margins": 0.3, "revenue_growth_next_year": 0.1},
+        {**eq, "ticker": "CCC", "forward_pe": 40.0, "profit_margins": float("nan"), "revenue_growth_next_year": 0.3},
+        {"ticker": "XLK", "instrument_group": "sector_proxy", "sector": "Technology", "forward_pe": 99.0},
+        {"ticker": "ZZZ", "instrument_group": "us_equity", "sector": "Basic Materials", "forward_pe": 10.0},
+    ])
+    ctx = sector_context(sm, "AAA")
+    assert ctx["etf"] == "XLK" and ctx["peers"] == 2      # self and the ETF row are not peers
+    assert ctx["fwd_pe"] == 30.0 and ctx["fwd_pe_median"] == 30.0
+    assert ctx["margin_median"] == 30.0                    # NaN peer skipped, shown in pct
+    lonely = sector_context(sm, "ZZZ")
+    assert lonely["etf"] is None and lonely["fwd_pe_median"] is None  # no ETF fetched, no peers: n/a

@@ -44,5 +44,6 @@ python main_v2.py build-report --as-of D  -> outputs/research_note_D.html (gitig
 - Use Python 3.12 (CI does); newer versions may not satisfy `requirements.txt`. Local venv goes in `.venv/`.
 - `derive_dcf_inputs` reads snake_case security-master columns (camelCase kept as fallback). Financial Services names get `net_debt = 0` on purpose: bank debt and cash are operating balances.
 - DCF inputs: shares come from the security master (`impliedSharesOutstanding`, all share classes; SEC and `sharesOutstanding` count one class for GOOGL/META). Growth is consensus +1y revenue growth (`revenue_growth_next_year`), trailing growth only as fallback. Beta is Blume adjusted. Banks, Capital Markets and Insurance get no FCF DCF (`value_ticker` returns None, dashboard shows n/a).
+- Benchmarks: the export reads the S&P 500 from `data/cache/us_macro_spx_{as_of}.csv` (written by the macro client during `fetch-all`) as the market column for risk beta and the `benchmarks` series; sector ETFs come from the XL* prices via `SECTOR_ETF` in `export_dashboard_data.py`. `vs_sector` medians exclude the stock itself.
 - JS: `new Date('YYYY-MM-DD')` is UTC midnight; `index.html` appends `T12:00` so dates do not shift a day in US timezones.
 - Open a PR for every change and check its Vercel preview before merging, including changes made by bots or AI agents.

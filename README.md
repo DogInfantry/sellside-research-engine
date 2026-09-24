@@ -25,7 +25,7 @@ Given the ticker universe in `trg_workbench/config.py` and a date, the engine:
 2. **Screens** stocks across valuation, growth, quality and momentum factors, plus a forward view from analyst consensus
 3. **Values** top candidates using a bear/base/bull DCF and a **reverse DCF** that solves for the growth rate priced in (top 3 names in the note, top 10 on the dashboard)
 4. **Analyzes** cached SEC 8-K earnings exhibits for tone, guidance, risks and catalysts via a **keyword heuristic** (no LLM)
-5. **Quantifies risk**: VaR, CVaR, Sharpe/Sortino ratios, volatility, max drawdown, correlation matrices (beta needs SPY, which is not in the fetched universe yet, so it shows n/a)
+5. **Quantifies risk**: VaR, CVaR, Sharpe/Sortino ratios, volatility, max drawdown, correlation matrices, and 63 day beta vs the S&P 500; the dashboard also shows each stock against its sector ETF and the S&P
 6. **Renders** an HTML research note plus PDF and Markdown, and exports `dashboard_data.json` for the live dashboard
 
 ---
@@ -70,7 +70,6 @@ Given the ticker universe in `trg_workbench/config.py` and a date, the engine:
 Missing values are written to `dashboard_data.json` as `null` (`allow_nan=False`) and render as n/a. Gaps are never filled with invented numbers.
 
 Known data gaps:
-- Beta is always n/a: `build_risk_table` regresses on `SPY`, which is not in the fetched universe
 - There is no 2 year Treasury series yet: the dashboard shows the 13 week T-bill (`^IRX`) and a 3M/10Y spread, labeled as such
 - The note's correlation heatmap drops tickers starting with "X" (so XOM) through the ETF filter in `charts.py`
 
@@ -237,7 +236,7 @@ The note writes the results to `data/normalized/management_commentary_{date}.jso
 VaR (95%, 1D) · CVaR · Beta · Volatility (21D/63D) · Sharpe Ratio · Sortino Ratio · Max Drawdown · Spearman Correlation Matrix
 
 - The risk table is shown on the dashboard. The note reads `risk_metrics_{date}.csv`, which nothing writes yet, so its risk table does not render
-- Beta is n/a until SPY is added to the fetched universe
+- Dashboard beta is 63 day OLS vs the S&P 500 (`^GSPC`, cached by the macro client); WACC uses the Blume adjusted Yahoo beta instead
 - Sharpe and Sortino use a fixed 5.3% risk free rate
 - Spearman correlation drives the note heatmap; the dashboard matrix is Pearson on 63 days of daily returns
 
