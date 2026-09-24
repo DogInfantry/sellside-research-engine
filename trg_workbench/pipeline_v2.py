@@ -35,6 +35,7 @@ from trg_workbench.io_utils import (
     append_jsonl,
     ensure_directories,
     load_dataframe,
+    read_json,
     resolve_manifest,
     save_dataframe,
     utc_now_iso,
@@ -98,6 +99,11 @@ def _load_quarterly(as_of: str) -> pd.DataFrame:
     return load_dataframe(path, parse_dates=["period_end"]) if path.exists() else pd.DataFrame()
 
 
+def _load_sentiment(as_of: str) -> Dict[str, Any]:
+    path = NORMALIZED_DIR / f"sentiment_{as_of}.json"
+    return read_json(path) if path.exists() else {}
+
+
 def _load_ecb(as_of: str) -> pd.DataFrame:
     path = NORMALIZED_DIR / f"ecb_macro_{as_of}.csv"
     if not path.exists():
@@ -129,6 +135,10 @@ def fetch_data_v2(as_of: str) -> Dict[str, Any]:
         save_dataframe(quarterly, NORMALIZED_DIR / f"quarterly_{as_of}.csv")
     except Exception as exc:  # noqa: BLE001  quarterly trends are optional, shown as n/a
         logger.warning("Quarterly statements fetch failed: %s", exc)
+    try:
+        write_json(NORMALIZED_DIR / f"sentiment_{as_of}.json", MarketDataClient().fetch_sentiment(as_of_date_obj))
+    except Exception as exc:  # noqa: BLE001  sentiment is optional, shown as n/a
+        logger.warning("Sentiment fetch failed: %s", exc)
 
     # Fetch US macro
     logger.info("Fetching US macro data...")

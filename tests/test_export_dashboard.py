@@ -4,7 +4,8 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from export_dashboard_data import pe_growth_fit, quarterly_block, sector_block, sector_context, spread_on_shared_dates, ticker_block
+from export_dashboard_data import (pe_growth_fit, quarterly_block, sector_block, sector_context, sentiment_block,
+                                   spread_on_shared_dates, ticker_block)
 from trg_workbench.analytics.valuation import build_comps_table
 from trg_workbench.pipeline_v2 import value_bank, value_ticker
 
@@ -171,3 +172,31 @@ def test_spread_on_shared_dates():
     assert date_ == "2026-09-21"  # the last day both have
     assert level == pytest.approx(0.20) and change == pytest.approx(0.0)  # vs 09-18, the previous shared day
     assert spread_on_shared_dates(ten.head(1), two.tail(1)) == (None, None, None)
+
+
+def test_sentiment_block_revisions_surprises_positioning():
+    s = {
+        "eps_trend": {"+1y": {"current": 15.0, "30daysAgo": 12.0, "90daysAgo": 12.5}},
+        "eps_revisions": {"+1y": {"upLast30days": 42, "downLast30days": 1}},
+        "surprises": [{"quarter": f"2026-0{m}-30", "actual": 1.0 + m / 10, "estimate": 1.0, "surprise_pct": 0.01 * m}
+                      for m in range(1, 6)],
+        "recommendations": [{"period": "-1m", "strongBuy": 9, "buy": 48, "hold": 2, "sell": 1, "strongSell": 0},
+                            {"period": "0m", "strongBuy": 10, "buy": 48, "hold": 2, "sell": 1, "strongSell": 0}],
+        "insider": {"purchases": 2.4e6, "sales": 6.2e6, "net_shares": -3.8e6, "net_pct": -0.004},
+    }
+    sm_row = {"short_pct_float": 0.0129, "short_ratio": 2.33, "shares_short": 110.0, "shares_short_prior": 100.0}
+    b = sentiment_block(s, sm_row)
+
+    assert (b["eps_next_fy"], b["rev_30d"], b["rev_90d"]) == (15.0, 25.0, 20.0)
+    assert (b["up_30d"], b["down_30d"]) == (42, 1)
+    assert [q["quarter"] for q in b["surprises"]] == ["2026-02-30", "2026-03-30", "2026-04-30", "2026-05-30"]  # last 4
+    assert b["surprises"][-1]["surprise_pct"] == 5.0
+    assert [r["period"] for r in b["recommendations"]] == ["-1m", "0m"] and b["recommendations"][-1]["strongBuy"] == 10
+    assert b["insider"] == {"purchases": 2400000, "sales": 6200000, "net_shares": -3800000, "net_pct": -0.4}
+    assert b["short"] == {"pct_float": 1.29, "days_to_cover": 2.3, "change_pct": 10.0}
+
+    loss = sentiment_block({"eps_trend": {"+1y": {"current": 0.5, "30daysAgo": -0.2, "90daysAgo": 0.0}}}, {})
+    assert loss["rev_30d"] is None and loss["rev_90d"] is None  # a % change from a loss or zero base means nothing
+    empty = sentiment_block(None, {})
+    assert empty["surprises"] == [] and empty["short"]["pct_float"] is None and empty["up_30d"] is None
+    json.dumps(b, allow_nan=False)
