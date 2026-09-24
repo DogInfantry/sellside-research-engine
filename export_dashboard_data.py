@@ -162,6 +162,8 @@ def sentiment_block(s: dict | None, sm_row: dict) -> dict:
     trend = (s.get("eps_trend") or {}).get("+1y") or {}
     revs = (s.get("eps_revisions") or {}).get("+1y") or {}
     ins = s.get("insider") or {}
+    net, held = num(ins.get("net_shares")), num(ins.get("held"))
+    before = held - net if net is not None and held is not None else None  # insider holdings 6 months ago
     return {
         "eps_next_fy": num(trend.get("current")),
         "rev_30d": chg(trend.get("current"), trend.get("30daysAgo")),
@@ -172,7 +174,9 @@ def sentiment_block(s: dict | None, sm_row: dict) -> dict:
         "recommendations": [{"period": r.get("period"), **{k: count(r.get(k)) for k in ("strongBuy", "buy", "hold", "sell", "strongSell")}}
                             for r in (s.get("recommendations") or [])],
         "insider": {"purchases": count(ins.get("purchases")), "sales": count(ins.get("sales")),
-                    "net_shares": count(ins.get("net_shares")), "net_pct": num(ins.get("net_pct"), 100, 1)},
+                    "net_shares": count(ins.get("net_shares")),
+                    # computed here: Yahoo's own % can carry the wrong sign
+                    "net_pct": num(net / before * 100, nd=1) if before and before > 0 else None},
         "short": {"pct_float": num(sm_row.get("short_pct_float"), 100, 2), "days_to_cover": num(sm_row.get("short_ratio"), nd=1),
                   "change_pct": chg(sm_row.get("shares_short"), sm_row.get("shares_short_prior"))},
     }

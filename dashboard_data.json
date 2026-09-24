@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-09-24T16:05:18+00:00",
+ "generated_at": "2026-09-24T16:11:11+00:00",
  "as_of": "2026-09-24",
  "macro": {
   "ust_10y": 5.156,
@@ -3788,7 +3788,7 @@
      "purchases": 513644,
      "sales": 242344,
      "net_shares": 271300,
-     "net_pct": 4.2
+     "net_pct": 4.1
     },
     "short": {
      "pct_float": 1.0,
@@ -4734,10 +4734,10 @@
      }
     ],
     "insider": {
-     "purchases": null,
+     "purchases": 0,
      "sales": null,
-     "net_shares": null,
-     "net_pct": null
+     "net_shares": 0,
+     "net_pct": 0.0
     },
     "short": {
      "pct_float": 1.32,
@@ -9044,7 +9044,7 @@
      "purchases": 1360606,
      "sales": 188291,
      "net_shares": 1172315,
-     "net_pct": 45.2
+     "net_pct": 45.1
     },
     "short": {
      "pct_float": 1.31,

@@ -1064,9 +1064,9 @@ function buildPositioning() {
   const sh = S.short || {}, ins = S.insider || {}, cnt = v => ok(v) ? Number(v).toLocaleString('en-US') : 'n/a';
   document.getElementById('positionContent').innerHTML = `<table class="vs-table" style="font-size:13px">
     ${[['Short interest, % of float',pc(sh.pct_float,2)],['Days to cover',ok(sh.days_to_cover)?f(sh.days_to_cover,1):'n/a'],
-       ['Shares short vs prior month',pct(sh.change_pct)],['Insider net shares, 6 months',cnt(ins.net_shares)],
-       ['Insider net, % of insider holdings',pct(ins.net_pct)]].map(([l,v])=>`<tr><td>${l}</td><td>${v}</td></tr>`).join('')}</table>
-    <div class="caption">Short interest as last reported to the exchanges (twice a month). Insider buys and sells from Form 4 filings over the last 6 months, as summarized by Yahoo.</div>`;
+       ['Shares short vs prior month',pct(sh.change_pct)],['Insider shares acquired less sold, 6 months',cnt(ins.net_shares)],
+       ['Same, % of insider holdings 6 months ago',pct(ins.net_pct)]].map(([l,v])=>`<tr><td>${l}</td><td>${v}</td></tr>`).join('')}</table>
+    <div class="caption">Short interest as last reported to the exchanges (twice a month). Insider figures are Yahoo's 6 month Form 4 summary: acquisitions include awards, vesting and option exercises, not only open market buys.</div>`;
 }
 
 // ─── RENDER ALL ───────────────────────────────────────────────────────────────

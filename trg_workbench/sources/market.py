@@ -219,8 +219,8 @@ class MarketDataClient:
                 "recommendations": part(lambda: plain(t.recommendations, orient="records")),
                 "insider": part(lambda: json.loads(pd.Series({
                     "purchases": ins.get("Purchases"), "sales": ins.get("Sales"),
-                    "net_shares": ins.get("Net Shares Purchased (Sold)"), "net_pct": ins.get("% Net Shares Purchased (Sold)"),
-                }, dtype="float64").to_json())) if ins is not None else None,
+                    "net_shares": ins.get("Net Shares Purchased (Sold)"), "held": ins.get("Total Insider Shares Held"),
+                }, dtype="Float64").to_json())) if ins is not None else None,  # nullable: <NA> becomes null
             }
             time.sleep(0.1)
         # ponytail: every US stock has an EPS trend, so a pull missing one is treated as failed and not cached

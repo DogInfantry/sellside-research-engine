@@ -182,7 +182,8 @@ def test_sentiment_block_revisions_surprises_positioning():
                       for m in range(1, 6)],
         "recommendations": [{"period": "-1m", "strongBuy": 9, "buy": 48, "hold": 2, "sell": 1, "strongSell": 0},
                             {"period": "0m", "strongBuy": 10, "buy": 48, "hold": 2, "sell": 1, "strongSell": 0}],
-        "insider": {"purchases": 2.4e6, "sales": 6.2e6, "net_shares": -3.8e6, "net_pct": -0.004},
+        # Yahoo's own % can carry the wrong sign (XOM: net +6.9M shares, -194.8%), so it is ignored
+        "insider": {"purchases": 2.4e6, "sales": 6.2e6, "net_shares": -3.8e6, "held": 961.9e6, "net_pct": -1.948},
     }
     sm_row = {"short_pct_float": 0.0129, "short_ratio": 2.33, "shares_short": 110.0, "shares_short_prior": 100.0}
     b = sentiment_block(s, sm_row)
@@ -192,6 +193,7 @@ def test_sentiment_block_revisions_surprises_positioning():
     assert [q["quarter"] for q in b["surprises"]] == ["2026-02-30", "2026-03-30", "2026-04-30", "2026-05-30"]  # last 4
     assert b["surprises"][-1]["surprise_pct"] == 5.0
     assert [r["period"] for r in b["recommendations"]] == ["-1m", "0m"] and b["recommendations"][-1]["strongBuy"] == 10
+    # net as a % of what insiders held before the 6 months: -3.8M / (961.9M + 3.8M)
     assert b["insider"] == {"purchases": 2400000, "sales": 6200000, "net_shares": -3800000, "net_pct": -0.4}
     assert b["short"] == {"pct_float": 1.29, "days_to_cover": 2.3, "change_pct": 10.0}
 
