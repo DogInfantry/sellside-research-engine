@@ -247,16 +247,18 @@ def build_comps_table(security_master: pd.DataFrame) -> pd.DataFrame:
     df = security_master[security_master["instrument_group"] == "us_equity"].reindex(columns=cols)
     col = lambda c: pd.to_numeric(df[c], errors="coerce")
     bank = df["industry"].astype(str).str.startswith(BALANCE_SHEET_INDUSTRIES)
-    ev = col("enterprise_value").mask(bank)
+    # loss makers have no P/E and cash rich names a negative EV: n/a, not a deep discount
+    fwd = col("forward_pe").where(lambda s: np.isfinite(s) & (s > 0))
+    ev = col("enterprise_value").mask(bank).where(lambda s: s > 0)
     ebitda = col("ebitda").where(col("ebitda") > 0)
     eps_growth = col("eps_growth_next_year")
     return pd.DataFrame({
         "ticker": df["ticker"],
         "sector": df["sector"],
-        "fwd_pe": col("forward_pe"),
+        "fwd_pe": fwd,
         "ev_ebitda": ev / ebitda,
         "ev_sales": ev / col("total_revenue"),
-        "peg": col("forward_pe") / (eps_growth * 100).where(eps_growth > 0),
+        "peg": fwd / (eps_growth * 100).where(eps_growth > 0),
         "growth": col("revenue_growth_next_year"),
         "margin": col("profit_margins"),
         "roe": col("return_on_equity"),

@@ -54,22 +54,32 @@ def test_sector_context_compares_with_peer_medians():
     assert ctx["fwd_pe"] == 30.0 and ctx["fwd_pe_median"] == 30.0
     assert ctx["margin_median"] == 30.0                    # NaN peer skipped, shown in pct
     assert ctx["ev_ebitda"] is None and ctx["ev_ebitda_median"] is None  # no EV data: n/a
+    fin = {"instrument_group": "us_equity", "sector": "Financial Services", "forward_pe": 12.0}
+    banks = build_comps_table(pd.DataFrame([
+        {**fin, "ticker": "AM", "industry": "Asset Management", "enterprise_value": 150.0, "ebitda": 10.0},
+        *[{**fin, "ticker": t, "industry": "Banks - Diversified"} for t in ["B1", "B2", "B3"]],
+    ]))
+    bank = sector_context(banks, "B1")
+    assert bank["ev_ebitda_median"] is None  # one asset manager is not the median of three peers
+    assert bank["fwd_pe_median"] == 12.0
     lonely = sector_context(comps, "ZZZ")
     assert lonely["etf"] is None and lonely["fwd_pe_median"] is None  # no ETF fetched, no peers: n/a
 
 
-def test_sector_block_compares_on_shared_days():
+def test_sector_block_windows_start_on_exact_dates():
     d = pd.bdate_range("2025-12-01", periods=80)
     wide = pd.DataFrame({"XLK": np.linspace(100, 179, 80), "XLE": 100.0, "SPX": np.linspace(200, 239.5, 80)}, index=d)
     wide.loc[d[-2], "XLK"] = float("nan")  # Yahoo dropped one day for one series
-    block = sector_block(wide, d[-1].date())
+    block = sector_block(wide)
     rows = {r["etf"]: r for r in block["rows"]}
 
     assert block["as_of"] == d[-1].strftime("%Y-%m-%d")
     assert rows["XLK"]["name"] == "Technology" and rows["SPX"]["name"] == "S&P 500"
-    assert rows["XLE"]["ret_1d"] == 0.0
-    spx = wide["SPX"].drop(d[-2])  # the day XLK lacks is skipped for every series
+    assert rows["XLK"]["ret_1d"] is None  # no close on the start day: n/a, not a two day move
+    assert rows["XLK"]["ret_1w"] == round((179 / wide["XLK"].iloc[-6] - 1) * 100, 1)
+    spx = wide["SPX"]
     assert rows["SPX"]["ret_1d"] == round((spx.iloc[-1] / spx.iloc[-2] - 1) * 100, 1)
+    assert rows["XLE"]["ret_1d"] == 0.0
     last_2025 = spx[spx.index.year == 2025].iloc[-1]
     assert rows["SPX"]["ret_ytd"] == round((spx.iloc[-1] / last_2025 - 1) * 100, 1)
     assert rows["SPX"]["prior_2m"] == round((spx.iloc[-22] / spx.iloc[-64] - 1) * 100, 1)

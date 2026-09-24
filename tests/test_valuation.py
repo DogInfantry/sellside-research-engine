@@ -82,11 +82,13 @@ def test_build_comps_table_multiples_and_balance_sheet_names():
          "total_debt": 900.0, "total_cash": 10.0},
         {**eq, "ticker": "AM", "sector": "Financial Services", "industry": "Asset Management",
          "enterprise_value": 200.0, "ebitda": 20.0, "total_revenue": 50.0},
+        {**eq, "ticker": "LOS", "industry": "Software", "forward_pe": -12.0, "enterprise_value": -5.0,
+         "ebitda": 1.0, "total_revenue": 4.0, "eps_growth_next_year": 0.5},
         {"ticker": "XLK", "instrument_group": "sector_proxy", "forward_pe": 99.0},
     ])
     c = build_comps_table(sm).set_index("ticker")
 
-    assert list(c.index) == ["AAA", "BNK", "AM"]  # ETF rows are not comps
+    assert list(c.index) == ["AAA", "BNK", "AM", "LOS"]  # ETF rows are not comps
     a = c.loc["AAA"]
     assert (a.fwd_pe, a.ev_ebitda, a.ev_sales, a.net_debt_ebitda) == (20, 10, 2.5, 2)
     assert a.peg == pytest.approx(0.8)  # 20x over 25% EPS growth
@@ -96,5 +98,7 @@ def test_build_comps_table_multiples_and_balance_sheet_names():
     assert c.loc["BNK", "fwd_pe"] == 12
     assert c.loc["AM", "ev_ebitda"] == 10  # asset managers keep EV multiples
     assert pd.isna(c.loc["AM", "fwd_pe"])  # missing stays missing
+    # a loss maker has no P/E and a cash rich negative EV no EV multiple: n/a, not a deep discount
+    assert c.loc["LOS", ["fwd_pe", "peg", "ev_ebitda", "ev_sales"]].isna().all()
     old_cache = build_comps_table(pd.DataFrame([{"ticker": "Z", "instrument_group": "us_equity"}]))
     assert old_cache[["fwd_pe", "ev_ebitda"]].isna().all(axis=None)  # no new columns yet: n/a, not KeyError

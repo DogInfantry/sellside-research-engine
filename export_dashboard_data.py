@@ -21,8 +21,7 @@ import numpy as np
 import pandas as pd
 
 from trg_workbench.analytics.risk import build_risk_table
-from trg_workbench.analytics.screening import (RETURN_WINDOWS, build_price_snapshot, build_research_dataset,
-                                               top_screen_candidates)
+from trg_workbench.analytics.screening import RETURN_WINDOWS, build_research_dataset, top_screen_candidates
 from trg_workbench.analytics.summaries import build_catalyst_calendar
 from trg_workbench.analytics.valuation import build_comps_table, reverse_dcf
 from trg_workbench.config import CACHE_DIR, NORMALIZED_DIR, US_SECTOR_PROXIES
@@ -76,24 +75,26 @@ def sector_context(comps: pd.DataFrame, ticker: str) -> dict:
     out = {"etf": SECTOR_ETF.get(sector), "peers": len(peers)}
     for key, scale in VS_SECTOR.items():
         has = key in comps
+        vals = peers[key].dropna() if has else peers.iloc[:0]
         out[key] = num(me[key].iloc[0], scale) if has and len(me) else None
-        out[f"{key}_median"] = num(peers[key].median(), scale) if has and len(peers) else None  # median skips NaN
+        # a median needs at least half the peers: one asset manager is not the median of seven banks and brokers
+        out[f"{key}_median"] = num(vals.median(), scale) if len(vals) and 2 * len(vals) >= len(peers) else None
     return out
 
 
-def sector_block(wide: pd.DataFrame, as_of_date: date) -> dict:
-    """Sector ETF and S&P 500 returns on the days every series has. Yahoo drops single days per series
-    (09-22 for XLK and SPX but not XLE), so counting rows per series would compare different windows."""
-    px = wide[[c for c in [*US_SECTOR_PROXIES, "SPX"] if c in wide]].dropna()
+def sector_block(wide: pd.DataFrame) -> dict:
+    """Sector ETF and S&P 500 returns over US sessions (days any of them has a close). Yahoo drops single days
+    per series (09-22 for XLK and SPX but not XLE): a window missing its start or end close is n/a, never
+    stretched back to an earlier close, so every value covers exactly its window."""
+    px = wide[[c for c in [*US_SECTOR_PROXIES, "SPX"] if c in wide]].dropna(how="all")
     if len(px) < 64:
         return {"as_of": None, "rows": []}
-    long = px.rename_axis("date").reset_index().melt("date", var_name="ticker", value_name="close")
-    snap = build_price_snapshot(long, as_of_date).set_index("ticker")
-    ytd = px.iloc[-1] / px[px.index.year < px.index[-1].year].iloc[-1] - 1
-    prior_2m = px.iloc[-22] / px.iloc[-64] - 1  # t-63 to t-21: does not overlap the last month
+    rets = {k: px.iloc[-1] / px.iloc[-1 - n] - 1 for k, n in RETURN_WINDOWS.items()}  # NaN if a close is missing
+    rets["ret_ytd"] = px.iloc[-1] / px[px.index.year < px.index[-1].year].iloc[-1] - 1
+    rets["prior_2m"] = px.iloc[-22] / px.iloc[-64] - 1  # 3M to 1M ago: does not overlap the last month
     return {"as_of": px.index[-1].strftime("%Y-%m-%d"), "rows": [
-        {"etf": t, "name": US_SECTOR_PROXIES.get(t, "S&P 500"), **{k: num(snap.at[t, k], 100, 1) for k in RETURN_WINDOWS},
-         "ret_ytd": num(ytd[t], 100, 1), "prior_2m": num(prior_2m[t], 100, 1)} for t in px.columns]}
+        {"etf": t, "name": US_SECTOR_PROXIES.get(t, "S&P 500"), **{k: num(r[t], 100, 1) for k, r in rets.items()}}
+        for t in px.columns]}
 
 
 def pe_growth_fit(comps: pd.DataFrame) -> dict | None:
@@ -278,7 +279,7 @@ def build_dashboard(as_of: str, limit: int = 10) -> dict:
             "factors": {k: num(c[col], 100, 0) for k, col in FACTORS.items()},
         } for _, c in comps.iterrows()},
         "pe_growth_fit": pe_growth_fit(comps),
-        "sectors": sector_block(wide, as_of_date),
+        "sectors": sector_block(wide),
         "correlation_matrix": {"tickers": corr_t,
                                "values": [[num(corr.at[a, b]) for b in corr_t] for a in corr_t]},
         "catalysts": [
