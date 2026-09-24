@@ -23,7 +23,7 @@ from trg_workbench.analytics.risk import build_risk_table
 from trg_workbench.analytics.screening import build_research_dataset, top_screen_candidates
 from trg_workbench.analytics.summaries import build_catalyst_calendar
 from trg_workbench.analytics.valuation import reverse_dcf
-from trg_workbench.config import NORMALIZED_DIR
+from trg_workbench.config import CACHE_DIR, NORMALIZED_DIR
 from trg_workbench.io_utils import load_dataframe
 from trg_workbench.pipeline_v2 import (
     _load_ecb,
@@ -39,6 +39,11 @@ WACC_STEPS = [-2, -1, 0, 1, 2]  # pct points around each ticker's own WACC
 TGS = [1.5, 2.0, 2.5, 3.0]
 FACTORS = {"valuation": "valuation_score", "growth": "growth_score", "quality": "quality_score",
            "momentum": "momentum_score", "consensus": "forward_score"}
+# yfinance sector -> SPDR sector ETF already fetched with the prices (no XLB: Basic Materials shows n/a)
+SECTOR_ETF = {"Technology": "XLK", "Communication Services": "XLC", "Consumer Cyclical": "XLY",
+              "Consumer Defensive": "XLP", "Financial Services": "XLF", "Healthcare": "XLV", "Energy": "XLE",
+              "Industrials": "XLI", "Real Estate": "XLRE", "Utilities": "XLU"}
+VS_SECTOR = {"fwd_pe": ("forward_pe", 1), "margin": ("profit_margins", 100), "growth": ("revenue_growth_next_year", 100)}
 
 
 def num(x, scale: float = 1.0, nd: int = 2):
@@ -57,6 +62,20 @@ def implied_growth(price: float, inputs: dict, wacc: float, tg: float):
                            wacc=wacc, terminal_growth=tg)["implied_growth_rate"]
     except ValueError:
         return None
+
+
+def sector_context(sm: pd.DataFrame, ticker: str) -> dict:
+    """Stock vs the median of its sector peers in the fetched US universe (the stock itself excluded)."""
+    eq = sm[sm["instrument_group"] == "us_equity"] if "instrument_group" in sm else sm
+    me = eq[eq["ticker"] == ticker]
+    sector = me["sector"].iloc[0] if len(me) else None
+    peers = eq[(eq["sector"] == sector) & (eq["ticker"] != ticker)]
+    out = {"etf": SECTOR_ETF.get(sector), "peers": len(peers)}
+    for key, (col, scale) in VS_SECTOR.items():
+        has = col in eq
+        out[key] = num(me[col].iloc[0], scale, 1) if has and len(me) else None
+        out[f"{key}_median"] = num(peers[col].median(), scale, 1) if has and len(peers) else None  # median skips NaN
+    return out
 
 
 def ticker_block(row: pd.Series, px: pd.Series, val: dict | None, risk: pd.Series | None,
@@ -170,7 +189,11 @@ def build_dashboard(as_of: str, limit: int = 10) -> dict:
     research = build_research_dataset(fundamentals, prices, security_master, as_of_date)
     top = top_screen_candidates(research, limit=limit)
     tickers = [t for t in top["ticker"] if t in wide.columns]
-    risk = build_risk_table(wide[tickers])
+    # S&P 500 level cached by macro_us during fetch-all; it is the market column for beta and the benchmark line
+    spx_path = CACHE_DIR / f"us_macro_spx_{as_of}.csv"
+    if spx_path.exists():
+        wide["SPX"] = load_dataframe(spx_path, parse_dates=["date"]).set_index("date")["value"].reindex(wide.index)
+    risk = build_risk_table(wide[tickers + [c for c in ["SPX"] if c in wide]], market_col="SPX")
 
     commentary = {}
     try:
@@ -190,6 +213,12 @@ def build_dashboard(as_of: str, limit: int = 10) -> dict:
             val = None
         blocks[t] = ticker_block(row, wide[t].dropna(), val,
                                  risk.loc[t] if t in risk.index else None, commentary.get(t))
+        blocks[t]["vs_sector"] = sector_context(security_master, t)
+
+    # same shape and window as price_history, so the page can rebase stock, sector and market together
+    bench = {"SPX"} | {b["vs_sector"]["etf"] for b in blocks.values()}
+    benchmarks = {c: [{"date": d.strftime("%Y-%m-%d"), "price": num(p)} for d, p in wide[c].dropna().tail(126).items()]
+                  for c in sorted(b for b in bench if b in wide)}
 
     corr_t = list(blocks)
     corr = wide[corr_t].pct_change().tail(63).corr()
@@ -201,6 +230,7 @@ def build_dashboard(as_of: str, limit: int = 10) -> dict:
         "macro": macro,
         "macro_chg": macro_chg,
         "tickers": blocks,
+        "benchmarks": benchmarks,
         "correlation_matrix": {"tickers": corr_t,
                                "values": [[num(corr.at[a, b]) for b in corr_t] for a in corr_t]},
         "catalysts": [
