@@ -1,6 +1,6 @@
 # Sellside Research Engine
 
-> Open source equity research dashboard and Python pipeline. It screens 21 US stocks on valuation, growth, quality and momentum, values the top 10 with a bear/base/bull DCF, a reverse DCF (the growth the price implies) or, for banks and brokers, residual income, and adds peer comps, risk metrics, sentiment and sector rotation. Data comes from SEC EDGAR XBRL, Yahoo Finance, FRED and the ECB, and is refreshed every weekday at 22:00 UTC by GitHub Actions. Missing values are null in the JSON and n/a on the page, never invented. Research and education tool, not investment advice.
+> Open source equity research dashboard and Python pipeline. It screens 21 US stocks on valuation, growth, quality and momentum, values the top 10 with a bear/base/bull DCF, a reverse DCF (the growth the price implies) or, for banks and brokers, residual income, and adds peer comps, risk metrics, sentiment and sector rotation. Data comes from SEC EDGAR XBRL, Yahoo Finance, FRED and the ECB, and is refreshed every weekday at 22:00 UTC by GitHub Actions. Missing values are null in the JSON and n/a on the page; the few model defaults (5% growth, 5.3% risk free fallback, beta 1.0) are documented in the README. Research and education tool, not investment advice.
 
 ## Live
 

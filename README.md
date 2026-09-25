@@ -26,11 +26,11 @@
 </p>
 
 > [!NOTE]
-> A research and education tool, not investment advice. Every number comes from a public source; anything missing shows as n/a, never invented.
+> A research and education tool, not investment advice. Every number comes from a public source and anything missing shows as n/a. The few model defaults (5% growth, 5.3% risk free fallback, beta 1.0) are listed under Methodology.
 
 ## What it is
 
-**Sellside Research Engine** is an open source Python pipeline and web dashboard that automates the core sell side analyst loop. It pulls audited fundamentals from SEC EDGAR, prices and consensus estimates from Yahoo Finance and rates from FRED and the ECB. It screens 21 US stocks, values the top 10 with a DCF, a reverse DCF or residual income, and publishes the result to a static dashboard that GitHub Actions refreshes every weekday.
+**Sellside Research Engine** is an open source Python pipeline and web dashboard that automates the core sell side analyst loop. It pulls audited fundamentals from SEC EDGAR, prices and consensus estimates from Yahoo Finance and rates from Yahoo Finance, FRED and the ECB. It screens 21 US stocks, values the top 10 with a DCF, a reverse DCF or residual income, and publishes the result to a static dashboard that GitHub Actions refreshes every weekday.
 
 | At a glance | |
 |---|---|
@@ -206,7 +206,7 @@ The composite is the equal weighted mean of the four factors. A forward view sco
 
 **FCF DCF**
 - FCF proxy = SEC net income (Yahoo fallback) × 0.80
-- WACC = E/V × (Rf + Blume adjusted β × 5.5%) + D/V × 6% × (1 less 21% tax), with D/E fixed at 0.30, rounded to 0.1pp. Rf is the live 10Y Treasury; 5.3% only if the macro fetch fails. Blume beta = 0.67 × Yahoo beta + 0.33
+- WACC = E/V × (Rf + Blume adjusted β × 5.5%) + D/V × 6% × (1 less 21% tax), with D/E fixed at 0.30, rounded to 0.1pp. Rf is the live 10Y Treasury; 5.3% only if the macro fetch fails. Blume beta = 0.67 × Yahoo beta + 0.33 (Yahoo beta 1.0 when missing)
 - Growth = consensus +1y revenue growth, trailing growth as fallback, 5% when neither exists, clamped to the range -20% to 50%
 - 5 year explicit forecast with growth fading ×0.85 a year, then a Gordon terminal value
 - Scenarios: Bear (growth × 0.7, TGR 1%, WACC +1pp, capped at 15%), Base (TGR 2.5%), Bull (growth × 1.3, TGR 3.5%, WACC -0.5pp, floored at 6%)
@@ -370,7 +370,7 @@ Contributions are welcome from equity researchers, quants, data engineers and Py
 
 **v1.3.0, April 12, 2026**: reverse DCF; management commentary heuristic; `--dry-run`, `--quiet` and progress bars; HTML fallback when WeasyPrint is missing
 
-**v1.2.0, April 11, 2026**: CLI refactor, chart integration, session outputs
+**v1.2.0, April 11, 2026**: CLI refactor, quiet mode, PDF fallback, chart integration, session outputs
 
 **v1.1.0, April 11, 2026**: `--dry-run` and progress bars
 
