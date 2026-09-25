@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "Sellside Research Engine"
+type: software
+authors:
+  - alias: DogInfantry
+repository-code: "https://github.com/DogInfantry/sellside-research-engine"
+url: "https://sellside-research-engine.vercel.app"
+license: Apache-2.0

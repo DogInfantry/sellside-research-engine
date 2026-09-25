@@ -83,7 +83,7 @@ Each module is intentionally self-contained. A contribution to `valuation.py` sh
 ## Pull Request Guidelines
 
 1. **Branch naming**: `feature/<short-description>`, `fix/<short-description>`, `docs/<short-description>`
-2. **Keep PRs focused** — one logical change per PR
+2. **Keep PRs focused**: one logical change per PR
 3. **Write tests** for any new analytics or data-pipeline logic (under `tests/`)
 4. **Run the full test suite** before opening your PR:
    ```bash
@@ -101,7 +101,7 @@ Each module is intentionally self-contained. A contribution to `valuation.py` sh
 
 | Label | Meaning |
 |-------|---------|
-| `good first issue` | Self-contained, well-scoped — ideal for new contributors |
+| `good first issue` | Self-contained, well-scoped, ideal for new contributors |
 | `help wanted` | We'd love external input on this |
 | `bug` | Confirmed defect |
 | `enhancement` | New feature or improvement |
@@ -114,9 +114,9 @@ Each module is intentionally self-contained. A contribution to `valuation.py` sh
 
 ## Code Standards
 
-- **Python 3.10+**, typed where practical (`from __future__ import annotations`)
+- **Python 3.12**, typed where practical (`from __future__ import annotations`)
 - **Black** formatting (line length 100)
-- **Descriptive variable names** — financial models are read more than written
+- **Descriptive variable names**: financial models are read more than written
 - No hardcoded tickers, dates, or magic numbers in module-level code (use constants or CLI args)
 - External API calls must be rate-limited and respect the service's Terms of Service
 
@@ -136,4 +136,4 @@ Not sure where to start? Look for issues tagged [`good first issue`](https://git
 
 ## Questions?
 
-Open a [Discussion](https://github.com/DogInfantry/sellside-research-engine/discussions) or comment on an existing issue. Financial domain questions (e.g., "what WACC convention should we use?") are welcome.
+Open an [issue](https://github.com/DogInfantry/sellside-research-engine/issues) or comment on an existing one. Financial domain questions (e.g., "what WACC convention should we use?") are welcome.

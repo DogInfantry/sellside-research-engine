@@ -3,7 +3,27 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Sellside Research Engine: Institutional Dashboard</title>
+<title>Sellside Research Engine: Open Source Equity Research Dashboard</title>
+<meta name="description" content="Open source equity research dashboard: DCF, reverse DCF, peer comps, factor screening and risk from live SEC EDGAR, Yahoo Finance and FRED data, refreshed weekdays."/>
+<link rel="canonical" href="https://sellside-research-engine.vercel.app/"/>
+<meta name="theme-color" content="#0d0e11"/>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230d0e11'/%3E%3Ctext x='16' y='23' font-family='monospace' font-size='20' font-weight='700' fill='%23C9A84C' text-anchor='middle'%3ES%3C/text%3E%3C/svg%3E"/>
+<meta property="og:type" content="website"/>
+<meta property="og:site_name" content="Sellside Research Engine"/>
+<meta property="og:title" content="Sellside Research Engine: Open Source Equity Research Dashboard"/>
+<meta property="og:description" content="Screens 21 US stocks and values the top 10 with DCF and reverse DCF, plus peer comps and risk, from live SEC EDGAR, Yahoo Finance and FRED data, refreshed every weekday."/>
+<meta property="og:url" content="https://sellside-research-engine.vercel.app/"/>
+<meta property="og:image" content="https://sellside-research-engine.vercel.app/docs/img/og.png"/>
+<meta property="og:image:width" content="1280"/>
+<meta property="og:image:height" content="640"/>
+<meta property="og:image:alt" content="Sellside Research Engine dashboard: KPI tiles, price chart, valuation football field and reverse DCF grid"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[
+{"@type":"WebApplication","name":"Sellside Research Engine","url":"https://sellside-research-engine.vercel.app/","description":"Open source equity research dashboard: DCF, reverse DCF, residual income, peer comps, factor screening and risk analytics: screens 21 US stocks and values the top 10, built from SEC EDGAR, Yahoo Finance, FRED and ECB data and refreshed every weekday.","applicationCategory":"FinanceApplication","operatingSystem":"Any","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Person","name":"DogInfantry","url":"https://github.com/DogInfantry"}},
+{"@type":"SoftwareSourceCode","name":"sellside-research-engine","codeRepository":"https://github.com/DogInfantry/sellside-research-engine","programmingLanguage":["Python","JavaScript"],"license":"https://www.apache.org/licenses/LICENSE-2.0","author":{"@type":"Person","name":"DogInfantry","url":"https://github.com/DogInfantry"}}
+]}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
@@ -115,6 +135,7 @@ tr.active-row td{background:rgba(201,168,76,0.06)}
 
 /* FOOTER */
 .footer{border-top:1px solid var(--border2);padding:14px 24px;display:flex;flex-wrap:wrap;gap:6px 16px;justify-content:space-between;font-size:12px;color:var(--t3);letter-spacing:.04em}
+.footer-about{flex-basis:100%;letter-spacing:0}
 .footer a{color:var(--t2);text-decoration:none}
 .footer a:hover{color:var(--t1)}
 
@@ -181,7 +202,7 @@ tr.active-row td{background:rgba(201,168,76,0.06)}
 <!-- TOPBAR -->
 <div class="topbar">
   <div class="brand-row">
-    <div class="brand">SELL<span>SIDE</span> RESEARCH ENGINE <span style="font-size:12px;color:var(--t3);letter-spacing:.04em;margin-left:8px;font-weight:400">v1.3.0</span></div>
+    <h1 class="brand">SELL<span>SIDE</span> RESEARCH ENGINE <span style="font-size:12px;color:var(--t3);letter-spacing:.04em;margin-left:8px;font-weight:400">v1.4.0</span></h1>
     <div class="status-row">
       <span>SEC EDGAR</span><span class="sep">|</span>
       <span>YAHOO FINANCE</span><span class="sep">|</span>
@@ -372,6 +393,7 @@ tr.active-row td{background:rgba(201,168,76,0.06)}
 </section>
 
 <div class="footer">
+  <p class="footer-about">Open source equity research dashboard: DCF, reverse DCF, peer comps, factor screening and risk for the top 10 of 21 US stocks, from SEC EDGAR, Yahoo Finance, FRED and ECB data, refreshed weekdays at 22:00 UTC. Missing data shows n/a. Not investment advice.</p>
   <span>SELLSIDE RESEARCH ENGINE · <span class="gold">DogInfantry</span> · <a href="https://github.com/DogInfantry/sellside-research-engine">github.com/DogInfantry/sellside-research-engine</a></span>
   <span id="genAt"></span>
 </div>

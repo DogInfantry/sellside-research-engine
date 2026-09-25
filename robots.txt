@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://sellside-research-engine.vercel.app/sitemap.xml

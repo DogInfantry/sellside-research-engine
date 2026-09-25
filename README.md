@@ -1,418 +1,387 @@
-# 🏦 Sell Side Research Engine
+<h1 align="center">Sellside Research Engine</h1>
 
-[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
-[![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/downloads/)
-[![Live Data](https://img.shields.io/badge/data-live%20%2F%20real-brightgreen.svg)](#data-sources)
-[![Built for Research](https://img.shields.io/badge/built%20for-equity%20research-navy.svg)](#)
-[![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](CONTRIBUTING.md)
-[![Version](https://img.shields.io/badge/version-v1.4.0-blue.svg)](#changelog)
+<p align="center">
+  <b>Open source equity research dashboard and Python pipeline.</b><br/>
+  DCF, reverse DCF, residual income, peer comps, factor screening and risk analytics on live SEC EDGAR, Yahoo Finance, FRED and ECB data, refreshed every weekday.
+</p>
 
-> An equity research workbench that automates the core sell side analyst loop: live data ingestion, factor screening, DCF valuation, risk analytics, a research note and a live dashboard.
+<p align="center">
+  <a href="https://sellside-research-engine.vercel.app"><img alt="Live dashboard" src="https://img.shields.io/badge/live-dashboard-C9A84C?style=flat-square"/></a>
+  <a href="https://github.com/DogInfantry/sellside-research-engine/actions/workflows/refresh-data.yml"><img alt="Weekday data refresh" src="https://img.shields.io/github/actions/workflow/status/DogInfantry/sellside-research-engine/refresh-data.yml?label=data%20refresh&style=flat-square"/></a>
+  <a href="https://github.com/DogInfantry/sellside-research-engine/releases"><img alt="Latest release" src="https://img.shields.io/github/v/release/DogInfantry/sellside-research-engine?style=flat-square"/></a>
+  <img alt="Python 3.12" src="https://img.shields.io/badge/python-3.12-3776AB?style=flat-square"/>
+  <a href="LICENSE"><img alt="License: Apache 2.0" src="https://img.shields.io/badge/license-Apache%202.0-blue?style=flat-square"/></a>
+</p>
 
-Built as a research workbench and portfolio project for equity researchers, PMs and quants. Every number comes from a live source; missing data shows as n/a, never invented.
+<p align="center">
+  <a href="https://sellside-research-engine.vercel.app"><b>Live dashboard</b></a> ·
+  <a href="#dashboard-tour">Tour</a> ·
+  <a href="#quick-start">Quick start</a> ·
+  <a href="#how-it-works">How it works</a> ·
+  <a href="#faq">FAQ</a>
+</p>
 
-**Live dashboard:** [sellside-research-engine.vercel.app](https://sellside-research-engine.vercel.app), refreshed every weekday from the pipeline.
+<p align="center">
+  <a href="https://sellside-research-engine.vercel.app"><img src="docs/img/hero.png" width="880" alt="Sellside Research Engine equity research dashboard for NVDA: KPI tiles for price, DCF value, reverse DCF implied growth and consensus rating, a 6 month price chart, a valuation football field and a reverse DCF sensitivity grid"/></a>
+</p>
 
-**This project is open to contributions.** Whether you want to add a new data source, improve valuation logic, or build a real LLM reasoning layer, see [CONTRIBUTING.md](CONTRIBUTING.md) to get started.
+> [!NOTE]
+> A research and education tool, not investment advice. Every number comes from a public source and anything missing shows as n/a. The few model defaults (5% growth, 5.3% risk free fallback, beta 1.0) are listed under Methodology.
 
----
+## What it is
 
-## What It Does
+**Sellside Research Engine** is an open source Python pipeline and web dashboard that automates the core sell side analyst loop. It pulls audited fundamentals from SEC EDGAR, prices and consensus estimates from Yahoo Finance and rates from Yahoo Finance, FRED and the ECB. It screens 21 US stocks, values the top 10 with a DCF, a reverse DCF or residual income, and publishes the result to a static dashboard that GitHub Actions refreshes every weekday.
 
-Given the ticker universe in `trg_workbench/config.py` and a date, the engine:
+| At a glance | |
+|---|---|
+| **Universe** | 21 US stocks in 8 sectors (`DEFAULT_US_TICKERS` in `trg_workbench/config.py`) |
+| **Dashboard** | Top 10 by research score, re-ranked on every refresh; comps, factors and scatters cover all 21 |
+| **Valuation** | Bear/base/bull FCF DCF, reverse DCF (the growth the price implies), residual income and justified P/B for banks and brokers, football field, peer multiples |
+| **Risk** | VaR and CVaR (95%, 1 day), volatility, beta vs the S&P 500, Sharpe, Sortino, max drawdown, correlation matrix |
+| **Sentiment** | EPS revisions, earnings surprises, recommendation trend, short interest, insider activity |
+| **Sector and macro** | 10 SPDR sector ETFs vs the S&P 500, rotation view, live 10Y, 2Y, 3M bill, VIX, DXY, WTI, EUR/USD |
+| **Data** | SEC EDGAR XBRL, Yahoo Finance, FRED, ECB. No API keys needed |
+| **Refresh** | Weekdays at 22:00 UTC via GitHub Actions; each data commit redeploys on Vercel |
+| **Stack** | Python 3.12, pandas, scipy, yfinance; vanilla JS, Chart.js, Plotly; Vercel static hosting |
+| **License** | Apache 2.0 |
 
-1. **Fetches** fundamentals from SEC EDGAR XBRL, prices and analyst estimates from Yahoo Finance, and macro data from the ECB SDMX API and Yahoo Finance market tickers (`^TNX`, `^TYX`, `^IRX`, `^VIX`, `DX-Y.NYB`, `CL=F`, `GC=F`)
-2. **Screens** stocks across valuation, growth, quality and momentum factors, plus a forward view from analyst consensus
-3. **Values** top candidates using a bear/base/bull DCF and a **reverse DCF** that solves for the growth rate priced in (top 3 names in the note, top 10 on the dashboard)
-4. **Analyzes** cached SEC 8-K earnings exhibits for tone, guidance, risks and catalysts via a **keyword heuristic** (no LLM)
-5. **Quantifies risk**: VaR, CVaR, Sharpe/Sortino ratios, volatility, max drawdown, correlation matrices, and 63 day beta vs the S&P 500; the dashboard also shows each stock against its sector ETF and the S&P, its sector peers (comps) and sector ETF rotation
-6. **Renders** an HTML research note plus PDF and Markdown, and exports `dashboard_data.json` for the live dashboard
+## Dashboard tour
 
----
+<p align="center">
+  <img src="docs/img/demo.gif" width="720" alt="Switching tickers on the dashboard: NVDA, JPM, CVX and MSFT, each with its own KPIs, price chart, football field and valuation grid"/>
+</p>
 
-## Key Features
+Screenshots of the [live dashboard](https://sellside-research-engine.vercel.app), data as of 2026-09-24.
 
-### 📊 Research Automation
-- Multifactor stock screener: valuation, growth, quality, momentum, plus an analyst consensus forward view
-- DCF valuation with CAPM based WACC (live 10Y risk free rate) and bear/base/bull scenarios. The dashboard football field shows DCF bear to bull, analyst targets and the 52 week range, next to a WACC × terminal growth value grid centred on each ticker's own WACC
-- Banks, brokers and insurers get a single stage residual income value and justified P/B vs actual P/B (CFA L2) instead of an FCF DCF
-- **Reverse DCF**: solves for the constant 10 year FCF growth rate implied by the current price (FCF proxy = net income × 0.8)
-- Earnings date calendar (Yahoo Finance) on the dashboard
-- Optional discretionary analyst overlays via CSV (thesis, conviction, catalysts, risks, client angle). They apply only to the v1 `main.py` daily/weekly reports; the v2 note and the dashboard ignore them
-- Peer comps on the dashboard: forward P/E, EV/EBITDA, EV/Sales, PEG, FCF yield, growth, margin, ROE and net debt/EBITDA against the median of the stock's sector peers in the 21 stock universe (`build_comps_table`). EV multiples are n/a for banks, brokers and insurers. Historical multiple bands are planned ([#24](https://github.com/DogInfantry/sellside-research-engine/issues/24))
+### Company
 
-### 🖥️ Live Dashboard
-- Static `index.html` (vanilla JS, Chart.js 4.4.1 and Plotly 2.26 from cdnjs) that fetches `dashboard_data.json` at runtime, hosted on Vercel
-- Top 10 names by research score: price, 6 month price chart, factor radar, risk metrics, and a football field with DCF bear to bull (or residual income for banks), analyst targets and the quoted 52 week range
-- Rating derived from consensus target upside: BUY above +10%, SELL below -10%, HOLD in between
-- Reverse DCF verdict: market implied FCF growth vs consensus +1y revenue growth (STRETCHED / DISCOUNT), plus an implied growth grid across WACC (±2pp) and terminal growth (1.5% to 3.0%)
-- Correlation matrix of the names shown, macro snapshot, and upcoming earnings dates
-- Three sections behind a sticky Company | Peers | Sector nav (plain anchors, no tab JS)
-- Company depth: the quarters Yahoo reports (revenue, operating margin, diluted EPS), TTM DuPont ROE, CFO/net income, capex intensity, drawdown and 21 day volatility
-- Sentiment and positioning: next fiscal year EPS revisions (30 and 90 days, analysts up vs down), the last earnings surprises, the 4 month recommendation trend, short interest and 6 month insider activity
-- Peers: comps table vs the sector peer median, forward P/E vs consensus revenue growth with a least squares line, risk vs return, and factor scores for the whole universe
-- Sector: sector ETF returns (1D to YTD) next to the S&P 500, a rotation view (each ETF vs the S&P, 3M to 1M ago against the last month), and each stock's 3M return against its own sector ETF
-- Management commentary panel: empty on the live site, because CI has no cached transcripts, so every ticker shows "n/a: no cached earnings call transcript"
+<img src="docs/img/company-depth.png" alt="Company fundamentals: quarterly revenue and operating margin, TTM DuPont ROE and earnings quality, a WACC by terminal growth DCF value grid, and drawdown with 21 day volatility"/>
 
-### 🎙️ Management Commentary (keyword heuristic)
-- Parses SEC 8-K earnings exhibits from a local cache (`data/cache/transcripts/TICKER_latest.txt`); set `TRG_FETCH_TRANSCRIPTS=1` to fetch from EDGAR when building the note
-- Outputs a keyword tone score, one guidance sentence, up to 3 risk and 3 catalyst sentences, and a Q&A tone label
-- No LLM calls: chunks are ranked and sentences picked by keyword counts
+- 8 KPI tiles, a 6 month price chart, a football field of real ranges (DCF bear to bull or residual income, analyst targets, 52 week range) and a reverse DCF grid
+- Relative performance vs the stock's sector ETF and the S&P 500, factor radar and risk metrics
+- Reported quarters, TTM DuPont, earnings quality, the DCF value grid, drawdown, estimate revisions, surprises, ratings and positioning
 
-### 🔄 Reverse DCF
-- Given the current price, WACC and terminal growth, solves for the constant 10 year FCF growth rate the market is pricing in
-- Note: implied growth at the base WACC and at WACC ±100bps (fixed terminal growth)
-- Dashboard: compares market implied FCF growth with consensus +1y revenue growth (STRETCHED / DISCOUNT) and shows a WACC × terminal growth grid
+### Peers
 
-### 🔌 Data Integration (No Synthetic Data)
+<img src="docs/img/peers.png" alt="Comparable company analysis vs the sector peer median, forward P/E vs revenue growth with a fitted line, and a risk vs return scatter"/>
 
-| Source | Coverage |
-|--------|----------|
-| **SEC EDGAR XBRL** | US fundamentals (revenue, net income, equity), audited |
-| **Yahoo Finance** | Prices, security master (shares, debt, cash, beta), EPS and revenue estimates, analyst recommendations, price targets, earnings dates |
-| **ECB SDMX API** | European interest rates, EUR/USD FX |
-| **US Macro (Yahoo Finance)** | 3M T-bill (`^IRX`), 10Y (`^TNX`) and 30Y (`^TYX`) yields, VIX, DXY, WTI, gold, S&P 500, Nasdaq 100 |
+- Comps table: forward P/E, EV/EBITDA, EV/Sales, PEG, FCF yield, growth, margin, ROE and net debt/EBITDA vs the sector peer median
+- Forward P/E vs consensus revenue growth with a least squares line, and risk vs return for the whole universe
 
-Missing values are written to `dashboard_data.json` as `null` (`allow_nan=False`) and render as n/a. Gaps are never filled with invented numbers.
+### Sector
 
-Known data gaps:
-- The 2Y Treasury comes from FRED (`DGS2`, no key) and can lag Yahoo's 10Y by a day; the macro card then shows its date. The 3M T-bill (`^IRX`) is the cash rate for Sharpe and Sortino
-- The note's correlation heatmap drops tickers starting with "X" (so XOM) through the ETF filter in `charts.py`
+<img src="docs/img/sector.png" alt="Sector view: SPDR sector ETF returns vs the S&P 500, a rotation scatter, 3 month excess return vs own ETF, a correlation matrix, a macro rates card and the earnings calendar"/>
 
-### 📁 Outputs
-- **HTML Research Note**: navy/gold template with 12 section slots. The v2 pipeline currently fills sector performance, risk analytics (correlation heatmap), valuation (DCF scenarios and reverse DCF) and management commentary when transcripts are cached. The other sections (executive summary, macro, ECB, screen, stock highlights, catalyst calendar, tactical takeaways, analyst overlays) are not wired yet
-- **PDF Export**: WeasyPrint rendering; falls back to HTML output when WeasyPrint is unavailable
-- **Markdown Note**: sector moves, reverse DCF results and commentary (top picks, macro and catalysts only via v1 `main.py`)
-- **PNG Charts** (150 DPI) in `outputs/charts/`: sector heatmap, screen scores, correlation heatmap, macro dashboard, and per ticker price, return distribution and factor radar
-- **Dashboard JSON**: `dashboard_data.json`, read by the live dashboard
+- Sector ETF returns from 1D to YTD next to the S&P 500, a rotation view and each stock's 3M return vs its own ETF
+- Correlation matrix, macro snapshot with live rates, and upcoming earnings dates
 
-### ⚙️ CLI
-- `--dry-run` checks the date, `SEC_USER_AGENT`, the output dir and the WeasyPrint/Plotly installs without fetching data
-- `--quiet` hides progress bars
-- `--formats html,pdf,markdown` picks the report outputs (`build-report`, `build-all`)
-- `tqdm` progress bars on report build stages (valuation, charts, PDF)
+### On mobile
 
----
+<p align="center">
+  <img src="docs/img/mobile.png" width="320" alt="Mobile layout at 375 px: ticker strip, section nav and KPI tiles two per row, with no horizontal scroll"/>
+</p>
 
-## Quick Start
+<details>
+<summary><b>More: bank valuation (JPM), factor heatmap and screener</b></summary>
+
+<br/>
+<img src="docs/img/residual-income.png" alt="Bank valuation for JPM: residual income value with cost of equity and justified P/B vs actual P/B, next to drawdown and volatility"/>
+<img src="docs/img/factors-screener.png" alt="Factor score heatmap for the 21 stock universe and the top 10 research screener ranking"/>
+
+</details>
+
+## Quick start
 
 ```bash
-git clone https://github.com/DogInfantry/sellside-research-engine.git
-cd sellside-research-engine
-python -m venv .venv                # Python 3.12 (what CI uses)
-source .venv/bin/activate           # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-
-# Set SEC user agent (API etiquette)
-export SEC_USER_AGENT="Your Name your_email@example.com"
-
-# Fetch data + build the research note in one command
-python main_v2.py build-all --as-of 2026-04-12
-
-# Check setup without fetching data
-python main_v2.py build-all --as-of 2026-04-12 --dry-run
-
-# Hide progress bars
-python main_v2.py build-all --as-of 2026-04-12 --quiet
+git clone https://github.com/DogInfantry/sellside-research-engine.git && cd sellside-research-engine
+pip install -r requirements.txt     # Python 3.12
+python export_dashboard_data.py     # fetch live data, write dashboard_data.json
+python -m http.server 8000          # open http://localhost:8000
 ```
 
-Outputs to `outputs/`:
-- `research_note_2026-04-12.html`
-- `research_note_2026-04-12.pdf`
-- `daily_note_2026-04-12.md`
+<details>
+<summary><b>Research note, CLI options, Windows and deploying your own copy</b></summary>
 
-Dashboard data:
+<br/>
 
-```bash
-python main_v2.py fetch-all --as-of 2026-04-12
-python export_dashboard_data.py --as-of 2026-04-12 --skip-fetch   # without --skip-fetch it fetches first
-python -m http.server                                             # then open http://localhost:8000
+**Virtual environment and SEC contact.** Use a venv (`python -m venv .venv`, then `source .venv/bin/activate` or `.venv\Scripts\activate` on Windows). SEC asks API users for contact details: `export SEC_USER_AGENT="Your Name you@example.com"` (PowerShell: `$env:SEC_USER_AGENT="Your Name you@example.com"`). Without it a generic agent is used.
+
+**Research note.** `python main_v2.py build-all --as-of 2026-09-24` fetches data and writes the HTML note, PDF and Markdown note to `outputs/`. Options: `--dry-run` checks the date, `SEC_USER_AGENT`, the output dir and the WeasyPrint/Plotly installs without fetching; `--quiet` hides progress bars; `--formats html,pdf,markdown` picks outputs. Without WeasyPrint the PDF falls back to HTML.
+
+**Two step dashboard build.** `python main_v2.py fetch-all --as-of D` then `python export_dashboard_data.py --as-of D --skip-fetch`. `--as-of` defaults to today.
+
+**Deploy your own copy.**
+1. Fork the repo.
+2. Import the fork in Vercel. `vercel.json` makes it a static site with no build step.
+3. Enable Actions in the fork so `refresh-data.yml` commits fresh data every weekday (an optional `SEC_USER_AGENT` secret is used when set).
+
+Forks and redistributions must keep the [NOTICE](NOTICE) file and credit the original repository.
+
+</details>
+
+## How it works
+
+```mermaid
+flowchart LR
+  SEC[SEC EDGAR XBRL] --> F
+  YF[Yahoo Finance] --> F
+  FRED[FRED 2Y] --> F
+  ECB[ECB Data API] --> F
+  GA[GitHub Actions<br/>weekdays 22:00 UTC] -. runs .-> F
+  F[main_v2.py fetch-all] --> N[(data/normalized)]
+  N --> E[export_dashboard_data.py]
+  E --> J[dashboard_data.json]
+  J --> V[Vercel] --> D[index.html dashboard]
+  N --> R[main_v2.py build-report] --> O[HTML, PDF and Markdown note]
 ```
 
-The v1 CLI `main.py` (`fetch-data`, `build-daily`, `build-weekly`, `build-kpis`) still exists. It is the only path that reads `data/analyst_views.csv` and fills the full daily/weekly templates (top picks, macro, catalysts).
+- **One valuation path.** `trg_workbench/pipeline_v2.py::value_ticker()` (FCF DCF) and `value_bank()` (residual income) feed both the research note and the dashboard with the same live risk free rate.
+- **Refresh and deploy.** The weekday workflow fetches, exports, validates the JSON and commits `dashboard_data.json` as `github-actions[bot]` only when it changed. The Vercel Git integration deploys every push to `main` and a preview for every PR.
 
----
+<details>
+<summary><b>File map</b></summary>
 
-## Architecture
+<br/>
 
-```
-python main_v2.py fetch-all --as-of D                   -> data/normalized/*_D.csv (gitignored)
-python export_dashboard_data.py --as-of D --skip-fetch  -> dashboard_data.json (committed)
-index.html fetch('dashboard_data.json')                 -> dashboard
-python main_v2.py build-report --as-of D                -> outputs/research_note_D.html (+ PDF, Markdown)
-```
+| Path | Role |
+|---|---|
+| `main_v2.py` | CLI: `fetch-all`, `build-report`, `build-all`, `--dry-run`, `--quiet` |
+| `main.py` | v1 CLI: `fetch-data`, `build-daily`, `build-weekly`, `build-kpis`, `build-all`, analyst overlays |
+| `trg_workbench/pipeline_v2.py` | Orchestration: `fetch_data_v2`, `value_ticker`, `value_bank`, `build_research_report_v2` |
+| `trg_workbench/pipeline.py` | v1 fetch (market, SEC, ECB), called by v2 |
+| `trg_workbench/analytics/screening.py` | `build_research_dataset` (factor scores, analyst targets, earnings dates), `top_screen_candidates` |
+| `trg_workbench/analytics/valuation.py` | WACC, DCF scenarios, value grid, reverse DCF, football field, `build_comps_table`, `residual_income_value` |
+| `trg_workbench/analytics/risk.py` | Vol, beta, Sharpe, Sortino, drawdown, VaR/CVaR |
+| `trg_workbench/analytics/summaries.py` | Catalyst calendar and report summaries |
+| `trg_workbench/sources/` | Yahoo market data (`fetch_quarterly`, `fetch_sentiment`), SEC, ECB, US macro (Yahoo plus FRED) |
+| `trg_workbench/llm/` | Transcript fetch and keyword heuristic commentary (no LLM calls) |
+| `trg_workbench/reporting/` | Charts, HTML/PDF/Markdown renderers, Jinja templates |
+| `export_dashboard_data.py` | Builds `dashboard_data.json` |
+| `index.html` | Dashboard (single file, JSON loaded at runtime) |
+| `vercel.json` | Static build: `index.html`, `dashboard_data.json`, `robots.txt`, `sitemap.xml`, `llms.txt`, preview image |
+| `.github/workflows/refresh-data.yml` | Weekday data refresh |
+| `tests/` | pytest suite |
 
-One valuation path: `pipeline_v2.value_ticker()` is shared by the research note (top 3 names) and the dashboard (top 10 names). Do not reimplement DCF logic elsewhere.
+</details>
 
-```
-sellside-research-engine/
-├── main_v2.py                          # CLI: fetch-all | build-report | build-all | --dry-run | --quiet
-├── main.py                             # v1 CLI: daily/weekly/KPI reports, analyst overlays
-├── export_dashboard_data.py            # Normalized CSVs → dashboard_data.json
-├── index.html                          # Dashboard (single file, JSON loaded at runtime)
-├── dashboard_data.json                 # Dashboard data, refreshed by CI
-├── vercel.json                         # Static build of index.html + dashboard_data.json
-├── .github/workflows/refresh-data.yml  # Weekday data refresh
-├── trg_workbench/
-│   ├── config.py                       # Universe (DEFAULT_US_TICKERS), sector ETFs, paths
-│   ├── pipeline.py                     # v1 fetch (market, SEC, ECB), called by v2
-│   ├── pipeline_v2.py                  # fetch_data_v2, value_ticker, build_research_report_v2
-│   ├── sources/
-│   │   ├── sec.py                      # SEC EDGAR XBRL companyfacts
-│   │   ├── ecb.py                      # ECB SDMX API client
-│   │   ├── macro_us.py                 # US macro via Yahoo Finance tickers
-│   │   └── market.py                   # Yahoo Finance prices, security master, estimates
-│   ├── analytics/
-│   │   ├── screening.py                # Factor scores and research ranking
-│   │   ├── valuation.py                # WACC, DCF scenarios, sensitivity, reverse DCF, football field
-│   │   ├── risk.py                     # Vol, beta, Sharpe, Sortino, drawdown, VaR/CVaR
-│   │   ├── summaries.py                # Catalyst calendar, sector and macro summaries
-│   │   └── kpis.py                     # KPI report context
-│   ├── llm/                            # Keyword heuristic, no LLM calls
-│   │   ├── transcript_fetcher.py       # SEC 8-K earnings exhibits, cached locally
-│   │   ├── chunker.py, retriever.py    # Chunking and keyword ranking
-│   │   └── reasoner.py, pipeline.py    # Tone, guidance, risk and catalyst extraction
-│   └── reporting/
-│       ├── charts.py                   # 12 chart functions (150 DPI), 8 called for the note
-│       ├── pdf_renderer.py             # Jinja2 → HTML → PDF (HTML fallback)
-│       ├── renderers.py                # Template rendering
-│       └── templates/                  # research_note.html.j2, daily_note.md.j2, weekly_wrap.md.j2, kpi_report.html.j2
-├── tests/                              # pytest suite
-├── data/
-│   ├── analyst_views_template.csv      # Discretionary analyst overlay template
-│   └── cache/, normalized/             # Cached and normalized data (gitignored)
-└── outputs/                            # Generated notes, PDFs, charts (gitignored)
-```
+## Methodology
 
-### Refresh and deploy
-- **Weekday refresh**: `.github/workflows/refresh-data.yml` runs weekdays at 22:00 UTC (cron `0 22 * * 1-5`) and on manual dispatch, on Python 3.12. It runs `fetch-all`, then `export_dashboard_data.py --skip-fetch`, validates the JSON, and commits `dashboard_data.json` as `github-actions[bot]` only when it changed. That push triggers the Vercel deploy.
-- **Deploys**: the Vercel Git integration deploys every push to `main` and builds a preview for every PR. Keep the legacy `builds` list in `vercel.json` (`index.html` + `dashboard_data.json`) so Vercel does not detect a Python app.
+<details>
+<summary><b>Data sources</b></summary>
 
----
+<br/>
 
-## Screening Model
+| Source | What it provides |
+|---|---|
+| **SEC EDGAR XBRL** (`companyfacts`) | Audited revenue, net income, equity and assets from 10-K and 20-F filings |
+| **Yahoo Finance** (yfinance) | Prices, security master (shares, debt, cash, beta, EV/EBITDA, book value, short interest), EPS and revenue estimates, price targets, recommendation trend, EPS trend and revisions, earnings history, insider summary, quarterly statements, earnings dates, 10 SPDR sector ETFs, 5 European indices |
+| **US macro via Yahoo** | 10Y (`^TNX`), 30Y (`^TYX`), 3M bill (`^IRX`), VIX, DXY, WTI, gold, S&P 500 (`^GSPC`), Nasdaq 100 (`^NDX`) |
+| **FRED** (`DGS2`, no key) | 2 year Treasury yield |
+| **ECB Data API** | EUR/USD, GBP/EUR, deposit facility rate and main refinancing rate (the dashboard shows EUR/USD) |
+
+Missing values are written as `null` (`allow_nan=False`) and render as n/a. Known gaps: FRED can lag Yahoo by a day (the macro card shows the date), and Yahoo drops single days per series, so every return window reads closes on exact dates and shows n/a when one is missing.
+
+</details>
+
+<details>
+<summary><b>Screening model</b></summary>
+
+<br/>
 
 | Factor | Signals | Weight |
-|--------|---------|--------|
+|---|---|---|
 | **Valuation** | P/S, P/E, percentile ranked (lower is better) | 25% |
 | **Growth** | Trailing YoY revenue growth (SEC) | 25% |
 | **Quality** | Net margin, ROE | 25% |
 | **Momentum** | 1M and 3M returns | 25% |
 
-The composite score is the equal weighted mean of the four factors. A second pass **Forward View** scores forward EPS growth, consensus target upside, the analyst buy ratio and its 3 month change. The research score averages the composite, forward and discretionary (CSV overlay, v1 only) scores.
+The composite is the equal weighted mean of the four factors. A forward view scores forward EPS growth, consensus target upside, the analyst buy ratio and its 3 month change. The research score averages the composite, forward and (v1 only) discretionary scores. The dashboard ranks by research score, then target upside, 1M return and market cap.
 
----
+</details>
 
-## DCF & Reverse DCF Valuation
+<details>
+<summary><b>DCF, reverse DCF and residual income</b></summary>
 
-**Standard DCF inputs:**
+<br/>
+
+**FCF DCF**
 - FCF proxy = SEC net income (Yahoo fallback) × 0.80
-- **WACC** = E/V × (Rf + Blume adjusted β × 5.5%) + D/V × 6% × (1 - 21%), with D/E fixed at 0.30. Rf is the live 10Y Treasury (`^TNX`); 5.3% is only the fallback when the macro fetch fails
-- Blume adjusted beta = 0.67 × raw Yahoo beta + 0.33
-- Growth = consensus +1y revenue growth (`revenue_growth_next_year`), trailing growth only as fallback, clamped to the range -20% to 50%
-- Shares from the security master (`impliedSharesOutstanding`, all share classes; SEC dei counts one class for GOOGL/META)
-- Financial Services names get net debt = 0 (bank debt and cash are operating balances). Banks, Capital Markets and Insurance get no FCF DCF: `value_ticker` returns None and `value_bank` gives a residual income value instead (JPM and JEF in the current data)
-- 3 scenarios: Bear (growth × 0.7, TGR 1%, WACC +1pp), Base (TGR 2.5%), Bull (growth × 1.3, TGR 3.5%, WACC -0.5pp)
-- Value grid: the ticker's own WACC ±2pp × terminal growth 1.5% to 3.5%, shown on the dashboard and in the note; its middle cell is the base case
-- Output: intrinsic value per share for each scenario, with the WACC and TGR used
+- WACC = E/V × (Rf + Blume adjusted β × 5.5%) + D/V × 6% × (1 less 21% tax), with D/E fixed at 0.30, rounded to 0.1pp. Rf is the live 10Y Treasury; 5.3% only if the macro fetch fails. Blume beta = 0.67 × Yahoo beta + 0.33 (Yahoo beta 1.0 when missing)
+- Growth = consensus +1y revenue growth, trailing growth as fallback, 5% when neither exists, clamped to the range -20% to 50%
+- 5 year explicit forecast with growth fading ×0.85 a year, then a Gordon terminal value
+- Scenarios: Bear (growth × 0.7, TGR 1%, WACC +1pp, capped at 15%), Base (TGR 2.5%), Bull (growth × 1.3, TGR 3.5%, WACC -0.5pp, floored at 6%)
+- Shares from the security master (`impliedSharesOutstanding`, all share classes)
+- Dashboard only: a value grid of the ticker's own WACC ±2pp × terminal growth 1.5% to 3.5%, and the football field
 
-**Reverse DCF:**
-- Inputs: current market price, base WACC, base terminal growth, FCF proxy, net debt, shares
-- Solves: the constant 10 year FCF growth rate priced in by the market
-- Output: implied growth at WACC ±100bps in the note; consensus comparison and WACC × terminal growth grid on the dashboard
+**Reverse DCF**: solves for the constant 10 year FCF growth rate the current price implies. The note shows it at WACC ±100bps; the dashboard compares it with consensus +1y revenue growth (STRETCHED or DISCOUNT) over a WACC × terminal growth grid.
 
----
+**Residual income**: banks, capital markets firms and insurers get no FCF DCF (their debt is operating). On the dashboard they get a single stage residual income value and justified P/B = (ROE less g) / (r less g) vs actual P/B, with g = 2.5% and a CAPM cost of equity. In the current universe that covers BAC, JPM, GS, JEF, LAZ, MS and PJT. The note skips these names.
 
-## Management Commentary
+**Rating**: mechanical, from consensus target upside. BUY above +10%, SELL below -10%, HOLD in between.
 
-The commentary module (`trg_workbench/llm/`) is a keyword heuristic over SEC 8-K earnings exhibits. It does not call an LLM.
+</details>
 
-- **Tone score**: positive / (positive + negative) keyword counts
-- **Q&A tone**: constructive / balanced / cautious (score >= 0.60 / between / <= 0.40)
-- **Guidance**: one verbatim sentence selected by guidance keywords
-- **Risk flags**: up to 3 sentences containing generic risk words (risk, headwind, pressure, decline, and similar)
-- **Catalyst flags**: up to 3 sentences mentioning launches, buybacks, approvals, partnerships
+<details>
+<summary><b>Risk metrics</b></summary>
 
-The note writes the results to `data/normalized/management_commentary_{date}.json` and renders them when transcripts are cached.
+<br/>
 
----
+- Historical VaR and CVaR at 95%, 1 day, over 252 daily log returns
+- Volatility (21D and 63D), max drawdown
+- Beta: 63 day OLS vs the S&P 500 (WACC uses the Blume adjusted Yahoo beta instead)
+- Sharpe and Sortino with the 3M T-bill as the risk free rate
+- Correlation: Pearson on 63 days of daily returns on the dashboard, Spearman in the note heatmap
 
-## Risk Metrics
+</details>
 
-VaR (95%, 1D) · CVaR · Beta · Volatility (21D/63D) · Sharpe Ratio · Sortino Ratio · Max Drawdown · Spearman Correlation Matrix
+<details>
+<summary><b>Management commentary (keyword heuristic, no LLM)</b></summary>
 
-- The risk table is shown on the dashboard. The note reads `risk_metrics_{date}.csv`, which nothing writes yet, so its risk table does not render
-- Dashboard beta is 63 day OLS vs the S&P 500 (`^GSPC`, cached by the macro client); WACC uses the Blume adjusted Yahoo beta instead
-- Sharpe and Sortino use the 3M T-bill as the risk free rate (5.3% fallback)
-- Spearman correlation drives the note heatmap; the dashboard matrix is Pearson on 63 days of daily returns
+<br/>
 
----
+Parses SEC 8-K earnings exhibits from a local cache (`data/cache/transcripts/TICKER_latest.txt`; set `TRG_FETCH_TRANSCRIPTS=1` to fetch from EDGAR when building the note). It outputs a keyword tone score, a Q&A tone label (constructive at 0.60 and up, cautious at 0.40 and below), one guidance sentence and up to 3 risk and 3 catalyst sentences. CI has no cached transcripts, so the live dashboard shows n/a for commentary.
 
-## Customization
+</details>
 
-**Change the universe**: edit `DEFAULT_US_TICKERS` in `trg_workbench/config.py`
+<details>
+<summary><b>Outputs</b></summary>
 
-**Adjust factor weights**: factors are equally weighted; change the `.mean(axis=1)` in `build_research_dataset` (`trg_workbench/analytics/screening.py`) to weight them
+<br/>
 
-**Override DCF assumptions**: edit the `estimate_wacc` defaults in `trg_workbench/analytics/valuation.py` (`risk_free_rate`, `equity_risk_premium`, `tax_rate`, `debt_to_equity`, `cost_of_debt`) and the scenario TGRs in `scenario_analysis`
+- **Dashboard JSON**: `dashboard_data.json`, read by the live dashboard
+- **HTML research note**: navy and gold template with 12 section slots; the v2 pipeline fills sector performance, risk (correlation heatmap), valuation (DCF scenarios and reverse DCF) and commentary when transcripts are cached
+- **PDF**: WeasyPrint, with an HTML fallback
+- **Markdown note**: sector 1 week moves, reverse DCF results and commentary
+- **PNG charts** (150 DPI) in `outputs/charts/`
 
-**Add analyst views** (v1 `main.py` reports only): copy `data/analyst_views_template.csv` to `data/analyst_views.csv` and populate the discretionary overlay fields:
+</details>
 
-| Column | Type | Valid Values / Example | Description |
-|--------|------|------------------------|-------------|
-| `ticker` | string | `AAPL` | Stock ticker, matched case insensitively against the research universe. |
-| `stance` | string | `Buy`, `Hold`, `Sell`, `Overweight`, `Underweight`, `Positive`, `Negative`, `Neutral` | Analyst rating used in discretionary scoring. |
-| `conviction` | number | `1` to `5` (`5` = highest conviction) | Analyst conviction score; the screening model normalizes this by dividing by 5. |
-| `thesis` | string | `Services mix supports margin expansion` | Core investment thesis. |
-| `catalyst` | string | `June WWDC AI updates` | Near term upside or event catalyst. |
-| `risk` | string | `China demand weakness` | Key downside risk or debate. |
-| `client_angle` | string | `High-quality mega-cap defensiveness with AI optionality` | Client specific framing for the callout section. |
-| `management_access_note` | string | `Investor meetings requested after earnings` | Management access or meeting context for research notes. |
+<details>
+<summary><b>Customization and analyst overlays</b></summary>
 
-Example:
+<br/>
 
-```csv
-ticker,stance,conviction,thesis,catalyst,risk,client_angle,management_access_note
-AAPL,Buy,4,"Services mix supports margin expansion","June WWDC AI updates","China demand weakness","High-quality mega-cap defensiveness with AI optionality","Investor meetings requested after earnings"
-```
+- **Universe**: edit `DEFAULT_US_TICKERS` in `trg_workbench/config.py`
+- **Factor weights**: change the `.mean(axis=1)` in `build_research_dataset` (`trg_workbench/analytics/screening.py`)
+- **DCF assumptions**: the `estimate_wacc` defaults and the scenario TGRs in `trg_workbench/analytics/valuation.py`
+- **Analyst views** (v1 `main.py` reports only): copy `data/analyst_views_template.csv` to `data/analyst_views.csv`
 
----
+| Column | Example | Description |
+|---|---|---|
+| `ticker` | `AAPL` | Matched case insensitively against the universe |
+| `stance` | `Buy`, `Hold`, `Sell`, `Overweight`, `Underweight`, `Positive`, `Negative`, `Neutral` | Rating used in discretionary scoring |
+| `conviction` | `1` to `5` | Normalized by dividing by 5 |
+| `thesis` | `Services mix supports margin expansion` | Core thesis |
+| `catalyst` | `June WWDC AI updates` | Near term catalyst |
+| `risk` | `China demand weakness` | Key downside risk |
+| `client_angle` | `High-quality mega-cap defensiveness` | Client framing |
+| `management_access_note` | `Investor meetings requested after earnings` | Management access context |
 
-## Testing
+</details>
+
+<details>
+<summary><b>Testing</b></summary>
+
+<br/>
 
 ```bash
 pytest -q
 ```
 
-Covers: SEC XBRL metric extraction · ECB normalization · price snapshot and screening · template rendering · factor radar chart · transcript chunking, retrieval and commentary extraction · reverse DCF solver · DCF inputs · bank exclusion · dashboard JSON export · KPI report
+Covers SEC XBRL extraction, ECB normalization, screening, DCF inputs and scenarios, reverse DCF, residual income, comps and sector peer medians, the football field, exact date return windows, quarterly TTM and DuPont, sentiment, the dashboard JSON export, commentary extraction, templates and charts. There is no pytest CI yet ([#4](https://github.com/DogInfantry/sellside-research-engine/issues/4)).
 
-There is no pytest CI yet ([#4](https://github.com/DogInfantry/sellside-research-engine/issues/4)); the only workflow is the data refresh.
+</details>
 
----
+## FAQ
 
-## 🤝 Contributing
+### What is Sellside Research Engine?
+An open source Python pipeline and static web dashboard that screens 21 US stocks and values the top 10 with a DCF, a reverse DCF or residual income, using only public data. The live dashboard is at [sellside-research-engine.vercel.app](https://sellside-research-engine.vercel.app).
 
-Contributions are welcome from equity researchers, quants, data engineers, and Python developers. Please read [CONTRIBUTING.md](CONTRIBUTING.md) for setup instructions, PR guidelines, and how to find good first issues.
+### Where does the data come from?
+Audited fundamentals from SEC EDGAR XBRL; prices, consensus estimates, price targets, quarterly statements and positioning from Yahoo Finance via yfinance; the 2 year Treasury from FRED (`DGS2`); EUR/USD from the ECB. Missing values stay `null` and show as n/a.
 
-Open a PR for every change and check its Vercel preview before merging, including changes made by bots or AI agents.
+### How often is it refreshed?
+Every weekday at 22:00 UTC a GitHub Actions workflow rebuilds `dashboard_data.json` and commits it only if the data changed; that commit triggers a Vercel deploy. The dashboard header shows the as of date.
 
-For questions or ideas, open a [Discussion](https://github.com/DogInfantry/sellside-research-engine/discussions) or comment on an issue.
+### Which stocks does it cover?
+AAPL, AMZN, BAC, BLK, CAT, CVX, GE, GOOGL, GS, HD, JEF, JPM, LAZ, META, MS, MSFT, NVDA, PJT, PG, UNH and XOM. The dashboard shows the top 10 by research score, so the list can change day to day; comps, the factor heatmap and the scatters cover all 21.
 
----
+### How is fair value estimated?
+A bear/base/bull FCF DCF with a 5 year fading forecast, a Gordon terminal value and a CAPM WACC on the live 10Y. A reverse DCF solves for the growth the price implies. Banks and capital markets firms get residual income and justified P/B instead.
+
+### What do BUY, HOLD and SELL mean here?
+They are mechanical: BUY when the consensus price target is more than 10% above the price, SELL when it is more than 10% below, HOLD otherwise. They are not recommendations.
+
+### Does it use an LLM?
+No. Management commentary is a keyword heuristic over SEC 8-K earnings exhibits, and it shows n/a on the live site because CI has no cached transcripts.
+
+### Can I run or deploy my own copy?
+Yes. See [Quick start](#quick-start): four commands run it locally, and a fork plus a Vercel import deploys it. The license is Apache 2.0; keep the NOTICE file and credit the original repository.
+
+### Is this investment advice?
+No. It is a research and education tool. Its outputs are model estimates from public data that can be delayed or missing.
 
 ## Roadmap
 
-Items marked 🟢 are open issues ready to be picked up. See the [Issues tab](https://github.com/DogInfantry/sellside-research-engine/issues) for full specs and acceptance criteria.
+See the [Issues tab](https://github.com/DogInfantry/sellside-research-engine/issues) for specs and acceptance criteria.
 
----
+- **Filings and estimates**: 10-K/10-Q intelligence ([#19](https://github.com/DogInfantry/sellside-research-engine/issues/19)); revision tracking and target drift ([#20](https://github.com/DogInfantry/sellside-research-engine/issues/20), revisions and surprises shipped in #62); Form 4 parser ([#25](https://github.com/DogInfantry/sellside-research-engine/issues/25), Yahoo insider summary shipped); FRED CPI, PCE and spreads ([#8](https://github.com/DogInfantry/sellside-research-engine/issues/8), the 2Y shipped)
+- **Valuation**: Monte Carlo DCF and EV bridge ([#23](https://github.com/DogInfantry/sellside-research-engine/issues/23)); historical multiple bands for the comps ([#24](https://github.com/DogInfantry/sellside-research-engine/issues/24)); Piotroski and Altman scores ([#7](https://github.com/DogInfantry/sellside-research-engine/issues/7))
+- **Note quality**: executive summary ([#21](https://github.com/DogInfantry/sellside-research-engine/issues/21)); audit trail ([#22](https://github.com/DogInfantry/sellside-research-engine/issues/22)); what changed since the last note ([#26](https://github.com/DogInfantry/sellside-research-engine/issues/26))
+- **New outputs**: tearsheet ([#30](https://github.com/DogInfantry/sellside-research-engine/issues/30), #33 to #36); sector watchlists ([#31](https://github.com/DogInfantry/sellside-research-engine/issues/31), #37 to #40); PowerPoint export ([#32](https://github.com/DogInfantry/sellside-research-engine/issues/32), #41 to #46)
+- **Engineering**: pytest CI ([#4](https://github.com/DogInfantry/sellside-research-engine/issues/4)); Docker ([#11](https://github.com/DogInfantry/sellside-research-engine/issues/11)); `config.yaml` ([#27](https://github.com/DogInfantry/sellside-research-engine/issues/27)); mocked API tests ([#28](https://github.com/DogInfantry/sellside-research-engine/issues/28)); notebooks and demo artifacts ([#29](https://github.com/DogInfantry/sellside-research-engine/issues/29)); catalyst calendar tests ([#2](https://github.com/DogInfantry/sellside-research-engine/issues/2))
 
-### 🏁 Milestone: v1.4, Depth & Credibility
+<details>
+<summary><b>Backlog</b></summary>
 
-> Make the research note defensible. These close the largest credibility gaps between a sophisticated demo and an institutional grade engine.
+<br/>
 
-#### Fundamentals & Filings
-- 🟢 [10-K/10-Q Filings Intelligence: MD&A parser, risk factor change detection, segment extraction](https://github.com/DogInfantry/sellside-research-engine/issues/19)
-- 🟢 [Estimate & revision layer: consensus revision tracking, surprise history, target price drift](https://github.com/DogInfantry/sellside-research-engine/issues/20)
-- 🟢 [Insider / Form 4 parser: management buy/sell signals from SEC filings](https://github.com/DogInfantry/sellside-research-engine/issues/25)
-- 🟢 [FRED API connector: CPI, PCE, credit spreads, yield curve](https://github.com/DogInfantry/sellside-research-engine/issues/8)
+- NTM EV/EBITDA in the comps (forward P/E already ships)
+- LBO model stub, event study module, ranking explainability
+- OpenBB as an optional source layer; SEDAR+ and Companies House filings; news catalyst detection
+- Excel DCF export with live formulas
+- Async fetching, a cache layer with TTL, a pluggable LLM backend to replace the keyword heuristic
 
-#### Valuation Engine
-- 🟢 [Monte Carlo DCF + EV bridge: scenario engine with sector specific assumption packs](https://github.com/DogInfantry/sellside-research-engine/issues/23)
-- 🟢 [Peer dashboard & CCA upgrade: historical multiples, percentile bands, peer rerating analysis](https://github.com/DogInfantry/sellside-research-engine/issues/24)
-- 🟢 [Piotroski F-Score and Altman Z-Score in screening model](https://github.com/DogInfantry/sellside-research-engine/issues/7)
+Open an issue to discuss scope before building.
 
-#### Output & Auditability
-- 🟢 [Executive summary page: six field note header (rating, target, variant view, thesis, risks, catalyst)](https://github.com/DogInfantry/sellside-research-engine/issues/21)
-- 🟢 [Audit trail panel: source, timestamp, and assumption provenance for every key claim](https://github.com/DogInfantry/sellside-research-engine/issues/22)
-- 🟢 ["What changed since last note" delta blocks: versioned thesis, target, estimate, and risk diffs](https://github.com/DogInfantry/sellside-research-engine/issues/26)
-- [Interactive HTML report with Plotly charts](https://github.com/DogInfantry/sellside-research-engine/issues/10) (closed: Plotly mode exists in `charts.py`, but the note still renders static PNGs)
+</details>
 
----
+## Contributing
 
-### 🏗️ Milestone: v1.5, Infrastructure & Packaging
-
-> Make the repo look built, not hacked. These don't add features; they make every existing feature credible to a technical reviewer.
-
-- 🟢 [GitHub Actions CI: run pytest on every PR automatically](https://github.com/DogInfantry/sellside-research-engine/issues/4)
-- 🟢 [Docker + docker-compose for reproducible execution](https://github.com/DogInfantry/sellside-research-engine/issues/11)
-- 🟢 [config.yaml: replace direct Python file editing for watchlists, weights, and output preferences](https://github.com/DogInfantry/sellside-research-engine/issues/27)
-- 🟢 [Integration tests with mocked APIs: fixture based test coverage for SEC, Yahoo, FRED](https://github.com/DogInfantry/sellside-research-engine/issues/28)
-- 🟢 [Sample notebooks + prerendered demo artifacts: zero friction portfolio preview](https://github.com/DogInfantry/sellside-research-engine/issues/29)
-- 🟢 [Unit tests for `build_catalyst_calendar` (`analytics/summaries.py`)](https://github.com/DogInfantry/sellside-research-engine/issues/2)
-
----
-
-### 🔭 Backlog
-
-#### Analytics
-- [ ] Forward multiples in CCA (NTM EV/EBITDA, forward P/E)
-- [ ] LBO model stub: entry/exit with sponsor IRR
-- [ ] Event study module: abnormal returns around earnings and macro catalysts
-- [ ] Ranking explainability layer: factor attribution and sensitivity for screener output
-
-#### Data Sources
-- [ ] OpenBB Platform SDK as optional aggregated source layer
-- [ ] SEDAR+ / Companies House for Canadian and UK filings
-- [ ] News catalyst detection: map headlines to catalyst calendar
-
-#### Reporting
-- 🟢 [PowerPoint export (`python-pptx`) matching GS/JPM slide deck format](https://github.com/DogInfantry/sellside-research-engine/issues/32)
-- [ ] Excel DCF model export (`openpyxl`) with live formula links
-- [ ] Streamlit dashboard comparing multiple tickers
-
-#### Engineering
-- [ ] Async data fetching (`asyncio` + `aiohttp`) to parallelise source calls
-- [ ] Redis backed caching layer with TTL invalidation
-- [ ] Pluggable LLM backend (OpenAI / local Ollama / Mistral) to replace the keyword heuristic
-
-> Want to tackle a backlog item? Open an issue to discuss scope before building.
-
----
+Contributions are welcome from equity researchers, quants, data engineers and Python developers. Read [CONTRIBUTING.md](CONTRIBUTING.md), open a PR for every change and check its Vercel preview before merging, including changes made by bots or AI agents. Questions and ideas go in [Issues](https://github.com/DogInfantry/sellside-research-engine/issues).
 
 ## Changelog
 
-### Since v1.4.0
-- **feat**: Dashboard connected to live pipeline data via `export_dashboard_data.py`, plus the weekday refresh workflow ([#50](https://github.com/DogInfantry/sellside-research-engine/pull/50))
-- **fix**: DCF inputs: all share classes from the security master, consensus +1y revenue growth, Blume adjusted beta, no FCF DCF for banks, capital markets and insurance ([#55](https://github.com/DogInfantry/sellside-research-engine/pull/55))
-- **fix**: `derive_dcf_inputs` reads snake_case security master columns ([#52](https://github.com/DogInfantry/sellside-research-engine/pull/52))
-- **fix**: Note sector heatmap and factor radar ([#56](https://github.com/DogInfantry/sellside-research-engine/pull/56))
-- **fix**: Dashboard dates no longer shift a day in US timezones ([#51](https://github.com/DogInfantry/sellside-research-engine/pull/51))
-- **ci**: Token based Vercel deploy workflow removed; the Vercel Git integration deploys `main` and PR previews
+<details>
+<summary><b>Release history</b></summary>
 
-### v1.4.0, June 1, 2026
-- **feat**: Research dashboard (`index.html`) with DCF, reverse DCF, factor screener and risk analytics, deployed on Vercel
-- **feat**: Plotly chart mode in `charts.py` ([#10](https://github.com/DogInfantry/sellside-research-engine/issues/10)); the note still uses static PNGs
-- **docs**: Roadmap with v1.4 and v1.5 milestone issues (#19 to #29)
-- **license**: Switched from MIT to Apache 2.0, with a NOTICE file
+<br/>
 
-### v1.3.0, April 12, 2026
-- **feat**: Reverse DCF analytics: solves for the implied FCF growth rate from the current market price, with WACC ±100bps sensitivity
-- **feat**: Management commentary MVP: keyword heuristic transcript parser (tone score, guidance sentence, risk/catalyst sentences)
-- **feat**: `--dry-run` CLI flag for setup checks without fetching data
-- **feat**: `--quiet` mode and `tqdm` progress bars on report build stages
-- **feat**: HTML fallback when WeasyPrint is unavailable
-- **docs**: Analyst views schema documented
+**Since v1.4.0**
+- **feat**: Sentiment and positioning: EPS revisions, surprises, recommendation trend, short interest, insiders ([#62](https://github.com/DogInfantry/sellside-research-engine/pull/62))
+- **feat**: Company depth: live rates in WACC and Sharpe, residual income for banks and brokers, reported quarters, DuPont, drawdown and volatility ([#61](https://github.com/DogInfantry/sellside-research-engine/pull/61))
+- **feat**: Peers and Sector views: comps vs peer median, P/E vs growth, risk vs return, sector ETF heatmap and rotation ([#60](https://github.com/DogInfantry/sellside-research-engine/pull/60))
+- **feat**: Each stock vs its sector ETF and the S&P 500 ([#59](https://github.com/DogInfantry/sellside-research-engine/pull/59)); legibility pass ([#58](https://github.com/DogInfantry/sellside-research-engine/pull/58)); screen bars by ticker ([#57](https://github.com/DogInfantry/sellside-research-engine/pull/57))
+- **fix**: DCF inputs: all share classes, consensus +1y growth, Blume beta, no FCF DCF for banks ([#55](https://github.com/DogInfantry/sellside-research-engine/pull/55)); snake_case security master columns ([#52](https://github.com/DogInfantry/sellside-research-engine/pull/52)); note heatmap and radar ([#56](https://github.com/DogInfantry/sellside-research-engine/pull/56)); dates no longer shift a day in US timezones ([#51](https://github.com/DogInfantry/sellside-research-engine/pull/51))
+- **feat**: Dashboard on live pipeline data plus the weekday refresh workflow ([#50](https://github.com/DogInfantry/sellside-research-engine/pull/50))
+- **docs**: CLAUDE.md project notes (#53, #54, #63); this README
 
-### v1.2.0, April 11, 2026
-- CLI refactor with quiet aware progress bars and automated chart integration
-- Session output pipeline: research note, daily brief, session README
-- Analyst views schema documentation
+**v1.4.0, June 1, 2026**: research dashboard on Vercel with DCF, reverse DCF, screener and risk; Plotly chart mode in `charts.py`; v1.4 and v1.5 roadmap issues; license moved from MIT to Apache 2.0 with a NOTICE file
 
-### v1.1.0, April 11, 2026
-- `--dry-run` and progress bar features merged
-- `.gitignore` updated to exclude `outputs/`
+**v1.3.0, April 12, 2026**: reverse DCF; management commentary heuristic; `--dry-run`, `--quiet` and progress bars; HTML fallback when WeasyPrint is missing
 
----
+**v1.2.0, April 11, 2026**: CLI refactor, quiet mode, PDF fallback, chart integration, session outputs
 
-## License
+**v1.1.0, April 11, 2026**: `--dry-run` and progress bars
 
-Apache 2.0. See [LICENSE](LICENSE). Forks and redistributions must keep the [NOTICE](NOTICE) file and credit the original author.
+**v1.0.0, April 7, 2026**: initial public release
 
----
+</details>
 
-## Acknowledgments
+## License, citation and credits
 
-Data: SEC EDGAR · Yahoo Finance (yfinance) · ECB SDMX  
-Inspiration: Goldman Sachs TRG · JPMorgan Equity Research · Morgan Stanley Research  
-Stack: Python · pandas · numpy · scipy · matplotlib · plotly · Jinja2 · WeasyPrint · yfinance · tqdm  
-Dashboard: vanilla JS · Chart.js · Plotly · Vercel · GitHub Actions
+Apache 2.0, see [LICENSE](LICENSE). Forks and redistributions must keep the [NOTICE](NOTICE) file and credit the original author. To cite this project, use the "Cite this repository" button (from [CITATION.cff](CITATION.cff)).
+
+**Data**: SEC EDGAR · Yahoo Finance (yfinance) · FRED · ECB Data API<br/>
+**Stack**: Python · pandas · numpy · scipy · matplotlib · seaborn · plotly · Jinja2 · WeasyPrint · yfinance · requests · tqdm<br/>
+**Dashboard**: vanilla JS · Chart.js · Plotly · Vercel · GitHub Actions
