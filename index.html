@@ -607,7 +607,7 @@ function buildValueGrid() {
   }
   title.textContent = 'DCF VALUE PER SHARE: WACC × TERMINAL GROWTH';
   const G = d.dcf.grid || [];
-  if(!G.length) return naBox('valueGrid', d.dcf.grid ? 'no FCF DCF, free cash flow is not positive' : 'not in this data export');
+  if(!G.length) return naBox('valueGrid', d.dcf.grid ? 'no FCF DCF, free cash flow is not positive or not available' : 'not in this data export');
   const waccs = [...new Set(G.map(c=>c.wacc))], tgs = [...new Set(G.map(c=>c.tg))];
   const tint = v => { if(!ok(v)) return ['rgba(255,255,255,0.03)','#a3a3a3']; const u = (v/d.price-1)*100;
     return u>=20 ? ['rgba(76,175,80,0.30)','#81c784'] : u>=0 ? ['rgba(76,175,80,0.15)','#81c784']
@@ -619,7 +619,7 @@ function buildValueGrid() {
       return `<td class="num" style="background:${bg};color:${col};${base?'outline:1px solid #e8e6e0;outline-offset:-1px;':''}">${ok(v)?'$'+Math.round(v):'n/a'}</td>`;}).join('')}</tr>`).join('')}</table>
     <div class="caption">Value per share against today's $${f(d.price,0)}: green above, red below, strong at 20% or more. Outlined: the base case at its own WACC and 2.5% terminal growth. WACC uses Rf ${pc(d.dcf.rf,2)}.${
       d.dcf.fcf_basis==='ttm' ? ` Base FCF: CFO less capex, TTM to ${new Date(d.dcf.fcf_through+'T12:00').toLocaleDateString('en-US',{month:'short',year:'numeric'})}.`
-      : d.dcf.fcf_basis==='proxy' ? ' Base FCF: net income × 0.8, as Yahoo has no 4 back to back quarters.' : ''}</div>`;
+      : d.dcf.fcf_basis==='proxy' ? ' Base FCF: net income × 0.8, as there are no 4 back to back quarters with CFO and capex.' : ''}</div>`;
 }
 
 // ─── DRAWDOWN AND ROLLING VOL (from the 6 month price history) ───────────────
