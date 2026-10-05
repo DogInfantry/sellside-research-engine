@@ -32,12 +32,15 @@ python main_v2.py build-report --as-of D  -> outputs/research_note_D.html (gitig
 | `trg_workbench/reporting/` | Charts, HTML/PDF/Markdown renderers, Jinja templates |
 | `trg_workbench/sources/` | Market (yfinance; also writes debt, cash, beta and short interest to the security master; `fetch_quarterly` for reported quarters, `fetch_sentiment` for EPS revisions, surprises, recommendations and insider activity), SEC, ECB, US macro (Yahoo, plus FRED for the 2Y) |
 | `export_dashboard_data.py` | Builds `dashboard_data.json`: `ticker_block`, `sector_context` (comps vs peer median), `sector_block`, `pe_growth_fit`, `quarterly_block`, `sentiment_block`, `macro_block` |
-| `index.html` | Dashboard (single file, JSON loaded at runtime) |
-| `vercel.json` | Static build of `index.html` + `dashboard_data.json`, filesystem first, then SPA fallback |
+| `index.html` | Dashboard (single file, JSON loaded at runtime). Its `<head>` carries the SEO tags (description, canonical, Open Graph, JSON-LD) and the footer has a static summary for crawlers that skip JS |
+| `vercel.json` | Static build of `index.html`, `dashboard_data.json`, `robots.txt`, `sitemap.xml`, `llms.txt` and `docs/img/og.png`, filesystem first, then SPA fallback |
+| `robots.txt`, `sitemap.xml`, `llms.txt` | Crawler and LLM discovery files served from the site root |
+| `docs/img/` | README screenshots and GIF from the live dashboard; `og.png` (1280x640) is also the site's og:image |
+| `CITATION.cff` | GitHub "Cite this repository" metadata |
 | `tests/` | pytest suite (`pytest -q`), incl. `test_export_dashboard.py` |
 
 ## Gotchas
-- Keep the legacy `builds` in `vercel.json`. Without it Vercel may auto-detect `requirements.txt` / `main.py` as a Python app. Any new static file the page fetches must be added to `builds`.
+- Keep the legacy `builds` in `vercel.json`. Without it Vercel may auto-detect `requirements.txt` / `main.py` as a Python app. Any new static file the site serves must be added to `builds`, one explicit `src` per file (never a glob: `*.txt` would publish `requirements.txt`). A missing entry fails silently: the SPA fallback returns `index.html` with status 200.
 - Export writes JSON with `allow_nan=False`. Missing values become `null` and render as `n/a`. Never fill gaps with invented numbers or placeholder text.
 - `data/`, `outputs/`, `.venv/`, `.env*` are gitignored. A few old sample outputs are tracked; do not add new generated files.
 - `.gitignore` has `/test_*.py` (root scratch scripts only); real tests live in `tests/`.
@@ -49,5 +52,7 @@ python main_v2.py build-report --as-of D  -> outputs/research_note_D.html (gitig
 - Dashboard design system (`index.html`): IBM Plex Sans for labels and prose, IBM Plex Mono with tabular numbers for numbers and tickers. Colors are `:root` tokens (`--t2`/`--t3` pass AA on `--card`); gold marks the selected ticker, green/red carry signal only. 12px minimum font. One `@media (max-width:900px)` rule; wide tables scroll inside their card, never the page. `Chart.defaults.animation=false`, Plotly uses `PLOT_FONT`/`PLOT_BASE`. Missing data is an n/a box or cell, never an empty chart. No em or en dashes in visible copy. Check with `detect.mjs` from the impeccable skill.
 - Rates: the DCF WACC uses the live 10Y (`ust_10y`, `^TNX`) and Sharpe/Sortino use the 3M bill (`tbill_3m`, `^IRX`); both fall back to 5.3% if the macro fetch fails. `ust_2y` is the real 2Y from FRED `DGS2` (it used to be `^IRX`), and FRED can lag Yahoo by a day.
 - Quarters: Yahoo keeps 4 to 7 quarters, and its balance sheet reaches further back than its income statement. `quarterly_block` lists only income statement quarters and builds TTM from 4 back to back quarters that have revenue and net income.
+- CI timing: the 22:00 UTC cron usually starts 2 to 4 hours late, so `AS_OF=$(date -u +%F)` labels the data with the next UTC day (the Thursday run writes Friday's date).
+- README screenshots: capture with the viewport set before the page loads (resizing after load leaves Plotly charts at 700px) and crop the 6px scrollbar. Re-shoot them when the dashboard layout changes.
 - JS: `new Date('YYYY-MM-DD')` is UTC midnight; `index.html` appends `T12:00` so dates do not shift a day in US timezones.
 - Open a PR for every change and check its Vercel preview before merging, including changes made by bots or AI agents.
