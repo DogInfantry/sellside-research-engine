@@ -54,7 +54,7 @@ def dcf_valuation(
     Multi-stage DCF → equity value per share.
 
     Args:
-        base_fcf: Most recent annual free cash flow (proxy: net_income * 0.8 if FCF unavailable).
+        base_fcf: TTM free cash flow (CFO less capex), or net_income * 0.8 when there is no TTM.
         growth_rates: List of growth rates for each explicit forecast year (e.g. [0.15, 0.12, 0.10, 0.09, 0.08]).
         terminal_growth_rate: Long-run FCF growth rate for Gordon Growth terminal value.
         wacc: Discount rate.
@@ -382,10 +382,11 @@ def residual_income_value(book_value_ps: float, roe: float, cost_of_equity: floa
     return {"justified_pb": justified_pb, "value_per_share": book_value_ps * justified_pb}
 
 
-def derive_dcf_inputs(ticker_meta: Dict, sec_data: Dict, risk_free_rate: float = 0.053) -> Dict:
+def derive_dcf_inputs(ticker_meta: Dict, sec_data: Dict, risk_free_rate: float = 0.053,
+                      ttm_fcf: Optional[float] = None, fcf_through: Optional[str] = None) -> Dict:
     """
     Derive DCF inputs from available data.
-    Uses net income as FCF proxy (× 0.80 capex haircut).
+    Base FCF is TTM CFO less capex when given; net income x 0.80 is the labeled proxy otherwise.
     Falls back gracefully where data is missing.
     """
     def pick(d: Dict, *keys, default=None):
@@ -404,7 +405,8 @@ def derive_dcf_inputs(ticker_meta: Dict, sec_data: Dict, risk_free_rate: float =
     # ponytail: Blume adjusted beta (Bloomberg ADJ BETA), shrinks raw beta toward 1; industry betas are the upgrade
     beta_val = 0.67 * (pick(ticker_meta, "beta", default=1.0) or 1.0) + 0.33
 
-    base_fcf = (net_income or 0) * 0.80
+    has_ttm = ttm_fcf is not None and not pd.isna(ttm_fcf)
+    base_fcf = float(ttm_fcf) if has_ttm else (net_income or 0) * 0.80
     net_debt = (total_debt or 0) - (total_cash or 0)
     # ponytail: bank debt/cash is operating balance sheet (JEF cash > 6x mcap), so no bridge for financials; also zeroes BLK/LAZ small corporate net debt
     if ticker_meta.get("sector") == "Financial Services":
@@ -413,6 +415,8 @@ def derive_dcf_inputs(ticker_meta: Dict, sec_data: Dict, risk_free_rate: float =
 
     return {
         "base_fcf": base_fcf,
+        "fcf_basis": "ttm" if has_ttm else "proxy",
+        "fcf_through": fcf_through if has_ttm else None,
         "base_growth": min(max(float(revenue_growth or 0.05), -0.20), 0.50),
         "consensus_growth": consensus_growth,
         "wacc": wacc,

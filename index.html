@@ -607,7 +607,7 @@ function buildValueGrid() {
   }
   title.textContent = 'DCF VALUE PER SHARE: WACC × TERMINAL GROWTH';
   const G = d.dcf.grid || [];
-  if(!G.length) return naBox('valueGrid', d.dcf.grid ? 'no FCF DCF for this ticker' : 'not in this data export');
+  if(!G.length) return naBox('valueGrid', d.dcf.grid ? 'no FCF DCF, free cash flow is not positive or not available' : 'not in this data export');
   const waccs = [...new Set(G.map(c=>c.wacc))], tgs = [...new Set(G.map(c=>c.tg))];
   const tint = v => { if(!ok(v)) return ['rgba(255,255,255,0.03)','#a3a3a3']; const u = (v/d.price-1)*100;
     return u>=20 ? ['rgba(76,175,80,0.30)','#81c784'] : u>=0 ? ['rgba(76,175,80,0.15)','#81c784']
@@ -617,7 +617,9 @@ function buildValueGrid() {
       // the grid is centred on the ticker's own WACC: the base case is the middle column at 2.5%
       const v = G.find(c=>c.wacc===w&&c.tg===t)?.value, [bg,col] = tint(v), base = i===Math.floor(waccs.length/2)&&t===2.5;
       return `<td class="num" style="background:${bg};color:${col};${base?'outline:1px solid #e8e6e0;outline-offset:-1px;':''}">${ok(v)?'$'+Math.round(v):'n/a'}</td>`;}).join('')}</tr>`).join('')}</table>
-    <div class="caption">Value per share against today's $${f(d.price,0)}: green above, red below, strong at 20% or more. Outlined: the base case at its own WACC and 2.5% terminal growth. WACC uses Rf ${pc(d.dcf.rf,2)}.</div>`;
+    <div class="caption">Value per share against today's $${f(d.price,0)}: green above, red below, strong at 20% or more. Outlined: the base case at its own WACC and 2.5% terminal growth. WACC uses Rf ${pc(d.dcf.rf,2)}.${
+      d.dcf.fcf_basis==='ttm' ? ` Base FCF: CFO less capex, TTM to ${new Date(d.dcf.fcf_through+'T12:00').toLocaleDateString('en-US',{month:'short',year:'numeric'})}.`
+      : d.dcf.fcf_basis==='proxy' ? ' Base FCF: net income × 0.8, as there are no 4 back to back quarters with CFO and capex.' : ''}</div>`;
 }
 
 // ─── DRAWDOWN AND ROLLING VOL (from the 6 month price history) ───────────────
@@ -943,7 +945,7 @@ function buildComps() {
       + tr('agg',`${active} vs median`,COMPS.map(([,k,,vs])=>vs(v[k],v[k+'_median']))) : ''}
     </tbody></table>
     ${peers.length ? '' : `<div class="signal-box" style="margin:12px">n/a: no other ${sector??''} names in the universe, so no peer median</div>`}
-    <div class="caption" style="padding:0 12px 12px">EV multiples, net debt/EBITDA and FCF yield are n/a for banks, brokers and insurers. A peer median needs values for at least half the peers. FCF yield is the DCF proxy (net income × 0.8) over market cap. PEG uses consensus EPS growth +1y, n/a when it is not positive.</div>`;
+    <div class="caption" style="padding:0 12px 12px">EV multiples, net debt/EBITDA and FCF yield are n/a for banks, brokers and insurers. A peer median needs values for at least half the peers. FCF yield is the DCF base FCF (TTM CFO less capex; net income × 0.8 without 4 back to back quarters) over market cap, n/a when it is not positive. PEG uses consensus EPS growth +1y, n/a when it is not positive.</div>`;
 }
 
 // ─── UNIVERSE SCATTERS: gold = selected, white = sector peers (labeled), grey = the rest ─

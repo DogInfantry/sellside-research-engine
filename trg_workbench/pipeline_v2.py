@@ -99,6 +99,12 @@ def _load_quarterly(as_of: str) -> pd.DataFrame:
     return load_dataframe(path, parse_dates=["period_end"]) if path.exists() else pd.DataFrame()
 
 
+def ttm_quarters(q: pd.DataFrame) -> Optional[pd.DataFrame]:
+    """The last 4 quarters with revenue and net income, only if back to back (about 9 months first to last)."""
+    full = q.dropna(subset=["revenue", "net_income"]).sort_values("period_end").tail(4)
+    return full if len(full) == 4 and (full["period_end"].iloc[-1] - full["period_end"].iloc[0]).days <= 300 else None
+
+
 def _load_sentiment(as_of: str) -> Dict[str, Any]:
     path = NORMALIZED_DIR / f"sentiment_{as_of}.json"
     return read_json(path) if path.exists() else {}
@@ -217,9 +223,11 @@ def value_ticker(
     fundamentals_df: pd.DataFrame,
     prices_wide: pd.DataFrame,
     risk_free_rate: float = 0.053,
+    quarterly_df: Optional[pd.DataFrame] = None,
 ) -> Optional[Dict[str, Any]]:
     """DCF scenarios, sensitivity, football field and reverse DCF for one ticker.
-    Returns None when there is no FCF proxy. Shared by the report and the dashboard export."""
+    Base FCF is TTM CFO less capex from the reported quarters (net income x 0.8 when there is no TTM).
+    Returns None when that FCF is not positive: no FCF DCF rather than a made up base. Shared by the report and the dashboard export."""
     from trg_workbench.analytics.valuation import (
         BALANCE_SHEET_INDUSTRIES,
         derive_dcf_inputs,
@@ -235,8 +243,12 @@ def value_ticker(
         return None
     sec_row = fundamentals_df[fundamentals_df["ticker"] == ticker].iloc[0].to_dict() if ticker in fundamentals_df["ticker"].values else {}
 
-    inputs = derive_dcf_inputs(sm_row, sec_row, risk_free_rate)
-    if inputs["base_fcf"] == 0:
+    q = quarterly_df[quarterly_df["ticker"] == ticker] if quarterly_df is not None and len(quarterly_df) else None
+    ttm = ttm_quarters(q) if q is not None and len(q) else None
+    ttm_fcf = pd.to_numeric(ttm["ocf"]).sum(min_count=4) + pd.to_numeric(ttm["capex"]).sum(min_count=4) if ttm is not None else None
+    through = ttm["period_end"].iloc[-1].strftime("%Y-%m-%d") if ttm is not None else None
+    inputs = derive_dcf_inputs(sm_row, sec_row, risk_free_rate, ttm_fcf=ttm_fcf, fcf_through=through)
+    if not inputs["base_fcf"] > 0:
         return None
 
     scenarios = scenario_analysis(inputs["base_fcf"], inputs["base_growth"], inputs["wacc"], inputs["net_debt"], inputs["shares_outstanding"])
@@ -365,9 +377,11 @@ def build_research_report_v2(
 
     ust10 = us_macro_df.set_index("key")["value"].get("ust_10y") if not us_macro_df.empty else None
     report_rf = float(ust10) / 100 if ust10 is not None and not pd.isna(ust10) else 0.053  # same live 10Y as the dashboard
+    quarterly = _load_quarterly(as_of)
     for ticker in tqdm(top3, desc="Computing valuations", disable=disable_prog):
         try:
-            result = value_ticker(ticker, security_master_df, fundamentals_df, prices_wide, risk_free_rate=report_rf)
+            result = value_ticker(ticker, security_master_df, fundamentals_df, prices_wide, risk_free_rate=report_rf,
+                                  quarterly_df=quarterly)
             if result is None:
                 continue
             dcf_results.append(result)

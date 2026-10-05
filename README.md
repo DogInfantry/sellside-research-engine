@@ -205,7 +205,10 @@ The composite is the equal weighted mean of the four factors. A forward view sco
 <br/>
 
 **FCF DCF**
-- FCF proxy = SEC net income (Yahoo fallback) × 0.80
+- Base FCF = TTM operating cash flow less capex, from the last 4 back to back reported quarters (the same window as the DuPont card)
+- Without 4 such quarters: SEC net income (Yahoo fallback) × 0.80, labeled as the proxy on the page
+- No FCF DCF (n/a) when that FCF is not positive, e.g. when capex exceeds operating cash flow
+- Known limits: CFO adds back stock based compensation and is after interest (levered), while the EV bridge also subtracts net debt
 - WACC = E/V × (Rf + Blume adjusted β × 5.5%) + D/V × 6% × (1 less 21% tax), with D/E fixed at 0.30, rounded to 0.1pp. Rf is the live 10Y Treasury; 5.3% only if the macro fetch fails. Blume beta = 0.67 × Yahoo beta + 0.33 (Yahoo beta 1.0 when missing)
 - Growth = consensus +1y revenue growth, trailing growth as fallback, 5% when neither exists, clamped to the range -20% to 50%
 - 5 year explicit forecast with growth fading ×0.85 a year, then a Gordon terminal value
@@ -358,6 +361,7 @@ Contributions are welcome from equity researchers, quants, data engineers and Py
 <br/>
 
 **Since v1.4.0**
+- **feat**: DCF base is real TTM free cash flow (CFO less capex) instead of net income × 0.8; n/a when it is not positive ([#66](https://github.com/DogInfantry/sellside-research-engine/pull/66))
 - **feat**: Sentiment and positioning: EPS revisions, surprises, recommendation trend, short interest, insiders ([#62](https://github.com/DogInfantry/sellside-research-engine/pull/62))
 - **feat**: Company depth: live rates in WACC and Sharpe, residual income for banks and brokers, reported quarters, DuPont, drawdown and volatility ([#61](https://github.com/DogInfantry/sellside-research-engine/pull/61))
 - **feat**: Peers and Sector views: comps vs peer median, P/E vs growth, risk vs return, sector ETF heatmap and rotation ([#60](https://github.com/DogInfantry/sellside-research-engine/pull/60))
