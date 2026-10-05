@@ -202,3 +202,33 @@ def test_sentiment_block_revisions_surprises_positioning():
     empty = sentiment_block(None, {})
     assert empty["surprises"] == [] and empty["short"]["pct_float"] is None and empty["up_30d"] is None
     json.dumps(b, allow_nan=False)
+
+
+def _fcf_case(ocf, capex=-1e9, ends=("2025-09-30", "2025-12-31", "2026-03-31", "2026-06-30")):
+    sm = pd.DataFrame([{"ticker": "AAA", "net_income_to_common": 1e9, "shares_outstanding": 1e8, "market_cap": 1e10}])
+    q = pd.DataFrame({"ticker": "AAA", "period_end": pd.to_datetime(list(ends)), "revenue": 10e9,
+                      "net_income": 2e9, "ocf": ocf, "capex": capex})
+    px = pd.DataFrame({"AAA": np.linspace(80, 100, 300)}, index=pd.bdate_range("2025-06-02", periods=300))
+    return value_ticker("AAA", sm, pd.DataFrame(columns=["ticker"]), px, quarterly_df=q), sm, px
+
+
+def test_value_ticker_uses_ttm_cfo_less_capex():
+    val, sm, px = _fcf_case(ocf=2.5e9)
+    assert val["inputs"]["base_fcf"] == pytest.approx(4 * 2.5e9 - 4 * 1e9)  # not net income x 0.8
+    assert (val["inputs"]["fcf_basis"], val["inputs"]["fcf_through"]) == ("ttm", "2026-06-30")
+    row = pd.Series({"ticker": "AAA", "market_cap": 1e10, "target_upside": None})
+    dcf = ticker_block(row, px["AAA"], val, risk=None, commentary=None)["dcf"]
+    assert (dcf["fcf_basis"], dcf["fcf_through"], dcf["fcf_yield"]) == ("ttm", "2026-06-30", 60.0)
+
+
+def test_value_ticker_falls_back_to_labeled_proxy_without_ttm():
+    gap, _, _ = _fcf_case(ocf=2.5e9, ends=("2025-06-30", "2025-09-30", "2026-03-31", "2026-06-30"))
+    assert gap["inputs"]["base_fcf"] == pytest.approx(0.8e9) and gap["inputs"]["fcf_basis"] == "proxy"
+    assert gap["inputs"]["fcf_through"] is None
+    no_capex, _, _ = _fcf_case(ocf=2.5e9, capex=None)  # Yahoo left capex blank: no TTM FCF
+    assert no_capex["inputs"]["fcf_basis"] == "proxy"
+
+
+def test_value_ticker_no_dcf_when_real_fcf_not_positive():
+    val, _, _ = _fcf_case(ocf=0.5e9)  # capex exceeds operating cash flow
+    assert val is None  # n/a, never the net income proxy

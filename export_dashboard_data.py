@@ -31,6 +31,7 @@ from trg_workbench.pipeline_v2 import (
     _load_fundamentals,
     _load_prices,
     _load_quarterly,
+    ttm_quarters,
     _load_security_master,
     _load_sentiment,
     _market_ranges,
@@ -122,9 +123,8 @@ def quarterly_block(q: pd.DataFrame, bank: bool) -> dict:
     bs = q.dropna(subset=["total_assets", "equity"])
     # Yahoo's balance sheet reaches further back than its income statement: those dates are not quarters
     q = q.dropna(subset=["revenue", "eps", "net_income"], how="all").tail(8)
-    # TTM: the last 4 quarters with revenue and net income, and only if back to back (about 9 months first to last)
-    full = q.dropna(subset=["revenue", "net_income"]).tail(4)
-    ttm_ok = len(full) == 4 and (full["period_end"].iloc[-1] - full["period_end"].iloc[0]).days <= 300
+    full = ttm_quarters(q)  # same TTM window as the DCF base FCF
+    ttm_ok = full is not None
     t = full[["revenue", "net_income", "ocf", "capex"]].sum(min_count=4) if ttm_ok else {}
     rev, ni, ocf, capex = (t.get(k, float("nan")) for k in ["revenue", "net_income", "ocf", "capex"])
     if ttm_ok:
@@ -190,7 +190,8 @@ def ticker_block(row: pd.Series, px: pd.Series, val: dict | None, risk: pd.Serie
     # ponytail: rating derived from analyst consensus target upside, +/-10% bands
     rating = "N/A" if upside is None else "BUY" if upside > 0.10 else "SELL" if upside < -0.10 else "HOLD"
 
-    dcf = {**dict.fromkeys(["bear", "base", "bull", "wacc", "terminal_growth", "fcf_yield", "rf"]), "grid": []}
+    dcf = {**dict.fromkeys(["bear", "base", "bull", "wacc", "terminal_growth", "fcf_yield", "rf", "fcf_basis", "fcf_through"]),
+           "grid": []}
     rdcf = {"implied_growth": None, "consensus_growth": None, "stretched": False, "sensitivity": []}
     if val:
         sc, inputs = val["scenarios"], val["inputs"]
@@ -202,6 +203,7 @@ def ticker_block(row: pd.Series, px: pd.Series, val: dict | None, risk: pd.Serie
             "terminal_growth": num(sc["Base Case"]["tgr_used"], 100, 1),
             "fcf_yield": num(inputs["base_fcf"] / row["market_cap"], 100, 1) if num(row.get("market_cap")) else None,
             "rf": num(inputs["risk_free_rate"], 100),
+            "fcf_basis": inputs["fcf_basis"], "fcf_through": inputs["fcf_through"],  # ttm, or the net income proxy
             # value per share across WACC and terminal growth, centred on this ticker's WACC and 2.5%
             "grid": [{"wacc": num(w, 100, 1), "tg": num(g, 100, 1), "value": num(val["sensitivity_df"].iat[i, j])}
                      for j, g in enumerate(val["sensitivity_axes"]["tg"]) for i, w in enumerate(val["sensitivity_axes"]["wacc"])],
@@ -327,9 +329,11 @@ def build_dashboard(as_of: str, limit: int = 10) -> dict:
     except Exception:  # noqa: BLE001  cached transcripts are optional
         pass
 
+    quarterly = _load_quarterly(as_of)
+
     def safe_value(t):
         try:
-            return value_ticker(t, security_master, fundamentals, wide, risk_free_rate=dcf_rf)
+            return value_ticker(t, security_master, fundamentals, wide, risk_free_rate=dcf_rf, quarterly_df=quarterly)
         except Exception:  # noqa: BLE001  same tolerance as build_research_report_v2
             return None
 
@@ -341,7 +345,6 @@ def build_dashboard(as_of: str, limit: int = 10) -> dict:
     base_fcf = pd.to_numeric(comps["ticker"].map(lambda t: vals[t]["inputs"]["base_fcf"] if vals.get(t) else None))
     comps["fcf_yield"] = base_fcf / comps["market_cap"].where(comps["market_cap"] > 0)
 
-    quarterly = _load_quarterly(as_of)
     sm_rows = security_master.drop_duplicates("ticker").set_index("ticker")
     sentiment = _load_sentiment(as_of)
     blocks = {}
