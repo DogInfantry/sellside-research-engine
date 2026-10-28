@@ -1,61 +1,61 @@
 {
- "generated_at": "2026-10-27T01:21:09+00:00",
- "as_of": "2026-10-27",
+ "generated_at": "2026-10-28T01:04:58+00:00",
+ "as_of": "2026-10-28",
  "macro": {
-  "ust_10y": 4.986,
-  "ust_2y": 4.69,
-  "tbill_3m": 4.025,
-  "ust_30y": 5.301,
-  "vix": 18.39,
-  "dxy": 102.095,
-  "wti": 100.99,
-  "spread_2s10s": 0.298,
-  "eurusd": 1.1188
+  "ust_10y": 4.993,
+  "ust_2y": 4.68,
+  "tbill_3m": 4.04,
+  "ust_30y": 5.305,
+  "vix": 17.52,
+  "dxy": 102.369,
+  "wti": 100.31,
+  "spread_2s10s": 0.306,
+  "eurusd": 1.115
  },
  "macro_chg": {
-  "ust_10y": "-0.2bps",
-  "ust_2y": "+4.0bps",
-  "tbill_3m": "-0.7bps",
-  "vix": "-1.06",
-  "dxy": "+0.28",
-  "wti": "-2.2%",
-  "spread_2s10s": "-0.5bps",
-  "eurusd": "-0.0005"
+  "ust_10y": "+0.7bps",
+  "ust_2y": "-1.0bps",
+  "tbill_3m": "+1.5bps",
+  "vix": "-0.87",
+  "dxy": "+0.41",
+  "wti": "-1.4%",
+  "spread_2s10s": "+0.8bps",
+  "eurusd": "-0.0038"
  },
  "macro_as_of": {
-  "ust_10y": "2026-10-26",
-  "ust_2y": "2026-10-23",
-  "tbill_3m": "2026-10-26",
-  "ust_30y": "2026-10-26",
-  "vix": "2026-10-26",
-  "dxy": "2026-10-26",
-  "wti": "2026-10-26",
-  "spread_2s10s": "2026-10-23"
+  "ust_10y": "2026-10-27",
+  "ust_2y": "2026-10-26",
+  "tbill_3m": "2026-10-27",
+  "ust_30y": "2026-10-27",
+  "vix": "2026-10-27",
+  "dxy": "2026-10-27",
+  "wti": "2026-10-27",
+  "spread_2s10s": "2026-10-26"
  },
  "rates": {
   "dcf_rf": 4.99,
   "dcf_rf_source": "UST 10Y",
-  "cash_rf": 4.03,
+  "cash_rf": 4.04,
   "cash_rf_source": "UST 3M bill"
  },
  "tickers": {
   "NVDA": {
    "name": "NVIDIA Corporation",
    "sector": "Technology",
-   "price": 210.96,
-   "price_change": -1.25,
-   "price_change_pct": -0.59,
-   "market_cap_b": 5094.0,
+   "price": 216.0,
+   "price_change": 5.04,
+   "price_change_pct": 2.39,
+   "market_cap_b": 5216.0,
    "rating": "BUY",
    "price_target": 328.95,
-   "composite_score": 76.0,
+   "composite_score": 78.0,
    "dcf": {
     "bear": 109.7,
     "base": 195.38,
     "bull": 324.26,
     "wacc": 12.6,
     "terminal_growth": 2.5,
-    "fcf_yield": 2.5,
+    "fcf_yield": 2.4,
     "rf": 4.99,
     "fcf_basis": "ttm",
     "fcf_through": "2026-07-31",
@@ -188,109 +188,109 @@
     ]
    },
    "reverse_dcf": {
-    "implied_growth": 22.5,
+    "implied_growth": 22.8,
     "consensus_growth": 68.2,
     "stretched": false,
     "sensitivity": [
      {
       "wacc": 10.6,
       "tg": 1.5,
-      "implied": 19.5
+      "implied": 19.9
      },
      {
       "wacc": 11.6,
       "tg": 1.5,
-      "implied": 21.5
+      "implied": 21.8
      },
      {
       "wacc": 12.6,
       "tg": 1.5,
-      "implied": 23.4
+      "implied": 23.7
      },
      {
       "wacc": 13.6,
       "tg": 1.5,
+      "implied": 25.6
+     },
+     {
+      "wacc": 14.6,
+      "tg": 1.5,
+      "implied": 27.3
+     },
+     {
+      "wacc": 10.6,
+      "tg": 2.0,
+      "implied": 19.3
+     },
+     {
+      "wacc": 11.6,
+      "tg": 2.0,
+      "implied": 21.4
+     },
+     {
+      "wacc": 12.6,
+      "tg": 2.0,
+      "implied": 23.3
+     },
+     {
+      "wacc": 13.6,
+      "tg": 2.0,
       "implied": 25.2
      },
      {
       "wacc": 14.6,
-      "tg": 1.5,
+      "tg": 2.0,
       "implied": 27.0
      },
      {
       "wacc": 10.6,
-      "tg": 2.0,
-      "implied": 19.0
+      "tg": 2.5,
+      "implied": 18.8
      },
      {
       "wacc": 11.6,
-      "tg": 2.0,
-      "implied": 21.0
+      "tg": 2.5,
+      "implied": 20.8
      },
      {
       "wacc": 12.6,
-      "tg": 2.0,
-      "implied": 22.9
+      "tg": 2.5,
+      "implied": 22.8
      },
      {
       "wacc": 13.6,
-      "tg": 2.0,
-      "implied": 24.8
+      "tg": 2.5,
+      "implied": 24.7
      },
      {
       "wacc": 14.6,
-      "tg": 2.0,
+      "tg": 2.5,
       "implied": 26.6
      },
      {
       "wacc": 10.6,
-      "tg": 2.5,
-      "implied": 18.4
+      "tg": 3.0,
+      "implied": 18.1
      },
      {
       "wacc": 11.6,
-      "tg": 2.5,
-      "implied": 20.5
+      "tg": 3.0,
+      "implied": 20.3
      },
      {
       "wacc": 12.6,
-      "tg": 2.5,
-      "implied": 22.5
+      "tg": 3.0,
+      "implied": 22.4
      },
      {
       "wacc": 13.6,
-      "tg": 2.5,
-      "implied": 24.4
+      "tg": 3.0,
+      "implied": 24.3
      },
      {
       "wacc": 14.6,
-      "tg": 2.5,
+      "tg": 3.0,
       "implied": 26.2
-     },
-     {
-      "wacc": 10.6,
-      "tg": 3.0,
-      "implied": 17.8
-     },
-     {
-      "wacc": 11.6,
-      "tg": 3.0,
-      "implied": 20.0
-     },
-     {
-      "wacc": 12.6,
-      "tg": 3.0,
-      "implied": 22.0
-     },
-     {
-      "wacc": 13.6,
-      "tg": 3.0,
-      "implied": 24.0
-     },
-     {
-      "wacc": 14.6,
-      "tg": 3.0,
-      "implied": 25.8
      }
     ]
    },
@@ -319,24 +319,20 @@
     "valuation": 17.0,
     "growth": 100.0,
     "quality": 97.0,
-    "momentum": 55.0,
+    "momentum": 67.0,
     "consensus": 86.0
    },
    "risk": {
     "var_95": -3.84,
     "cvar": -4.67,
-    "beta": 2.03,
-    "sharpe": 0.24,
-    "sortino": 0.39,
+    "beta": 2.05,
+    "sharpe": 0.37,
+    "sortino": 0.6,
     "max_drawdown": -20.21,
-    "vol_21d": 28.9,
-    "vol_63d": 35.9
+    "vol_21d": 30.3,
+    "vol_63d": 36.2
    },
    "price_history": [
-    {
-     "date": "2026-04-27",
-     "price": 216.12
-    },
     {
      "date": "2026-04-28",
      "price": 212.68
@@ -836,30 +832,34 @@
     {
      "date": "2026-10-23",
      "price": 210.96
+    },
+    {
+     "date": "2026-10-26",
+     "price": 216.0
     }
    ],
    "commentary": null,
    "financials": {
     "revenue_growth_yoy": 105.9,
     "net_margin": 63.7,
-    "pe_ttm": 26.4,
+    "pe_ttm": 27.0,
     "eps_next_yr": 15.91
    },
    "vs_sector": {
     "etf": "XLK",
     "peers": 2,
-    "fwd_pe": 13.57,
-    "fwd_pe_median": 29.22,
-    "ev_ebitda": 25.75,
-    "ev_ebitda_median": 25.32,
-    "ev_sales": 17.1,
-    "ev_sales_median": 11.44,
+    "fwd_pe": 13.69,
+    "fwd_pe_median": 29.36,
+    "ev_ebitda": 25.98,
+    "ev_ebitda_median": 25.44,
+    "ev_sales": 17.26,
+    "ev_sales_median": 11.47,
     "peg": 0.19,
-    "peg_median": 2.75,
-    "fcf_yield": 2.49,
+    "peg_median": 2.76,
+    "fcf_yield": 2.44,
     "fcf_yield_median": 2.21,
     "growth": 68.15,
-    "growth_median": 15.0,
+    "growth_median": 15.01,
     "margin": 63.66,
     "margin_median": 33.96,
     "roe": 117.21,
@@ -990,967 +990,16 @@
     "fcf_margin": 41.9
    }
   },
-  "META": {
-   "name": "Meta Platforms, Inc.",
-   "sector": "Communication Services",
-   "price": 642.62,
-   "price_change": -6.23,
-   "price_change_pct": -0.96,
-   "market_cap_b": 1637.0,
-   "rating": "BUY",
-   "price_target": 845.5,
-   "composite_score": 64.0,
-   "dcf": {
-    "bear": 165.82,
-    "base": 268.19,
-    "bull": 405.56,
-    "wacc": 9.7,
-    "terminal_growth": 2.5,
-    "fcf_yield": 1.8,
-    "rf": 4.99,
-    "fcf_basis": "ttm",
-    "fcf_through": "2026-09-30",
-    "grid": [
-     {
-      "wacc": 7.7,
-      "tg": 1.5,
-      "value": 327.38
-     },
-     {
-      "wacc": 8.7,
-      "tg": 1.5,
-      "value": 277.93
-     },
-     {
-      "wacc": 9.7,
-      "tg": 1.5,
-      "value": 240.6
-     },
-     {
-      "wacc": 10.7,
-      "tg": 1.5,
-      "value": 211.45
-     },
-     {
-      "wacc": 11.7,
-      "tg": 1.5,
-      "value": 188.06
-     },
-     {
-      "wacc": 7.7,
-      "tg": 2.0,
-      "value": 352.18
-     },
-     {
-      "wacc": 8.7,
-      "tg": 2.0,
-      "value": 295.44
-     },
-     {
-      "wacc": 9.7,
-      "tg": 2.0,
-      "value": 253.5
-     },
-     {
-      "wacc": 10.7,
-      "tg": 2.0,
-      "value": 221.26
-     },
-     {
-      "wacc": 11.7,
-      "tg": 2.0,
-      "value": 195.72
-     },
-     {
-      "wacc": 7.7,
-      "tg": 2.5,
-      "value": 381.75
-     },
-     {
-      "wacc": 8.7,
-      "tg": 2.5,
-      "value": 315.77
-     },
-     {
-      "wacc": 9.7,
-      "tg": 2.5,
-      "value": 268.19
-     },
-     {
-      "wacc": 10.7,
-      "tg": 2.5,
-      "value": 232.27
-     },
-     {
-      "wacc": 11.7,
-      "tg": 2.5,
-      "value": 204.21
-     },
-     {
-      "wacc": 7.7,
-      "tg": 3.0,
-      "value": 417.61
-     },
-     {
-      "wacc": 8.7,
-      "tg": 3.0,
-      "value": 339.67
-     },
-     {
-      "wacc": 9.7,
-      "tg": 3.0,
-      "value": 285.07
-     },
-     {
-      "wacc": 10.7,
-      "tg": 3.0,
-      "value": 244.7
-     },
-     {
-      "wacc": 11.7,
-      "tg": 3.0,
-      "value": 213.67
-     },
-     {
-      "wacc": 7.7,
-      "tg": 3.5,
-      "value": 462.01
-     },
-     {
-      "wacc": 8.7,
-      "tg": 3.5,
-      "value": 368.17
-     },
-     {
-      "wacc": 9.7,
-      "tg": 3.5,
-      "value": 304.67
-     },
-     {
-      "wacc": 10.7,
-      "tg": 3.5,
-      "value": 258.87
-     },
-     {
-      "wacc": 11.7,
-      "tg": 3.5,
-      "value": 224.29
-     }
-    ]
-   },
-   "reverse_dcf": {
-    "implied_growth": 21.6,
-    "consensus_growth": 21.6,
-    "stretched": false,
-    "sensitivity": [
-     {
-      "wacc": 7.7,
-      "tg": 1.5,
-      "implied": 18.1
-     },
-     {
-      "wacc": 8.7,
-      "tg": 1.5,
-      "implied": 20.6
-     },
-     {
-      "wacc": 9.7,
-      "tg": 1.5,
-      "implied": 22.9
-     },
-     {
-      "wacc": 10.7,
-      "tg": 1.5,
-      "implied": 25.1
-     },
-     {
-      "wacc": 11.7,
-      "tg": 1.5,
-      "implied": 27.2
-     },
-     {
-      "wacc": 7.7,
-      "tg": 2.0,
-      "implied": 17.2
-     },
-     {
-      "wacc": 8.7,
-      "tg": 2.0,
-      "implied": 19.9
-     },
-     {
-      "wacc": 9.7,
-      "tg": 2.0,
-      "implied": 22.3
-     },
-     {
-      "wacc": 10.7,
-      "tg": 2.0,
-      "implied": 24.5
-     },
-     {
-      "wacc": 11.7,
-      "tg": 2.0,
-      "implied": 26.7
-     },
-     {
-      "wacc": 7.7,
-      "tg": 2.5,
-      "implied": 16.3
-     },
-     {
-      "wacc": 8.7,
-      "tg": 2.5,
-      "implied": 19.1
-     },
-     {
-      "wacc": 9.7,
-      "tg": 2.5,
-      "implied": 21.6
-     },
-     {
-      "wacc": 10.7,
-      "tg": 2.5,
-      "implied": 23.9
-     },
-     {
-      "wacc": 11.7,
-      "tg": 2.5,
-      "implied": 26.1
-     },
-     {
-      "wacc": 7.7,
-      "tg": 3.0,
-      "implied": 15.3
-     },
-     {
-      "wacc": 8.7,
-      "tg": 3.0,
-      "implied": 18.2
-     },
-     {
-      "wacc": 9.7,
-      "tg": 3.0,
-      "implied": 20.9
-     },
-     {
-      "wacc": 10.7,
-      "tg": 3.0,
-      "implied": 23.3
-     },
-     {
-      "wacc": 11.7,
-      "tg": 3.0,
-      "implied": 25.6
-     }
-    ]
-   },
-   "football": [
-    {
-     "method": "DCF Scenarios (Bear/Base/Bull)",
-     "low": 165.82,
-     "mid": 268.19,
-     "high": 405.56
-    },
-    {
-     "method": "Analyst Consensus Target",
-     "low": 629.06,
-     "mid": 845.5,
-     "high": 1050.0
-    },
-    {
-     "method": "52-Week Range",
-     "low": 520.26,
-     "mid": 650.04,
-     "high": 779.82
-    }
-   ],
-   "residual_income": null,
-   "factors": {
-    "valuation": 43.0,
-    "growth": 86.0,
-    "quality": 67.0,
-    "momentum": 43.0,
-    "consensus": 69.0
-   },
-   "risk": {
-    "var_95": -3.84,
-    "cvar": -6.44,
-    "beta": 1.32,
-    "sharpe": -0.48,
-    "sortino": -0.65,
-    "max_drawdown": -31.18,
-    "vol_21d": 42.2,
-    "vol_63d": 47.4
-   },
-   "price_history": [
-    {
-     "date": "2026-04-27",
-     "price": 677.46
-    },
-    {
-     "date": "2026-04-28",
-     "price": 670.19
-    },
-    {
-     "date": "2026-04-29",
-     "price": 667.97
-    },
-    {
-     "date": "2026-04-30",
-     "price": 610.86
-    },
-    {
-     "date": "2026-05-01",
-     "price": 607.71
-    },
-    {
-     "date": "2026-05-04",
-     "price": 609.36
-    },
-    {
-     "date": "2026-05-05",
-     "price": 603.92
-    },
-    {
-     "date": "2026-05-06",
-     "price": 611.83
-    },
-    {
-     "date": "2026-05-07",
-     "price": 615.75
-    },
-    {
-     "date": "2026-05-08",
-     "price": 608.59
-    },
-    {
-     "date": "2026-05-11",
-     "price": 597.83
-    },
-    {
-     "date": "2026-05-12",
-     "price": 601.97
-    },
-    {
-     "date": "2026-05-13",
-     "price": 615.57
-    },
-    {
-     "date": "2026-05-14",
-     "price": 617.37
-    },
-    {
-     "date": "2026-05-15",
-     "price": 613.18
-    },
-    {
-     "date": "2026-05-18",
-     "price": 610.16
-    },
-    {
-     "date": "2026-05-19",
-     "price": 601.58
-    },
-    {
-     "date": "2026-05-20",
-     "price": 604.02
-    },
-    {
-     "date": "2026-05-21",
-     "price": 606.34
-    },
-    {
-     "date": "2026-05-22",
-     "price": 609.21
-    },
-    {
-     "date": "2026-05-26",
-     "price": 611.29
-    },
-    {
-     "date": "2026-05-27",
-     "price": 634.17
-    },
-    {
-     "date": "2026-05-28",
-     "price": 634.2
-    },
-    {
-     "date": "2026-05-29",
-     "price": 631.43
-    },
-    {
-     "date": "2026-06-01",
-     "price": 599.44
-    },
-    {
-     "date": "2026-06-02",
-     "price": 596.61
-    },
-    {
-     "date": "2026-06-03",
-     "price": 621.91
-    },
-    {
-     "date": "2026-06-04",
-     "price": 626.49
-    },
-    {
-     "date": "2026-06-05",
-     "price": 591.98
-    },
-    {
-     "date": "2026-06-08",
-     "price": 584.39
-    },
-    {
-     "date": "2026-06-09",
-     "price": 583.59
-    },
-    {
-     "date": "2026-06-10",
-     "price": 570.0
-    },
-    {
-     "date": "2026-06-11",
-     "price": 567.46
-    },
-    {
-     "date": "2026-06-12",
-     "price": 566.01
-    },
-    {
-     "date": "2026-06-15",
-     "price": 593.01
-    },
-    {
-     "date": "2026-06-16",
-     "price": 599.74
-    },
-    {
-     "date": "2026-06-17",
-     "price": 567.13
-    },
-    {
-     "date": "2026-06-18",
-     "price": 576.76
-    },
-    {
-     "date": "2026-06-22",
-     "price": 563.41
-    },
-    {
-     "date": "2026-06-23",
-     "price": 561.76
-    },
-    {
-     "date": "2026-06-24",
-     "price": 557.23
-    },
-    {
-     "date": "2026-06-25",
-     "price": 542.44
-    },
-    {
-     "date": "2026-06-26",
-     "price": 549.82
-    },
-    {
-     "date": "2026-06-29",
-     "price": 562.16
-    },
-    {
-     "date": "2026-06-30",
-     "price": 562.85
-    },
-    {
-     "date": "2026-07-01",
-     "price": 612.43
-    },
-    {
-     "date": "2026-07-02",
-     "price": 582.44
-    },
-    {
-     "date": "2026-07-06",
-     "price": 599.82
-    },
-    {
-     "date": "2026-07-07",
-     "price": 615.09
-    },
-    {
-     "date": "2026-07-08",
-     "price": 602.64
-    },
-    {
-     "date": "2026-07-09",
-     "price": 630.98
-    },
-    {
-     "date": "2026-07-10",
-     "price": 668.68
-    },
-    {
-     "date": "2026-07-13",
-     "price": 656.21
-    },
-    {
-     "date": "2026-07-14",
-     "price": 660.52
-    },
-    {
-     "date": "2026-07-15",
-     "price": 680.77
-    },
-    {
-     "date": "2026-07-16",
-     "price": 664.02
-    },
-    {
-     "date": "2026-07-17",
-     "price": 645.5
-    },
-    {
-     "date": "2026-07-20",
-     "price": 645.34
-    },
-    {
-     "date": "2026-07-21",
-     "price": 643.3
-    },
-    {
-     "date": "2026-07-22",
-     "price": 626.68
-    },
-    {
-     "date": "2026-07-23",
-     "price": 605.62
-    },
-    {
-     "date": "2026-07-24",
-     "price": 594.72
-    },
-    {
-     "date": "2026-07-27",
-     "price": 593.4
-    },
-    {
-     "date": "2026-07-28",
-     "price": 592.94
-    },
-    {
-     "date": "2026-07-29",
-     "price": 585.15
-    },
-    {
-     "date": "2026-07-30",
-     "price": 538.6
-    },
-    {
-     "date": "2026-07-31",
-     "price": 556.27
-    },
-    {
-     "date": "2026-08-03",
-     "price": 589.77
-    },
-    {
-     "date": "2026-08-04",
-     "price": 587.48
-    },
-    {
-     "date": "2026-08-05",
-     "price": 588.31
-    },
-    {
-     "date": "2026-08-06",
-     "price": 589.43
-    },
-    {
-     "date": "2026-08-07",
-     "price": 591.63
-    },
-    {
-     "date": "2026-08-10",
-     "price": 594.45
-    },
-    {
-     "date": "2026-08-11",
-     "price": 598.65
-    },
-    {
-     "date": "2026-08-12",
-     "price": 578.39
-    },
-    {
-     "date": "2026-08-13",
-     "price": 594.5
-    },
-    {
-     "date": "2026-08-14",
-     "price": 589.38
-    },
-    {
-     "date": "2026-08-17",
-     "price": 568.52
-    },
-    {
-     "date": "2026-08-18",
-     "price": 543.24
-    },
-    {
-     "date": "2026-08-19",
-     "price": 545.6
-    },
-    {
-     "date": "2026-08-20",
-     "price": 545.4
-    },
-    {
-     "date": "2026-08-21",
-     "price": 549.47
-    },
-    {
-     "date": "2026-08-24",
-     "price": 558.58
-    },
-    {
-     "date": "2026-08-25",
-     "price": 569.6
-    },
-    {
-     "date": "2026-08-26",
-     "price": 575.69
-    },
-    {
-     "date": "2026-08-27",
-     "price": 570.65
-    },
-    {
-     "date": "2026-08-28",
-     "price": 577.56
-    },
-    {
-     "date": "2026-08-31",
-     "price": 571.89
-    },
-    {
-     "date": "2026-09-01",
-     "price": 578.08
-    },
-    {
-     "date": "2026-09-02",
-     "price": 592.38
-    },
-    {
-     "date": "2026-09-03",
-     "price": 610.2
-    },
-    {
-     "date": "2026-09-04",
-     "price": 616.28
-    },
-    {
-     "date": "2026-09-08",
-     "price": 613.0
-    },
-    {
-     "date": "2026-09-09",
-     "price": 653.17
-    },
-    {
-     "date": "2026-09-10",
-     "price": 643.87
-    },
-    {
-     "date": "2026-09-11",
-     "price": 647.52
-    },
-    {
-     "date": "2026-09-14",
-     "price": 665.08
-    },
-    {
-     "date": "2026-09-15",
-     "price": 669.71
-    },
-    {
-     "date": "2026-09-16",
-     "price": 672.78
-    },
-    {
-     "date": "2026-09-17",
-     "price": 681.77
-    },
-    {
-     "date": "2026-09-18",
-     "price": 665.23
-    },
-    {
-     "date": "2026-09-21",
-     "price": 741.25
-    },
-    {
-     "date": "2026-09-22",
-     "price": 736.6
-    },
-    {
-     "date": "2026-09-23",
-     "price": 744.1
-    },
-    {
-     "date": "2026-09-24",
-     "price": 777.59
-    },
-    {
-     "date": "2026-09-25",
-     "price": 751.66
-    },
-    {
-     "date": "2026-09-28",
-     "price": 715.62
-    },
-    {
-     "date": "2026-09-29",
-     "price": 738.79
-    },
-    {
-     "date": "2026-09-30",
-     "price": 725.18
-    },
-    {
-     "date": "2026-10-01",
-     "price": 725.93
-    },
-    {
-     "date": "2026-10-02",
-     "price": 728.08
-    },
-    {
-     "date": "2026-10-05",
-     "price": 741.9
-    },
-    {
-     "date": "2026-10-06",
-     "price": 738.88
-    },
-    {
-     "date": "2026-10-07",
-     "price": 721.31
-    },
-    {
-     "date": "2026-10-08",
-     "price": 720.89
-    },
-    {
-     "date": "2026-10-09",
-     "price": 718.67
-    },
-    {
-     "date": "2026-10-12",
-     "price": 742.96
-    },
-    {
-     "date": "2026-10-13",
-     "price": 762.5
-    },
-    {
-     "date": "2026-10-14",
-     "price": 737.54
-    },
-    {
-     "date": "2026-10-15",
-     "price": 736.72
-    },
-    {
-     "date": "2026-10-16",
-     "price": 709.33
-    },
-    {
-     "date": "2026-10-19",
-     "price": 705.44
-    },
-    {
-     "date": "2026-10-20",
-     "price": 694.25
-    },
-    {
-     "date": "2026-10-21",
-     "price": 697.52
-    },
-    {
-     "date": "2026-10-22",
-     "price": 648.85
-    },
-    {
-     "date": "2026-10-23",
-     "price": 642.62
-    }
-   ],
-   "commentary": null,
-   "financials": {
-    "revenue_growth_yoy": 26.1,
-    "net_margin": 31.1,
-    "pe_ttm": 21.8,
-    "eps_next_yr": 33.97
-   },
-   "vs_sector": {
-    "etf": "XLC",
-    "peers": 1,
-    "fwd_pe": 17.99,
-    "fwd_pe_median": 20.63,
-    "ev_ebitda": 14.15,
-    "ev_ebitda_median": 21.78,
-    "ev_sales": 6.81,
-    "ev_sales_median": 8.46,
-    "peg": 1.1,
-    "peg_median": null,
-    "fcf_yield": 1.75,
-    "fcf_yield_median": 1.36,
-    "growth": 21.6,
-    "growth_median": 25.33,
-    "margin": 31.14,
-    "margin_median": 54.77,
-    "roe": 32.26,
-    "roe_median": 48.68,
-    "net_debt_ebitda": 0.28,
-    "net_debt_ebitda_median": -0.7
-   },
-   "sentiment": {
-    "eps_next_fy": 33.97,
-    "rev_30d": -0.3,
-    "rev_90d": -3.2,
-    "up_30d": 7,
-    "down_30d": 3,
-    "surprises": [
-     {
-      "quarter": "2025-12-31",
-      "actual": 8.88,
-      "estimate": 8.22,
-      "surprise_pct": 8.0
-     },
-     {
-      "quarter": "2026-03-31",
-      "actual": 10.44,
-      "estimate": 6.66,
-      "surprise_pct": 56.8
-     },
-     {
-      "quarter": "2026-06-30",
-      "actual": 6.18,
-      "estimate": 7.22,
-      "surprise_pct": -14.4
-     },
-     {
-      "quarter": "2026-09-30",
-      "actual": 3.83,
-      "estimate": 5.46,
-      "surprise_pct": -29.9
-     }
-    ],
-    "recommendations": [
-     {
-      "period": "0m",
-      "strongBuy": 9,
-      "buy": 46,
-      "hold": 6,
-      "sell": 1,
-      "strongSell": 0
-     },
-     {
-      "period": "-1m",
-      "strongBuy": 8,
-      "buy": 47,
-      "hold": 7,
-      "sell": 1,
-      "strongSell": 0
-     },
-     {
-      "period": "-2m",
-      "strongBuy": 8,
-      "buy": 47,
-      "hold": 7,
-      "sell": 0,
-      "strongSell": 0
-     },
-     {
-      "period": "-3m",
-      "strongBuy": 8,
-      "buy": 47,
-      "hold": 7,
-      "sell": 0,
-      "strongSell": 0
-     }
-    ],
-    "insider": {
-     "purchases": 1377746,
-     "sales": 213710,
-     "net_shares": 1164036,
-     "net_pct": 44.9
-    },
-    "short": {
-     "pct_float": 1.52,
-     "days_to_cover": 1.4,
-     "change_pct": 16.5
-    }
-   },
-   "quarters": [
-    {
-     "period": "2025-09-30",
-     "revenue_b": 51.24,
-     "eps": 1.05,
-     "op_margin": 40.1
-    },
-    {
-     "period": "2025-12-31",
-     "revenue_b": 59.89,
-     "eps": 8.88,
-     "op_margin": 41.3
-    },
-    {
-     "period": "2026-03-31",
-     "revenue_b": 56.31,
-     "eps": 10.44,
-     "op_margin": 40.6
-    },
-    {
-     "period": "2026-06-30",
-     "revenue_b": 60.8,
-     "eps": 6.18,
-     "op_margin": 30.9
-    },
-    {
-     "period": "2026-09-30",
-     "revenue_b": 64.6,
-     "eps": 3.83,
-     "op_margin": 20.1
-    }
-   ],
-   "dupont": {
-    "net_margin": 31.1,
-    "asset_turnover": 0.505,
-    "equity_multiplier": 1.76,
-    "roe": 27.6,
-    "through": "2026-09-30"
-   },
-   "quality": {
-    "cfo_ni": 1.77,
-    "capex_pct_revenue": 43.2,
-    "fcf_margin": 11.9
-   }
-  },
   "AMZN": {
    "name": "Amazon.com, Inc.",
    "sector": "Consumer Cyclical",
-   "price": 248.0,
-   "price_change": -2.38,
-   "price_change_pct": -0.95,
-   "market_cap_b": 2675.0,
+   "price": 249.09,
+   "price_change": 1.09,
+   "price_change_pct": 0.44,
+   "market_cap_b": 2687.0,
    "rating": "BUY",
    "price_target": 332.24,
-   "composite_score": 63.0,
+   "composite_score": 64.0,
    "dcf": {
     "bear": null,
     "base": null,
@@ -1988,24 +1037,20 @@
     "valuation": 67.0,
     "growth": 67.0,
     "quality": 50.0,
-    "momentum": 64.0,
-    "consensus": 65.0
+    "momentum": 67.0,
+    "consensus": 66.0
    },
    "risk": {
     "var_95": -2.99,
     "cvar": -4.08,
-    "beta": 1.83,
-    "sharpe": 0.12,
-    "sortino": 0.2,
+    "beta": 1.82,
+    "sharpe": 0.21,
+    "sortino": 0.38,
     "max_drawdown": -21.74,
     "vol_21d": 31.9,
     "vol_63d": 41.1
    },
    "price_history": [
-    {
-     "date": "2026-04-27",
-     "price": 261.12
-    },
     {
      "date": "2026-04-28",
      "price": 259.7
@@ -2505,28 +1550,32 @@
     {
      "date": "2026-10-23",
      "price": 248.0
+    },
+    {
+     "date": "2026-10-26",
+     "price": 249.09
     }
    ],
    "commentary": null,
    "financials": {
     "revenue_growth_yoy": 19.6,
     "net_margin": 17.4,
-    "pe_ttm": 19.8,
+    "pe_ttm": 19.9,
     "eps_next_yr": 10.55
    },
    "vs_sector": {
     "etf": "XLY",
     "peers": 1,
-    "fwd_pe": 23.88,
-    "fwd_pe_median": 19.93,
-    "ev_ebitda": 16.66,
-    "ev_ebitda_median": 15.41,
-    "ev_sales": 3.63,
+    "fwd_pe": 24.26,
+    "fwd_pe_median": 19.92,
+    "ev_ebitda": 16.92,
+    "ev_ebitda_median": 15.37,
+    "ev_sales": 3.69,
     "ev_sales_median": 2.24,
     "peg": null,
     "peg_median": 3.15,
     "fcf_yield": null,
-    "fcf_yield_median": 4.73,
+    "fcf_yield_median": 4.74,
     "growth": 14.62,
     "growth_median": 3.33,
     "margin": 17.44,
@@ -2665,13 +1714,964 @@
     "fcf_margin": -0.3
    }
   },
+  "META": {
+   "name": "Meta Platforms, Inc.",
+   "sector": "Communication Services",
+   "price": 630.56,
+   "price_change": -12.06,
+   "price_change_pct": -1.88,
+   "market_cap_b": 1612.0,
+   "rating": "BUY",
+   "price_target": 846.79,
+   "composite_score": 64.0,
+   "dcf": {
+    "bear": 165.29,
+    "base": 267.37,
+    "bull": 404.39,
+    "wacc": 9.7,
+    "terminal_growth": 2.5,
+    "fcf_yield": 1.8,
+    "rf": 4.99,
+    "fcf_basis": "ttm",
+    "fcf_through": "2026-09-30",
+    "grid": [
+     {
+      "wacc": 7.7,
+      "tg": 1.5,
+      "value": 326.39
+     },
+     {
+      "wacc": 8.7,
+      "tg": 1.5,
+      "value": 277.08
+     },
+     {
+      "wacc": 9.7,
+      "tg": 1.5,
+      "value": 239.87
+     },
+     {
+      "wacc": 10.7,
+      "tg": 1.5,
+      "value": 210.81
+     },
+     {
+      "wacc": 11.7,
+      "tg": 1.5,
+      "value": 187.49
+     },
+     {
+      "wacc": 7.7,
+      "tg": 2.0,
+      "value": 351.12
+     },
+     {
+      "wacc": 8.7,
+      "tg": 2.0,
+      "value": 294.54
+     },
+     {
+      "wacc": 9.7,
+      "tg": 2.0,
+      "value": 252.73
+     },
+     {
+      "wacc": 10.7,
+      "tg": 2.0,
+      "value": 220.59
+     },
+     {
+      "wacc": 11.7,
+      "tg": 2.0,
+      "value": 195.12
+     },
+     {
+      "wacc": 7.7,
+      "tg": 2.5,
+      "value": 380.6
+     },
+     {
+      "wacc": 8.7,
+      "tg": 2.5,
+      "value": 314.81
+     },
+     {
+      "wacc": 9.7,
+      "tg": 2.5,
+      "value": 267.37
+     },
+     {
+      "wacc": 10.7,
+      "tg": 2.5,
+      "value": 231.56
+     },
+     {
+      "wacc": 11.7,
+      "tg": 2.5,
+      "value": 203.59
+     },
+     {
+      "wacc": 7.7,
+      "tg": 3.0,
+      "value": 416.35
+     },
+     {
+      "wacc": 8.7,
+      "tg": 3.0,
+      "value": 338.64
+     },
+     {
+      "wacc": 9.7,
+      "tg": 3.0,
+      "value": 284.2
+     },
+     {
+      "wacc": 10.7,
+      "tg": 3.0,
+      "value": 243.96
+     },
+     {
+      "wacc": 11.7,
+      "tg": 3.0,
+      "value": 213.02
+     },
+     {
+      "wacc": 7.7,
+      "tg": 3.5,
+      "value": 460.61
+     },
+     {
+      "wacc": 8.7,
+      "tg": 3.5,
+      "value": 367.05
+     },
+     {
+      "wacc": 9.7,
+      "tg": 3.5,
+      "value": 303.74
+     },
+     {
+      "wacc": 10.7,
+      "tg": 3.5,
+      "value": 258.08
+     },
+     {
+      "wacc": 11.7,
+      "tg": 3.5,
+      "value": 223.61
+     }
+    ]
+   },
+   "reverse_dcf": {
+    "implied_growth": 21.4,
+    "consensus_growth": 21.6,
+    "stretched": false,
+    "sensitivity": [
+     {
+      "wacc": 7.7,
+      "tg": 1.5,
+      "implied": 17.9
+     },
+     {
+      "wacc": 8.7,
+      "tg": 1.5,
+      "implied": 20.4
+     },
+     {
+      "wacc": 9.7,
+      "tg": 1.5,
+      "implied": 22.7
+     },
+     {
+      "wacc": 10.7,
+      "tg": 1.5,
+      "implied": 24.9
+     },
+     {
+      "wacc": 11.7,
+      "tg": 1.5,
+      "implied": 27.0
+     },
+     {
+      "wacc": 7.7,
+      "tg": 2.0,
+      "implied": 17.1
+     },
+     {
+      "wacc": 8.7,
+      "tg": 2.0,
+      "implied": 19.7
+     },
+     {
+      "wacc": 9.7,
+      "tg": 2.0,
+      "implied": 22.1
+     },
+     {
+      "wacc": 10.7,
+      "tg": 2.0,
+      "implied": 24.3
+     },
+     {
+      "wacc": 11.7,
+      "tg": 2.0,
+      "implied": 26.5
+     },
+     {
+      "wacc": 7.7,
+      "tg": 2.5,
+      "implied": 16.1
+     },
+     {
+      "wacc": 8.7,
+      "tg": 2.5,
+      "implied": 18.9
+     },
+     {
+      "wacc": 9.7,
+      "tg": 2.5,
+      "implied": 21.4
+     },
+     {
+      "wacc": 10.7,
+      "tg": 2.5,
+      "implied": 23.7
+     },
+     {
+      "wacc": 11.7,
+      "tg": 2.5,
+      "implied": 25.9
+     },
+     {
+      "wacc": 7.7,
+      "tg": 3.0,
+      "implied": 15.1
+     },
+     {
+      "wacc": 8.7,
+      "tg": 3.0,
+      "implied": 18.0
+     },
+     {
+      "wacc": 9.7,
+      "tg": 3.0,
+      "implied": 20.7
+     },
+     {
+      "wacc": 10.7,
+      "tg": 3.0,
+      "implied": 23.1
+     },
+     {
+      "wacc": 11.7,
+      "tg": 3.0,
+      "implied": 25.4
+     }
+    ]
+   },
+   "football": [
+    {
+     "method": "DCF Scenarios (Bear/Base/Bull)",
+     "low": 165.29,
+     "mid": 267.37,
+     "high": 404.39
+    },
+    {
+     "method": "Analyst Consensus Target",
+     "low": 629.06,
+     "mid": 846.79,
+     "high": 1050.0
+    },
+    {
+     "method": "52-Week Range",
+     "low": 520.26,
+     "mid": 650.04,
+     "high": 779.82
+    }
+   ],
+   "residual_income": null,
+   "factors": {
+    "valuation": 43.0,
+    "growth": 86.0,
+    "quality": 67.0,
+    "momentum": 38.0,
+    "consensus": 70.0
+   },
+   "risk": {
+    "var_95": -3.84,
+    "cvar": -6.44,
+    "beta": 1.26,
+    "sharpe": -0.49,
+    "sortino": -0.67,
+    "max_drawdown": -30.77,
+    "vol_21d": 41.4,
+    "vol_63d": 47.6
+   },
+   "price_history": [
+    {
+     "date": "2026-04-28",
+     "price": 670.19
+    },
+    {
+     "date": "2026-04-29",
+     "price": 667.97
+    },
+    {
+     "date": "2026-04-30",
+     "price": 610.86
+    },
+    {
+     "date": "2026-05-01",
+     "price": 607.71
+    },
+    {
+     "date": "2026-05-04",
+     "price": 609.36
+    },
+    {
+     "date": "2026-05-05",
+     "price": 603.92
+    },
+    {
+     "date": "2026-05-06",
+     "price": 611.83
+    },
+    {
+     "date": "2026-05-07",
+     "price": 615.75
+    },
+    {
+     "date": "2026-05-08",
+     "price": 608.59
+    },
+    {
+     "date": "2026-05-11",
+     "price": 597.83
+    },
+    {
+     "date": "2026-05-12",
+     "price": 601.97
+    },
+    {
+     "date": "2026-05-13",
+     "price": 615.57
+    },
+    {
+     "date": "2026-05-14",
+     "price": 617.37
+    },
+    {
+     "date": "2026-05-15",
+     "price": 613.18
+    },
+    {
+     "date": "2026-05-18",
+     "price": 610.16
+    },
+    {
+     "date": "2026-05-19",
+     "price": 601.58
+    },
+    {
+     "date": "2026-05-20",
+     "price": 604.02
+    },
+    {
+     "date": "2026-05-21",
+     "price": 606.34
+    },
+    {
+     "date": "2026-05-22",
+     "price": 609.21
+    },
+    {
+     "date": "2026-05-26",
+     "price": 611.29
+    },
+    {
+     "date": "2026-05-27",
+     "price": 634.17
+    },
+    {
+     "date": "2026-05-28",
+     "price": 634.2
+    },
+    {
+     "date": "2026-05-29",
+     "price": 631.43
+    },
+    {
+     "date": "2026-06-01",
+     "price": 599.44
+    },
+    {
+     "date": "2026-06-02",
+     "price": 596.61
+    },
+    {
+     "date": "2026-06-03",
+     "price": 621.91
+    },
+    {
+     "date": "2026-06-04",
+     "price": 626.49
+    },
+    {
+     "date": "2026-06-05",
+     "price": 591.98
+    },
+    {
+     "date": "2026-06-08",
+     "price": 584.39
+    },
+    {
+     "date": "2026-06-09",
+     "price": 583.59
+    },
+    {
+     "date": "2026-06-10",
+     "price": 570.0
+    },
+    {
+     "date": "2026-06-11",
+     "price": 567.46
+    },
+    {
+     "date": "2026-06-12",
+     "price": 566.01
+    },
+    {
+     "date": "2026-06-15",
+     "price": 593.01
+    },
+    {
+     "date": "2026-06-16",
+     "price": 599.74
+    },
+    {
+     "date": "2026-06-17",
+     "price": 567.13
+    },
+    {
+     "date": "2026-06-18",
+     "price": 576.76
+    },
+    {
+     "date": "2026-06-22",
+     "price": 563.41
+    },
+    {
+     "date": "2026-06-23",
+     "price": 561.76
+    },
+    {
+     "date": "2026-06-24",
+     "price": 557.23
+    },
+    {
+     "date": "2026-06-25",
+     "price": 542.44
+    },
+    {
+     "date": "2026-06-26",
+     "price": 549.82
+    },
+    {
+     "date": "2026-06-29",
+     "price": 562.16
+    },
+    {
+     "date": "2026-06-30",
+     "price": 562.85
+    },
+    {
+     "date": "2026-07-01",
+     "price": 612.43
+    },
+    {
+     "date": "2026-07-02",
+     "price": 582.44
+    },
+    {
+     "date": "2026-07-06",
+     "price": 599.82
+    },
+    {
+     "date": "2026-07-07",
+     "price": 615.09
+    },
+    {
+     "date": "2026-07-08",
+     "price": 602.64
+    },
+    {
+     "date": "2026-07-09",
+     "price": 630.98
+    },
+    {
+     "date": "2026-07-10",
+     "price": 668.68
+    },
+    {
+     "date": "2026-07-13",
+     "price": 656.21
+    },
+    {
+     "date": "2026-07-14",
+     "price": 660.52
+    },
+    {
+     "date": "2026-07-15",
+     "price": 680.77
+    },
+    {
+     "date": "2026-07-16",
+     "price": 664.02
+    },
+    {
+     "date": "2026-07-17",
+     "price": 645.5
+    },
+    {
+     "date": "2026-07-20",
+     "price": 645.34
+    },
+    {
+     "date": "2026-07-21",
+     "price": 643.3
+    },
+    {
+     "date": "2026-07-22",
+     "price": 626.68
+    },
+    {
+     "date": "2026-07-23",
+     "price": 605.62
+    },
+    {
+     "date": "2026-07-24",
+     "price": 594.72
+    },
+    {
+     "date": "2026-07-27",
+     "price": 593.4
+    },
+    {
+     "date": "2026-07-28",
+     "price": 592.94
+    },
+    {
+     "date": "2026-07-29",
+     "price": 585.15
+    },
+    {
+     "date": "2026-07-30",
+     "price": 538.6
+    },
+    {
+     "date": "2026-07-31",
+     "price": 556.27
+    },
+    {
+     "date": "2026-08-03",
+     "price": 589.77
+    },
+    {
+     "date": "2026-08-04",
+     "price": 587.48
+    },
+    {
+     "date": "2026-08-05",
+     "price": 588.31
+    },
+    {
+     "date": "2026-08-06",
+     "price": 589.43
+    },
+    {
+     "date": "2026-08-07",
+     "price": 591.63
+    },
+    {
+     "date": "2026-08-10",
+     "price": 594.45
+    },
+    {
+     "date": "2026-08-11",
+     "price": 598.65
+    },
+    {
+     "date": "2026-08-12",
+     "price": 578.39
+    },
+    {
+     "date": "2026-08-13",
+     "price": 594.5
+    },
+    {
+     "date": "2026-08-14",
+     "price": 589.38
+    },
+    {
+     "date": "2026-08-17",
+     "price": 568.52
+    },
+    {
+     "date": "2026-08-18",
+     "price": 543.24
+    },
+    {
+     "date": "2026-08-19",
+     "price": 545.6
+    },
+    {
+     "date": "2026-08-20",
+     "price": 545.4
+    },
+    {
+     "date": "2026-08-21",
+     "price": 549.47
+    },
+    {
+     "date": "2026-08-24",
+     "price": 558.58
+    },
+    {
+     "date": "2026-08-25",
+     "price": 569.6
+    },
+    {
+     "date": "2026-08-26",
+     "price": 575.69
+    },
+    {
+     "date": "2026-08-27",
+     "price": 570.65
+    },
+    {
+     "date": "2026-08-28",
+     "price": 577.56
+    },
+    {
+     "date": "2026-08-31",
+     "price": 571.89
+    },
+    {
+     "date": "2026-09-01",
+     "price": 578.08
+    },
+    {
+     "date": "2026-09-02",
+     "price": 592.38
+    },
+    {
+     "date": "2026-09-03",
+     "price": 610.2
+    },
+    {
+     "date": "2026-09-04",
+     "price": 616.28
+    },
+    {
+     "date": "2026-09-08",
+     "price": 613.0
+    },
+    {
+     "date": "2026-09-09",
+     "price": 653.17
+    },
+    {
+     "date": "2026-09-10",
+     "price": 643.87
+    },
+    {
+     "date": "2026-09-11",
+     "price": 647.52
+    },
+    {
+     "date": "2026-09-14",
+     "price": 665.08
+    },
+    {
+     "date": "2026-09-15",
+     "price": 669.71
+    },
+    {
+     "date": "2026-09-16",
+     "price": 672.78
+    },
+    {
+     "date": "2026-09-17",
+     "price": 681.77
+    },
+    {
+     "date": "2026-09-18",
+     "price": 665.23
+    },
+    {
+     "date": "2026-09-21",
+     "price": 741.25
+    },
+    {
+     "date": "2026-09-22",
+     "price": 736.6
+    },
+    {
+     "date": "2026-09-23",
+     "price": 744.1
+    },
+    {
+     "date": "2026-09-24",
+     "price": 777.59
+    },
+    {
+     "date": "2026-09-25",
+     "price": 751.66
+    },
+    {
+     "date": "2026-09-28",
+     "price": 715.62
+    },
+    {
+     "date": "2026-09-29",
+     "price": 738.79
+    },
+    {
+     "date": "2026-09-30",
+     "price": 725.18
+    },
+    {
+     "date": "2026-10-01",
+     "price": 725.93
+    },
+    {
+     "date": "2026-10-02",
+     "price": 728.08
+    },
+    {
+     "date": "2026-10-05",
+     "price": 741.9
+    },
+    {
+     "date": "2026-10-06",
+     "price": 738.88
+    },
+    {
+     "date": "2026-10-07",
+     "price": 721.31
+    },
+    {
+     "date": "2026-10-08",
+     "price": 720.89
+    },
+    {
+     "date": "2026-10-09",
+     "price": 718.67
+    },
+    {
+     "date": "2026-10-12",
+     "price": 742.96
+    },
+    {
+     "date": "2026-10-13",
+     "price": 762.5
+    },
+    {
+     "date": "2026-10-14",
+     "price": 737.54
+    },
+    {
+     "date": "2026-10-15",
+     "price": 736.72
+    },
+    {
+     "date": "2026-10-16",
+     "price": 709.33
+    },
+    {
+     "date": "2026-10-19",
+     "price": 705.44
+    },
+    {
+     "date": "2026-10-20",
+     "price": 694.25
+    },
+    {
+     "date": "2026-10-21",
+     "price": 697.52
+    },
+    {
+     "date": "2026-10-22",
+     "price": 648.85
+    },
+    {
+     "date": "2026-10-23",
+     "price": 642.62
+    },
+    {
+     "date": "2026-10-26",
+     "price": 630.56
+    }
+   ],
+   "commentary": null,
+   "financials": {
+    "revenue_growth_yoy": 26.1,
+    "net_margin": 31.1,
+    "pe_ttm": 21.4,
+    "eps_next_yr": 33.97
+   },
+   "vs_sector": {
+    "etf": "XLC",
+    "peers": 1,
+    "fwd_pe": 17.64,
+    "fwd_pe_median": 20.87,
+    "ev_ebitda": 13.92,
+    "ev_ebitda_median": 22.04,
+    "ev_sales": 6.7,
+    "ev_sales_median": 8.56,
+    "peg": 1.07,
+    "peg_median": null,
+    "fcf_yield": 1.78,
+    "fcf_yield_median": 1.37,
+    "growth": 21.62,
+    "growth_median": 25.16,
+    "margin": 31.14,
+    "margin_median": 54.77,
+    "roe": 32.26,
+    "roe_median": 48.68,
+    "net_debt_ebitda": 0.28,
+    "net_debt_ebitda_median": -0.7
+   },
+   "sentiment": {
+    "eps_next_fy": 33.97,
+    "rev_30d": -0.3,
+    "rev_90d": -3.2,
+    "up_30d": 7,
+    "down_30d": 3,
+    "surprises": [
+     {
+      "quarter": "2025-12-31",
+      "actual": 8.88,
+      "estimate": 8.22,
+      "surprise_pct": 8.0
+     },
+     {
+      "quarter": "2026-03-31",
+      "actual": 10.44,
+      "estimate": 6.66,
+      "surprise_pct": 56.8
+     },
+     {
+      "quarter": "2026-06-30",
+      "actual": 6.18,
+      "estimate": 7.22,
+      "surprise_pct": -14.4
+     },
+     {
+      "quarter": "2026-09-30",
+      "actual": 3.83,
+      "estimate": 5.46,
+      "surprise_pct": -29.9
+     }
+    ],
+    "recommendations": [
+     {
+      "period": "0m",
+      "strongBuy": 9,
+      "buy": 46,
+      "hold": 6,
+      "sell": 1,
+      "strongSell": 0
+     },
+     {
+      "period": "-1m",
+      "strongBuy": 8,
+      "buy": 47,
+      "hold": 7,
+      "sell": 1,
+      "strongSell": 0
+     },
+     {
+      "period": "-2m",
+      "strongBuy": 8,
+      "buy": 47,
+      "hold": 7,
+      "sell": 0,
+      "strongSell": 0
+     },
+     {
+      "period": "-3m",
+      "strongBuy": 8,
+      "buy": 47,
+      "hold": 7,
+      "sell": 0,
+      "strongSell": 0
+     }
+    ],
+    "insider": {
+     "purchases": 1377746,
+     "sales": 213710,
+     "net_shares": 1164036,
+     "net_pct": 44.9
+    },
+    "short": {
+     "pct_float": 1.52,
+     "days_to_cover": 1.4,
+     "change_pct": 16.5
+    }
+   },
+   "quarters": [
+    {
+     "period": "2025-09-30",
+     "revenue_b": 51.24,
+     "eps": 1.05,
+     "op_margin": 40.1
+    },
+    {
+     "period": "2025-12-31",
+     "revenue_b": 59.89,
+     "eps": 8.88,
+     "op_margin": 41.3
+    },
+    {
+     "period": "2026-03-31",
+     "revenue_b": 56.31,
+     "eps": 10.44,
+     "op_margin": 40.6
+    },
+    {
+     "period": "2026-06-30",
+     "revenue_b": 60.8,
+     "eps": 6.18,
+     "op_margin": 30.9
+    },
+    {
+     "period": "2026-09-30",
+     "revenue_b": 64.6,
+     "eps": 3.83,
+     "op_margin": 20.1
+    }
+   ],
+   "dupont": {
+    "net_margin": 31.1,
+    "asset_turnover": 0.505,
+    "equity_multiplier": 1.76,
+    "roe": 27.6,
+    "through": "2026-09-30"
+   },
+   "quality": {
+    "cfo_ni": 1.77,
+    "capex_pct_revenue": 43.2,
+    "fcf_margin": 11.9
+   }
+  },
   "BLK": {
    "name": "BlackRock, Inc.",
    "sector": "Financial Services",
-   "price": 1118.25,
-   "price_change": -19.04,
-   "price_change_pct": -1.67,
-   "market_cap_b": 182.0,
+   "price": 1127.66,
+   "price_change": 9.41,
+   "price_change_pct": 0.84,
+   "market_cap_b": 183.0,
    "rating": "BUY",
    "price_target": 1351.0,
    "composite_score": 63.0,
@@ -2814,109 +2814,109 @@
     ]
    },
    "reverse_dcf": {
-    "implied_growth": 21.6,
+    "implied_growth": 21.7,
     "consensus_growth": 11.0,
     "stretched": true,
     "sensitivity": [
      {
       "wacc": 8.4,
       "tg": 1.5,
-      "implied": 18.2
+      "implied": 18.4
      },
      {
       "wacc": 9.4,
       "tg": 1.5,
-      "implied": 20.6
+      "implied": 20.7
      },
      {
       "wacc": 10.4,
       "tg": 1.5,
-      "implied": 22.8
+      "implied": 22.9
      },
      {
       "wacc": 11.4,
       "tg": 1.5,
-      "implied": 24.8
+      "implied": 24.9
      },
      {
       "wacc": 12.4,
       "tg": 1.5,
-      "implied": 26.8
+      "implied": 26.9
      },
      {
       "wacc": 8.4,
       "tg": 2.0,
-      "implied": 17.5
+      "implied": 17.6
      },
      {
       "wacc": 9.4,
       "tg": 2.0,
-      "implied": 19.9
+      "implied": 20.0
      },
      {
       "wacc": 10.4,
       "tg": 2.0,
-      "implied": 22.2
+      "implied": 22.3
      },
      {
       "wacc": 11.4,
       "tg": 2.0,
-      "implied": 24.3
+      "implied": 24.4
      },
      {
       "wacc": 12.4,
       "tg": 2.0,
-      "implied": 26.3
+      "implied": 26.5
      },
      {
       "wacc": 8.4,
       "tg": 2.5,
-      "implied": 16.7
+      "implied": 16.8
      },
      {
       "wacc": 9.4,
       "tg": 2.5,
-      "implied": 19.2
+      "implied": 19.4
      },
      {
       "wacc": 10.4,
       "tg": 2.5,
-      "implied": 21.6
+      "implied": 21.7
      },
      {
       "wacc": 11.4,
       "tg": 2.5,
-      "implied": 23.8
+      "implied": 23.9
      },
      {
       "wacc": 12.4,
       "tg": 2.5,
-      "implied": 25.9
+      "implied": 26.0
      },
      {
       "wacc": 8.4,
       "tg": 3.0,
-      "implied": 15.8
+      "implied": 15.9
      },
      {
       "wacc": 9.4,
       "tg": 3.0,
-      "implied": 18.5
+      "implied": 18.6
      },
      {
       "wacc": 10.4,
       "tg": 3.0,
-      "implied": 20.9
+      "implied": 21.1
      },
      {
       "wacc": 11.4,
       "tg": 3.0,
-      "implied": 23.2
+      "implied": 23.3
      },
      {
       "wacc": 12.4,
       "tg": 3.0,
-      "implied": 25.3
+      "implied": 25.5
      }
     ]
    },
@@ -2945,24 +2945,20 @@
     "valuation": 31.0,
     "growth": 57.0,
     "quality": null,
-    "momentum": 69.0,
-    "consensus": 74.0
+    "momentum": 71.0,
+    "consensus": 72.0
    },
    "risk": {
     "var_95": -2.52,
     "cvar": -3.79,
-    "beta": 1.14,
-    "sharpe": -0.13,
-    "sortino": -0.2,
+    "beta": 1.12,
+    "sharpe": -0.09,
+    "sortino": -0.13,
     "max_drawdown": -22.45,
-    "vol_21d": 22.7,
-    "vol_63d": 23.5
+    "vol_21d": 22.5,
+    "vol_63d": 22.7
    },
    "price_history": [
-    {
-     "date": "2026-04-27",
-     "price": 1045.57
-    },
     {
      "date": "2026-04-28",
      "price": 1038.55
@@ -3462,27 +3458,31 @@
     {
      "date": "2026-10-23",
      "price": 1118.25
+    },
+    {
+     "date": "2026-10-26",
+     "price": 1127.66
     }
    ],
    "commentary": null,
    "financials": {
     "revenue_growth_yoy": 19.1,
     "net_margin": 24.2,
-    "pe_ttm": 26.3,
+    "pe_ttm": 26.5,
     "eps_next_yr": 64.83
    },
    "vs_sector": {
     "etf": "XLF",
     "peers": 7,
-    "fwd_pe": 17.4,
-    "fwd_pe_median": 12.06,
-    "ev_ebitda": 15.19,
+    "fwd_pe": 17.52,
+    "fwd_pe_median": 12.31,
+    "ev_ebitda": 15.3,
     "ev_ebitda_median": null,
-    "ev_sales": 6.39,
+    "ev_sales": 6.44,
     "ev_sales_median": null,
-    "peg": 1.44,
+    "peg": 1.46,
     "peg_median": 0.95,
-    "fcf_yield": 1.93,
+    "fcf_yield": 1.92,
     "fcf_yield_median": null,
     "growth": 11.0,
     "growth_median": 6.08,
@@ -3561,9 +3561,9 @@
     ],
     "insider": {
      "purchases": 31415,
-     "sales": 62639,
-     "net_shares": -31224,
-     "net_pct": -1.0
+     "sales": 53900,
+     "net_shares": -22485,
+     "net_pct": -0.8
     },
     "short": {
      "pct_float": 1.35,
@@ -3625,17 +3625,17 @@
   "GOOGL": {
    "name": "Alphabet Inc.",
    "sector": "Communication Services",
-   "price": 320.21,
-   "price_change": -4.01,
-   "price_change_pct": -1.24,
-   "market_cap_b": 3916.0,
+   "price": 316.8,
+   "price_change": -3.41,
+   "price_change_pct": -1.06,
+   "market_cap_b": 3874.0,
    "rating": "BUY",
    "price_target": 429.12,
-   "composite_score": 62.0,
+   "composite_score": 61.0,
    "dcf": {
-    "bear": 83.78,
-    "base": 129.38,
-    "bull": 192.35,
+    "bear": 83.53,
+    "base": 128.8,
+    "bull": 191.23,
     "wacc": 9.8,
     "terminal_growth": 2.5,
     "fcf_yield": 1.4,
@@ -3646,243 +3646,243 @@
      {
       "wacc": 7.8,
       "tg": 1.5,
-      "value": 154.41
+      "value": 153.7
      },
      {
       "wacc": 8.8,
       "tg": 1.5,
-      "value": 133.53
+      "value": 132.93
      },
      {
       "wacc": 9.8,
       "tg": 1.5,
-      "value": 117.72
+      "value": 117.2
      },
      {
       "wacc": 10.8,
       "tg": 1.5,
-      "value": 105.33
+      "value": 104.88
      },
      {
       "wacc": 11.8,
       "tg": 1.5,
-      "value": 95.38
+      "value": 94.98
      },
      {
       "wacc": 7.8,
       "tg": 2.0,
-      "value": 164.81
+      "value": 164.05
      },
      {
       "wacc": 8.8,
       "tg": 2.0,
-      "value": 140.91
+      "value": 140.27
      },
      {
       "wacc": 9.8,
       "tg": 2.0,
-      "value": 123.17
+      "value": 122.63
      },
      {
       "wacc": 10.8,
       "tg": 2.0,
-      "value": 109.5
+      "value": 109.02
      },
      {
       "wacc": 11.8,
       "tg": 2.0,
-      "value": 98.64
+      "value": 98.22
      },
      {
       "wacc": 7.8,
       "tg": 2.5,
-      "value": 177.18
+      "value": 176.35
      },
      {
       "wacc": 8.8,
       "tg": 2.5,
-      "value": 149.47
+      "value": 148.78
      },
      {
       "wacc": 9.8,
       "tg": 2.5,
-      "value": 129.38
+      "value": 128.8
      },
      {
       "wacc": 10.8,
       "tg": 2.5,
-      "value": 114.16
+      "value": 113.66
      },
      {
       "wacc": 11.8,
       "tg": 2.5,
-      "value": 102.24
+      "value": 101.8
      },
      {
       "wacc": 7.8,
       "tg": 3.0,
-      "value": 192.13
+      "value": 191.22
      },
      {
       "wacc": 8.8,
       "tg": 3.0,
-      "value": 159.49
+      "value": 158.76
      },
      {
       "wacc": 9.8,
       "tg": 3.0,
-      "value": 136.49
+      "value": 135.88
      },
      {
       "wacc": 10.8,
       "tg": 3.0,
-      "value": 119.42
+      "value": 118.9
      },
      {
       "wacc": 11.8,
       "tg": 3.0,
-      "value": 106.26
+      "value": 105.8
      },
      {
       "wacc": 7.8,
       "tg": 3.5,
-      "value": 210.55
+      "value": 209.55
      },
      {
       "wacc": 8.8,
       "tg": 3.5,
-      "value": 171.41
+      "value": 170.62
      },
      {
       "wacc": 9.8,
       "tg": 3.5,
-      "value": 144.74
+      "value": 144.08
      },
      {
       "wacc": 10.8,
       "tg": 3.5,
-      "value": 125.41
+      "value": 124.85
      },
      {
       "wacc": 11.8,
       "tg": 3.5,
-      "value": 110.76
+      "value": 110.27
      }
     ]
    },
    "reverse_dcf": {
-    "implied_growth": 24.6,
-    "consensus_growth": 25.3,
+    "implied_growth": 24.5,
+    "consensus_growth": 25.2,
     "stretched": false,
     "sensitivity": [
      {
       "wacc": 7.8,
       "tg": 1.5,
-      "implied": 21.0
+      "implied": 20.9
      },
      {
       "wacc": 8.8,
       "tg": 1.5,
-      "implied": 23.6
+      "implied": 23.4
      },
      {
       "wacc": 9.8,
       "tg": 1.5,
-      "implied": 26.0
+      "implied": 25.8
      },
      {
       "wacc": 10.8,
       "tg": 1.5,
-      "implied": 28.2
+      "implied": 28.0
      },
      {
       "wacc": 11.8,
       "tg": 1.5,
-      "implied": 30.3
+      "implied": 30.2
      },
      {
       "wacc": 7.8,
       "tg": 2.0,
-      "implied": 20.2
+      "implied": 20.0
      },
      {
       "wacc": 8.8,
       "tg": 2.0,
-      "implied": 22.9
+      "implied": 22.7
      },
      {
       "wacc": 9.8,
       "tg": 2.0,
-      "implied": 25.3
+      "implied": 25.2
      },
      {
       "wacc": 10.8,
       "tg": 2.0,
-      "implied": 27.6
+      "implied": 27.5
      },
      {
       "wacc": 11.8,
       "tg": 2.0,
-      "implied": 29.8
+      "implied": 29.6
      },
      {
       "wacc": 7.8,
       "tg": 2.5,
-      "implied": 19.2
+      "implied": 19.1
      },
      {
       "wacc": 8.8,
       "tg": 2.5,
-      "implied": 22.1
+      "implied": 21.9
      },
      {
       "wacc": 9.8,
       "tg": 2.5,
-      "implied": 24.6
+      "implied": 24.5
      },
      {
       "wacc": 10.8,
       "tg": 2.5,
-      "implied": 27.0
+      "implied": 26.9
      },
      {
       "wacc": 11.8,
       "tg": 2.5,
-      "implied": 29.3
+      "implied": 29.1
      },
      {
       "wacc": 7.8,
       "tg": 3.0,
-      "implied": 18.2
+      "implied": 18.1
      },
      {
       "wacc": 8.8,
       "tg": 3.0,
-      "implied": 21.2
+      "implied": 21.1
      },
      {
       "wacc": 9.8,
       "tg": 3.0,
-      "implied": 23.9
+      "implied": 23.7
      },
      {
       "wacc": 10.8,
       "tg": 3.0,
-      "implied": 26.4
+      "implied": 26.2
      },
      {
       "wacc": 11.8,
       "tg": 3.0,
-      "implied": 28.7
+      "implied": 28.5
      }
     ]
    },
    "football": [
     {
      "method": "DCF Scenarios (Bear/Base/Bull)",
-     "low": 83.78,
-     "mid": 129.38,
-     "high": 192.35
+     "low": 83.53,
+     "mid": 128.8,
+     "high": 191.23
     },
     {
      "method": "Analyst Consensus Target",
@@ -3892,8 +3892,8 @@
     },
     {
      "method": "52-Week Range",
-     "low": 264.28,
-     "mid": 336.44,
+     "low": 266.5,
+     "mid": 337.56,
      "high": 408.61
     }
    ],
@@ -3902,24 +3902,20 @@
     "valuation": 48.0,
     "growth": 81.0,
     "quality": 84.0,
-    "momentum": 40.0,
-    "consensus": 61.0
+    "momentum": 38.0,
+    "consensus": 60.0
    },
    "risk": {
     "var_95": -2.71,
     "cvar": -4.06,
-    "beta": 1.24,
-    "sharpe": 0.59,
-    "sortino": 0.96,
-    "max_drawdown": -21.05,
+    "beta": 1.2,
+    "sharpe": 0.56,
+    "sortino": 0.93,
+    "max_drawdown": -21.22,
     "vol_21d": 20.7,
-    "vol_63d": 29.1
+    "vol_63d": 28.8
    },
    "price_history": [
-    {
-     "date": "2026-04-27",
-     "price": 349.91
-    },
     {
      "date": "2026-04-28",
      "price": 349.35
@@ -4419,30 +4415,34 @@
     {
      "date": "2026-10-23",
      "price": 320.21
+    },
+    {
+     "date": "2026-10-26",
+     "price": 316.8
     }
    ],
    "commentary": null,
    "financials": {
     "revenue_growth_yoy": 24.2,
     "net_margin": 54.8,
-    "pe_ttm": 16.0,
+    "pe_ttm": 15.9,
     "eps_next_yr": 15.12
    },
    "vs_sector": {
     "etf": "XLC",
     "peers": 1,
-    "fwd_pe": 20.63,
-    "fwd_pe_median": 17.99,
-    "ev_ebitda": 21.78,
-    "ev_ebitda_median": 14.15,
-    "ev_sales": 8.46,
-    "ev_sales_median": 6.81,
+    "fwd_pe": 20.87,
+    "fwd_pe_median": 17.64,
+    "ev_ebitda": 22.04,
+    "ev_ebitda_median": 13.92,
+    "ev_sales": 8.56,
+    "ev_sales_median": 6.7,
     "peg": null,
-    "peg_median": 1.1,
-    "fcf_yield": 1.36,
-    "fcf_yield_median": 1.75,
-    "growth": 25.33,
-    "growth_median": 21.6,
+    "peg_median": 1.07,
+    "fcf_yield": 1.37,
+    "fcf_yield_median": 1.78,
+    "growth": 25.16,
+    "growth_median": 21.62,
     "margin": 54.77,
     "margin_median": 31.14,
     "roe": 48.68,
@@ -4576,17 +4576,17 @@
   "MSFT": {
    "name": "Microsoft Corporation",
    "sector": "Technology",
-   "price": 524.51,
-   "price_change": 3.43,
-   "price_change_pct": 0.66,
-   "market_cap_b": 3895.0,
+   "price": 532.6,
+   "price_change": 8.09,
+   "price_change_pct": 1.54,
+   "market_cap_b": 3955.0,
    "rating": "BUY",
-   "price_target": 603.43,
-   "composite_score": 60.0,
+   "price_target": 605.12,
+   "composite_score": 61.0,
    "dcf": {
-    "bear": 135.15,
-    "base": 215.47,
-    "bull": 323.01,
+    "bear": 135.18,
+    "base": 215.54,
+    "bull": 323.13,
     "wacc": 9.4,
     "terminal_growth": 2.5,
     "fcf_yield": 1.7,
@@ -4597,248 +4597,248 @@
      {
       "wacc": 7.4,
       "tg": 1.5,
-      "value": 264.13
+      "value": 264.21
      },
      {
       "wacc": 8.4,
       "tg": 1.5,
-      "value": 223.21
+      "value": 223.28
      },
      {
       "wacc": 9.4,
       "tg": 1.5,
-      "value": 192.71
+      "value": 192.76
      },
      {
       "wacc": 10.4,
       "tg": 1.5,
-      "value": 169.1
+      "value": 169.15
      },
      {
       "wacc": 11.4,
       "tg": 1.5,
-      "value": 150.29
+      "value": 150.34
      },
      {
       "wacc": 7.4,
       "tg": 2.0,
-      "value": 285.09
+      "value": 285.18
      },
      {
       "wacc": 8.4,
       "tg": 2.0,
-      "value": 237.79
+      "value": 237.86
      },
      {
       "wacc": 9.4,
       "tg": 2.0,
-      "value": 203.32
+      "value": 203.38
      },
      {
       "wacc": 10.4,
       "tg": 2.0,
-      "value": 177.1
+      "value": 177.15
      },
      {
       "wacc": 11.4,
       "tg": 2.0,
-      "value": 156.49
+      "value": 156.54
      },
      {
       "wacc": 7.4,
       "tg": 2.5,
-      "value": 310.34
+      "value": 310.43
      },
      {
       "wacc": 8.4,
       "tg": 2.5,
-      "value": 254.83
+      "value": 254.91
      },
      {
       "wacc": 9.4,
       "tg": 2.5,
-      "value": 215.47
+      "value": 215.54
      },
      {
       "wacc": 10.4,
       "tg": 2.5,
-      "value": 186.11
+      "value": 186.17
      },
      {
       "wacc": 11.4,
       "tg": 2.5,
-      "value": 163.39
+      "value": 163.44
      },
      {
       "wacc": 7.4,
       "tg": 3.0,
-      "value": 341.32
+      "value": 341.42
      },
      {
       "wacc": 8.4,
       "tg": 3.0,
-      "value": 275.04
+      "value": 275.12
      },
      {
       "wacc": 9.4,
       "tg": 3.0,
-      "value": 229.52
+      "value": 229.59
      },
      {
       "wacc": 10.4,
       "tg": 3.0,
-      "value": 196.35
+      "value": 196.41
      },
      {
       "wacc": 11.4,
       "tg": 3.0,
-      "value": 171.11
+      "value": 171.16
      },
      {
       "wacc": 7.4,
       "tg": 3.5,
-      "value": 380.24
+      "value": 380.36
      },
      {
       "wacc": 8.4,
       "tg": 3.5,
-      "value": 299.36
+      "value": 299.46
      },
      {
       "wacc": 9.4,
       "tg": 3.5,
-      "value": 245.95
+      "value": 246.03
      },
      {
       "wacc": 10.4,
       "tg": 3.5,
-      "value": 208.07
+      "value": 208.13
      },
      {
       "wacc": 11.4,
       "tg": 3.5,
-      "value": 179.81
+      "value": 179.86
      }
     ]
    },
    "reverse_dcf": {
-    "implied_growth": 21.0,
+    "implied_growth": 21.2,
     "consensus_growth": 19.7,
     "stretched": true,
     "sensitivity": [
      {
       "wacc": 7.4,
       "tg": 1.5,
-      "implied": 17.4
+      "implied": 17.6
      },
      {
       "wacc": 8.4,
       "tg": 1.5,
-      "implied": 20.0
+      "implied": 20.2
      },
      {
       "wacc": 9.4,
       "tg": 1.5,
-      "implied": 22.4
+      "implied": 22.6
      },
      {
       "wacc": 10.4,
       "tg": 1.5,
-      "implied": 24.6
+      "implied": 24.8
      },
      {
       "wacc": 11.4,
       "tg": 1.5,
-      "implied": 26.7
+      "implied": 26.9
      },
      {
       "wacc": 7.4,
       "tg": 2.0,
-      "implied": 16.6
+      "implied": 16.8
      },
      {
       "wacc": 8.4,
       "tg": 2.0,
-      "implied": 19.2
+      "implied": 19.4
      },
      {
       "wacc": 9.4,
       "tg": 2.0,
-      "implied": 21.7
+      "implied": 21.9
      },
      {
       "wacc": 10.4,
       "tg": 2.0,
-      "implied": 24.0
+      "implied": 24.2
      },
      {
       "wacc": 11.4,
       "tg": 2.0,
-      "implied": 26.2
+      "implied": 26.4
      },
      {
       "wacc": 7.4,
       "tg": 2.5,
-      "implied": 15.6
+      "implied": 15.8
      },
      {
       "wacc": 8.4,
       "tg": 2.5,
-      "implied": 18.4
+      "implied": 18.6
      },
      {
       "wacc": 9.4,
       "tg": 2.5,
-      "implied": 21.0
+      "implied": 21.2
      },
      {
       "wacc": 10.4,
       "tg": 2.5,
-      "implied": 23.4
+      "implied": 23.6
      },
      {
       "wacc": 11.4,
       "tg": 2.5,
-      "implied": 25.6
+      "implied": 25.9
      },
      {
       "wacc": 7.4,
       "tg": 3.0,
-      "implied": 14.5
+      "implied": 14.7
      },
      {
       "wacc": 8.4,
       "tg": 3.0,
-      "implied": 17.5
+      "implied": 17.7
      },
      {
       "wacc": 9.4,
       "tg": 3.0,
-      "implied": 20.3
+      "implied": 20.5
      },
      {
       "wacc": 10.4,
       "tg": 3.0,
-      "implied": 22.7
+      "implied": 22.9
      },
      {
       "wacc": 11.4,
       "tg": 3.0,
-      "implied": 25.1
+      "implied": 25.3
      }
     ]
    },
    "football": [
     {
      "method": "DCF Scenarios (Bear/Base/Bull)",
-     "low": 135.15,
-     "mid": 215.47,
-     "high": 323.01
+     "low": 135.18,
+     "mid": 215.54,
+     "high": 323.13
     },
     {
      "method": "Analyst Consensus Target",
      "low": 440.0,
-     "mid": 603.43,
+     "mid": 605.12,
      "high": 870.0
     },
     {
@@ -4850,27 +4850,23 @@
    ],
    "residual_income": null,
    "factors": {
-    "valuation": 17.0,
+    "valuation": 14.0,
     "growth": 52.0,
     "quality": 77.0,
-    "momentum": 88.0,
-    "consensus": 62.0
+    "momentum": 86.0,
+    "consensus": 65.0
    },
    "risk": {
     "var_95": -2.84,
     "cvar": -4.15,
-    "beta": 2.0,
-    "sharpe": -0.05,
-    "sortino": -0.07,
+    "beta": 1.99,
+    "sharpe": 0.03,
+    "sortino": 0.04,
     "max_drawdown": -34.5,
-    "vol_21d": 22.8,
+    "vol_21d": 19.9,
     "vol_63d": 37.0
    },
    "price_history": [
-    {
-     "date": "2026-04-27",
-     "price": 423.11
-    },
     {
      "date": "2026-04-28",
      "price": 427.52
@@ -5370,29 +5366,33 @@
     {
      "date": "2026-10-23",
      "price": 524.51
+    },
+    {
+     "date": "2026-10-26",
+     "price": 532.6
     }
    ],
    "commentary": null,
    "financials": {
     "revenue_growth_yoy": 17.7,
     "net_margin": 40.3,
-    "pe_ttm": 29.1,
+    "pe_ttm": 29.6,
     "eps_next_yr": 23.69
    },
    "vs_sector": {
     "etf": "XLK",
     "peers": 2,
-    "fwd_pe": 22.48,
-    "fwd_pe_median": 24.77,
-    "ev_ebitda": 20.63,
-    "ev_ebitda_median": 27.88,
-    "ev_sales": 12.07,
-    "ev_sales_median": 13.95,
+    "fwd_pe": 22.43,
+    "fwd_pe_median": 25.0,
+    "ev_ebitda": 20.58,
+    "ev_ebitda_median": 28.13,
+    "ev_sales": 12.05,
+    "ev_sales_median": 14.08,
     "peg": 1.13,
-    "peg_median": 2.28,
-    "fcf_yield": 1.72,
-    "fcf_yield_median": 2.59,
-    "growth": 19.65,
+    "peg_median": 2.3,
+    "fcf_yield": 1.69,
+    "fcf_yield_median": 2.58,
+    "growth": 19.66,
     "growth_median": 39.25,
     "margin": 40.3,
     "margin_median": 45.64,
@@ -5527,13 +5527,13 @@
   "CAT": {
    "name": "Caterpillar Inc.",
    "sector": "Industrials",
-   "price": 687.0,
-   "price_change": -17.05,
-   "price_change_pct": -2.42,
-   "market_cap_b": 316.0,
+   "price": 692.13,
+   "price_change": 6.76,
+   "price_change_pct": 0.99,
+   "market_cap_b": 318.0,
    "rating": "BUY",
    "price_target": 926.91,
-   "composite_score": 58.0,
+   "composite_score": 59.0,
    "dcf": {
     "bear": 139.24,
     "base": 225.69,
@@ -5673,59 +5673,59 @@
     ]
    },
    "reverse_dcf": {
-    "implied_growth": 18.7,
+    "implied_growth": 18.8,
     "consensus_growth": 11.4,
     "stretched": true,
     "sensitivity": [
      {
       "wacc": 8.8,
       "tg": 1.5,
-      "implied": 15.5
+      "implied": 15.6
      },
      {
       "wacc": 9.8,
       "tg": 1.5,
-      "implied": 17.7
+      "implied": 17.8
      },
      {
       "wacc": 10.8,
       "tg": 1.5,
-      "implied": 19.8
+      "implied": 19.9
      },
      {
       "wacc": 11.8,
       "tg": 1.5,
-      "implied": 21.7
+      "implied": 21.8
      },
      {
       "wacc": 12.8,
       "tg": 1.5,
-      "implied": 23.6
+      "implied": 23.7
      },
      {
       "wacc": 8.8,
       "tg": 2.0,
-      "implied": 14.9
+      "implied": 15.0
      },
      {
       "wacc": 9.8,
       "tg": 2.0,
-      "implied": 17.1
+      "implied": 17.2
      },
      {
       "wacc": 10.8,
       "tg": 2.0,
-      "implied": 19.2
+      "implied": 19.3
      },
      {
       "wacc": 11.8,
       "tg": 2.0,
-      "implied": 21.2
+      "implied": 21.3
      },
      {
       "wacc": 12.8,
       "tg": 2.0,
-      "implied": 23.2
+      "implied": 23.3
      },
      {
       "wacc": 8.8,
@@ -5735,12 +5735,12 @@
      {
       "wacc": 9.8,
       "tg": 2.5,
-      "implied": 16.5
+      "implied": 16.6
      },
      {
       "wacc": 10.8,
       "tg": 2.5,
-      "implied": 18.7
+      "implied": 18.8
      },
      {
       "wacc": 11.8,
@@ -5750,32 +5750,32 @@
      {
       "wacc": 12.8,
       "tg": 2.5,
-      "implied": 22.7
+      "implied": 22.8
      },
      {
       "wacc": 8.8,
       "tg": 3.0,
-      "implied": 13.4
+      "implied": 13.5
      },
      {
       "wacc": 9.8,
       "tg": 3.0,
-      "implied": 15.8
+      "implied": 15.9
      },
      {
       "wacc": 10.8,
       "tg": 3.0,
-      "implied": 18.1
+      "implied": 18.2
      },
      {
       "wacc": 11.8,
       "tg": 3.0,
-      "implied": 20.2
+      "implied": 20.3
      },
      {
       "wacc": 12.8,
       "tg": 3.0,
-      "implied": 22.2
+      "implied": 22.3
      }
     ]
    },
@@ -5794,8 +5794,8 @@
     },
     {
      "method": "52-Week Range",
-     "low": 521.43,
-     "mid": 797.44,
+     "low": 521.67,
+     "mid": 797.57,
      "high": 1073.46
     }
    ],
@@ -5804,545 +5804,545 @@
     "valuation": 33.0,
     "growth": 76.0,
     "quality": 61.0,
-    "momentum": 7.0,
-    "consensus": 72.0
+    "momentum": 14.0,
+    "consensus": 71.0
    },
    "risk": {
     "var_95": -4.11,
     "cvar": -5.27,
-    "beta": 2.07,
-    "sharpe": 0.79,
-    "sortino": 1.23,
+    "beta": 2.09,
+    "sharpe": 0.82,
+    "sortino": 1.27,
     "max_drawdown": -35.37,
-    "vol_21d": 37.1,
-    "vol_63d": 36.6
+    "vol_21d": 36.3,
+    "vol_63d": 36.0
    },
    "price_history": [
     {
-     "date": "2026-04-27",
-     "price": 827.26
-    },
-    {
      "date": "2026-04-28",
-     "price": 816.36
+     "price": 814.42
     },
     {
      "date": "2026-04-29",
-     "price": 808.55
+     "price": 806.63
     },
     {
      "date": "2026-04-30",
-     "price": 888.46
+     "price": 886.35
     },
     {
      "date": "2026-05-01",
-     "price": 888.02
+     "price": 885.92
     },
     {
      "date": "2026-05-04",
-     "price": 873.16
+     "price": 871.09
     },
     {
      "date": "2026-05-05",
-     "price": 902.92
+     "price": 900.77
     },
     {
      "date": "2026-05-06",
-     "price": 925.21
+     "price": 923.02
     },
     {
      "date": "2026-05-07",
-     "price": 894.03
+     "price": 891.91
     },
     {
      "date": "2026-05-08",
-     "price": 895.79
+     "price": 893.66
     },
     {
      "date": "2026-05-11",
-     "price": 925.07
+     "price": 922.88
     },
     {
      "date": "2026-05-12",
-     "price": 910.45
+     "price": 908.29
     },
     {
      "date": "2026-05-13",
-     "price": 900.63
+     "price": 898.49
     },
     {
      "date": "2026-05-14",
-     "price": 918.52
+     "price": 916.34
     },
     {
      "date": "2026-05-15",
-     "price": 886.67
+     "price": 884.56
     },
     {
      "date": "2026-05-18",
-     "price": 862.35
+     "price": 860.3
     },
     {
      "date": "2026-05-19",
-     "price": 858.56
+     "price": 856.52
     },
     {
      "date": "2026-05-20",
-     "price": 870.94
+     "price": 868.88
     },
     {
      "date": "2026-05-21",
-     "price": 864.35
+     "price": 862.3
     },
     {
      "date": "2026-05-22",
-     "price": 878.26
+     "price": 876.18
     },
     {
      "date": "2026-05-26",
-     "price": 906.87
+     "price": 904.72
     },
     {
      "date": "2026-05-27",
-     "price": 908.25
+     "price": 906.09
     },
     {
      "date": "2026-05-28",
-     "price": 886.03
+     "price": 883.92
     },
     {
      "date": "2026-05-29",
-     "price": 874.25
+     "price": 872.17
     },
     {
      "date": "2026-06-01",
-     "price": 863.76
+     "price": 861.71
     },
     {
      "date": "2026-06-02",
-     "price": 908.13
+     "price": 905.97
     },
     {
      "date": "2026-06-03",
-     "price": 924.47
+     "price": 922.27
     },
     {
      "date": "2026-06-04",
-     "price": 938.74
+     "price": 936.51
     },
     {
      "date": "2026-06-05",
-     "price": 902.61
+     "price": 900.46
     },
     {
      "date": "2026-06-08",
-     "price": 913.94
+     "price": 911.78
     },
     {
      "date": "2026-06-09",
-     "price": 913.01
+     "price": 910.84
     },
     {
      "date": "2026-06-10",
-     "price": 854.57
+     "price": 852.55
     },
     {
      "date": "2026-06-11",
-     "price": 895.97
+     "price": 893.84
     },
     {
      "date": "2026-06-12",
-     "price": 908.88
+     "price": 906.73
     },
     {
      "date": "2026-06-15",
-     "price": 932.2
+     "price": 929.99
     },
     {
      "date": "2026-06-16",
-     "price": 943.71
+     "price": 941.47
     },
     {
      "date": "2026-06-17",
-     "price": 954.15
+     "price": 951.89
     },
     {
      "date": "2026-06-18",
-     "price": 983.99
+     "price": 981.66
     },
     {
      "date": "2026-06-22",
-     "price": 1020.39
+     "price": 1017.97
     },
     {
      "date": "2026-06-23",
-     "price": 982.42
+     "price": 980.09
     },
     {
      "date": "2026-06-24",
-     "price": 992.61
+     "price": 990.25
     },
     {
      "date": "2026-06-25",
-     "price": 1055.05
+     "price": 1052.55
     },
     {
      "date": "2026-06-26",
-     "price": 995.62
+     "price": 993.26
     },
     {
      "date": "2026-06-29",
-     "price": 1031.28
+     "price": 1028.83
     },
     {
      "date": "2026-06-30",
-     "price": 1062.93
+     "price": 1060.41
     },
     {
      "date": "2026-07-01",
-     "price": 989.57
+     "price": 987.23
     },
     {
      "date": "2026-07-02",
-     "price": 961.75
+     "price": 959.46
     },
     {
      "date": "2026-07-06",
-     "price": 968.12
+     "price": 965.83
     },
     {
      "date": "2026-07-07",
-     "price": 938.38
+     "price": 936.15
     },
     {
      "date": "2026-07-08",
-     "price": 946.32
+     "price": 944.08
     },
     {
      "date": "2026-07-09",
-     "price": 936.65
+     "price": 934.43
     },
     {
      "date": "2026-07-10",
-     "price": 950.65
+     "price": 948.39
     },
     {
      "date": "2026-07-13",
-     "price": 929.75
+     "price": 927.54
     },
     {
      "date": "2026-07-14",
-     "price": 931.61
+     "price": 929.4
     },
     {
      "date": "2026-07-15",
-     "price": 912.61
+     "price": 910.44
     },
     {
      "date": "2026-07-16",
-     "price": 875.55
+     "price": 873.47
     },
     {
      "date": "2026-07-17",
-     "price": 878.65
+     "price": 876.57
     },
     {
      "date": "2026-07-20",
-     "price": 864.3
+     "price": 862.25
     },
     {
      "date": "2026-07-21",
-     "price": 889.97
+     "price": 887.86
     },
     {
      "date": "2026-07-22",
-     "price": 889.31
+     "price": 887.2
     },
     {
      "date": "2026-07-23",
-     "price": 894.54
+     "price": 892.42
     },
     {
      "date": "2026-07-24",
-     "price": 888.73
+     "price": 886.62
     },
     {
      "date": "2026-07-27",
-     "price": 873.28
+     "price": 871.21
     },
     {
      "date": "2026-07-28",
-     "price": 840.85
+     "price": 838.85
     },
     {
      "date": "2026-07-29",
-     "price": 782.71
+     "price": 780.85
     },
     {
      "date": "2026-07-30",
-     "price": 809.14
+     "price": 807.22
     },
     {
      "date": "2026-07-31",
-     "price": 814.81
+     "price": 812.88
     },
     {
      "date": "2026-08-03",
-     "price": 830.03
+     "price": 828.06
     },
     {
      "date": "2026-08-04",
-     "price": 876.54
+     "price": 874.46
     },
     {
      "date": "2026-08-05",
-     "price": 871.08
+     "price": 869.01
     },
     {
      "date": "2026-08-06",
-     "price": 856.96
+     "price": 854.93
     },
     {
      "date": "2026-08-07",
-     "price": 842.19
+     "price": 840.19
     },
     {
      "date": "2026-08-10",
-     "price": 837.58
+     "price": 835.59
     },
     {
      "date": "2026-08-11",
-     "price": 843.37
+     "price": 841.37
     },
     {
      "date": "2026-08-12",
-     "price": 855.6
+     "price": 853.57
     },
     {
      "date": "2026-08-13",
-     "price": 854.6
+     "price": 852.57
     },
     {
      "date": "2026-08-14",
-     "price": 856.57
+     "price": 854.54
     },
     {
      "date": "2026-08-17",
-     "price": 881.65
+     "price": 879.56
     },
     {
      "date": "2026-08-18",
-     "price": 840.87
+     "price": 838.87
     },
     {
      "date": "2026-08-19",
-     "price": 816.15
+     "price": 814.21
     },
     {
      "date": "2026-08-20",
-     "price": 815.39
+     "price": 813.46
     },
     {
      "date": "2026-08-21",
-     "price": 827.9
+     "price": 825.94
     },
     {
      "date": "2026-08-24",
-     "price": 811.02
+     "price": 809.1
     },
     {
      "date": "2026-08-25",
-     "price": 811.29
+     "price": 809.37
     },
     {
      "date": "2026-08-26",
-     "price": 821.93
+     "price": 819.98
     },
     {
      "date": "2026-08-27",
-     "price": 817.0
+     "price": 815.06
     },
     {
      "date": "2026-08-28",
-     "price": 800.25
+     "price": 798.35
     },
     {
      "date": "2026-08-31",
-     "price": 797.47
+     "price": 795.58
     },
     {
      "date": "2026-09-01",
-     "price": 779.16
+     "price": 777.31
     },
     {
      "date": "2026-09-02",
-     "price": 792.28
+     "price": 790.4
     },
     {
      "date": "2026-09-03",
-     "price": 800.14
+     "price": 798.24
     },
     {
      "date": "2026-09-04",
-     "price": 813.94
+     "price": 812.01
     },
     {
      "date": "2026-09-08",
-     "price": 822.48
+     "price": 820.53
     },
     {
      "date": "2026-09-09",
-     "price": 815.56
+     "price": 813.62
     },
     {
      "date": "2026-09-10",
-     "price": 805.0
+     "price": 803.09
     },
     {
      "date": "2026-09-11",
-     "price": 818.57
+     "price": 816.63
     },
     {
      "date": "2026-09-14",
-     "price": 784.0
+     "price": 782.14
     },
     {
      "date": "2026-09-15",
-     "price": 783.54
+     "price": 781.68
     },
     {
      "date": "2026-09-16",
-     "price": 782.72
+     "price": 780.86
     },
     {
      "date": "2026-09-17",
-     "price": 798.57
+     "price": 796.68
     },
     {
      "date": "2026-09-18",
-     "price": 808.99
+     "price": 807.07
     },
     {
      "date": "2026-09-21",
-     "price": 816.5
+     "price": 814.56
     },
     {
      "date": "2026-09-22",
-     "price": 808.01
+     "price": 806.09
     },
     {
      "date": "2026-09-23",
-     "price": 812.02
+     "price": 810.09
     },
     {
      "date": "2026-09-24",
-     "price": 805.25
+     "price": 803.34
     },
     {
      "date": "2026-09-25",
-     "price": 821.58
+     "price": 819.63
     },
     {
      "date": "2026-09-28",
-     "price": 819.95
+     "price": 818.0
     },
     {
      "date": "2026-09-29",
-     "price": 826.64
+     "price": 824.68
     },
     {
      "date": "2026-09-30",
-     "price": 810.79
+     "price": 808.87
     },
     {
      "date": "2026-10-01",
-     "price": 826.35
+     "price": 824.39
     },
     {
      "date": "2026-10-02",
-     "price": 845.42
+     "price": 843.41
     },
     {
      "date": "2026-10-05",
-     "price": 848.14
+     "price": 846.13
     },
     {
      "date": "2026-10-06",
-     "price": 863.44
+     "price": 861.39
     },
     {
      "date": "2026-10-07",
-     "price": 813.83
+     "price": 811.9
     },
     {
      "date": "2026-10-08",
-     "price": 796.18
+     "price": 794.29
     },
     {
      "date": "2026-10-09",
-     "price": 800.47
+     "price": 798.57
     },
     {
      "date": "2026-10-12",
-     "price": 799.37
+     "price": 797.47
     },
     {
      "date": "2026-10-13",
-     "price": 772.78
+     "price": 770.95
     },
     {
      "date": "2026-10-14",
-     "price": 748.98
+     "price": 747.2
     },
     {
      "date": "2026-10-15",
-     "price": 735.64
+     "price": 733.89
     },
     {
      "date": "2026-10-16",
-     "price": 730.76
+     "price": 729.03
     },
     {
      "date": "2026-10-19",
-     "price": 725.79
+     "price": 724.07
     },
     {
      "date": "2026-10-20",
-     "price": 725.24
+     "price": 723.52
     },
     {
      "date": "2026-10-21",
-     "price": 740.21
+     "price": 738.45
     },
     {
      "date": "2026-10-22",
-     "price": 704.05
+     "price": 702.38
     },
     {
      "date": "2026-10-23",
-     "price": 687.0
+     "price": 685.37
+    },
+    {
+     "date": "2026-10-26",
+     "price": 692.13
     }
    ],
    "commentary": null,
    "financials": {
     "revenue_growth_yoy": 24.0,
     "net_margin": 14.5,
-    "pe_ttm": 29.1,
+    "pe_ttm": 29.3,
     "eps_next_yr": 32.59
    },
    "vs_sector": {
     "etf": "XLI",
     "peers": 1,
-    "fwd_pe": 21.24,
-    "fwd_pe_median": 30.98,
-    "ev_ebitda": 21.99,
-    "ev_ebitda_median": 26.61,
-    "ev_sales": 4.78,
-    "ev_sales_median": 5.88,
-    "peg": 1.1,
-    "peg_median": 2.28,
-    "fcf_yield": 2.85,
-    "fcf_yield_median": 2.71,
+    "fwd_pe": 21.89,
+    "fwd_pe_median": 31.96,
+    "ev_ebitda": 22.59,
+    "ev_ebitda_median": 27.43,
+    "ev_sales": 4.91,
+    "ev_sales_median": 6.06,
+    "peg": 1.14,
+    "peg_median": 2.35,
+    "fcf_yield": 2.83,
+    "fcf_yield_median": 2.68,
     "growth": 11.39,
     "growth_median": 11.69,
     "margin": 14.51,
@@ -6432,12 +6432,6 @@
    },
    "quarters": [
     {
-     "period": "2025-03-31",
-     "revenue_b": null,
-     "eps": 4.2,
-     "op_margin": null
-    },
-    {
      "period": "2025-06-30",
      "revenue_b": 16.57,
      "eps": 4.62,
@@ -6464,7 +6458,7 @@
     {
      "period": "2026-06-30",
      "revenue_b": 20.54,
-     "eps": null,
+     "eps": 7.77,
      "op_margin": 20.9
     }
    ],
@@ -6484,13 +6478,13 @@
   "BAC": {
    "name": "Bank of America Corporation",
    "sector": "Financial Services",
-   "price": 50.56,
-   "price_change": -0.52,
-   "price_change_pct": -1.02,
+   "price": 50.52,
+   "price_change": -0.04,
+   "price_change_pct": -0.08,
    "market_cap_b": 350.0,
    "rating": "BUY",
    "price_target": 62.95,
-   "composite_score": 57.0,
+   "composite_score": 56.0,
    "dcf": {
     "bear": null,
     "base": null,
@@ -6512,9 +6506,9 @@
    "football": [
     {
      "method": "Residual Income",
-     "low": 33.05,
-     "mid": 36.82,
-     "high": 41.55
+     "low": 33.03,
+     "mid": 36.79,
+     "high": 41.52
     },
     {
      "method": "Analyst Consensus Target",
@@ -6530,7 +6524,7 @@
     }
    ],
    "residual_income": {
-    "value": 36.82,
+    "value": 36.79,
     "justified_pb": 0.94,
     "actual_pb": 1.29,
     "roe": 10.7,
@@ -6542,24 +6536,20 @@
     "valuation": 86.0,
     "growth": 19.0,
     "quality": 41.0,
-    "momentum": 19.0,
+    "momentum": 17.0,
     "consensus": 72.0
    },
    "risk": {
     "var_95": -2.57,
     "cvar": -3.47,
-    "beta": 0.83,
-    "sharpe": -0.2,
-    "sortino": -0.26,
+    "beta": 0.81,
+    "sharpe": -0.19,
+    "sortino": -0.24,
     "max_drawdown": -21.85,
-    "vol_21d": 22.1,
-    "vol_63d": 21.7
+    "vol_21d": 21.3,
+    "vol_63d": 21.6
    },
    "price_history": [
-    {
-     "date": "2026-04-27",
-     "price": 52.09
-    },
     {
      "date": "2026-04-28",
      "price": 52.12
@@ -7059,6 +7049,10 @@
     {
      "date": "2026-10-23",
      "price": 50.56
+    },
+    {
+     "date": "2026-10-26",
+     "price": 50.52
     }
    ],
    "commentary": null,
@@ -7071,14 +7065,14 @@
    "vs_sector": {
     "etf": "XLF",
     "peers": 7,
-    "fwd_pe": 9.73,
-    "fwd_pe_median": 13.08,
+    "fwd_pe": 9.76,
+    "fwd_pe_median": 13.15,
     "ev_ebitda": null,
     "ev_ebitda_median": null,
     "ev_sales": null,
     "ev_sales_median": null,
     "peg": 0.6,
-    "peg_median": 1.44,
+    "peg_median": 1.46,
     "fcf_yield": null,
     "fcf_yield_median": null,
     "growth": 6.08,
@@ -7228,9 +7222,9 @@
   "HD": {
    "name": "The Home Depot, Inc.",
    "sector": "Consumer Cyclical",
-   "price": 319.83,
-   "price_change": -7.9,
-   "price_change_pct": -2.41,
+   "price": 319.38,
+   "price_change": -0.45,
+   "price_change_pct": -0.14,
    "market_cap_b": 319.0,
    "rating": "BUY",
    "price_target": 379.0,
@@ -7411,12 +7405,12 @@
      {
       "wacc": 8.2,
       "tg": 2.0,
-      "implied": 7.6
+      "implied": 7.5
      },
      {
       "wacc": 9.2,
       "tg": 2.0,
-      "implied": 9.8
+      "implied": 9.7
      },
      {
       "wacc": 10.2,
@@ -7505,24 +7499,20 @@
     "valuation": 69.0,
     "growth": 14.0,
     "quality": 52.0,
-    "momentum": 64.0,
-    "consensus": 57.0
+    "momentum": 62.0,
+    "consensus": 58.0
    },
    "risk": {
     "var_95": -2.53,
     "cvar": -3.15,
-    "beta": 0.41,
-    "sharpe": -0.96,
-    "sortino": -1.69,
-    "max_drawdown": -29.83,
+    "beta": 0.39,
+    "sharpe": -0.95,
+    "sortino": -1.68,
+    "max_drawdown": -29.64,
     "vol_21d": 28.5,
-    "vol_63d": 26.3
+    "vol_63d": 25.8
    },
    "price_history": [
-    {
-     "date": "2026-04-27",
-     "price": 327.41
-    },
     {
      "date": "2026-04-28",
      "price": 324.22
@@ -8022,6 +8012,10 @@
     {
      "date": "2026-10-23",
      "price": 319.83
+    },
+    {
+     "date": "2026-10-26",
+     "price": 319.38
     }
    ],
    "commentary": null,
@@ -8034,15 +8028,15 @@
    "vs_sector": {
     "etf": "XLY",
     "peers": 1,
-    "fwd_pe": 19.93,
-    "fwd_pe_median": 23.88,
-    "ev_ebitda": 15.41,
-    "ev_ebitda_median": 16.66,
+    "fwd_pe": 19.92,
+    "fwd_pe_median": 24.26,
+    "ev_ebitda": 15.37,
+    "ev_ebitda_median": 16.92,
     "ev_sales": 2.24,
-    "ev_sales_median": 3.63,
+    "ev_sales_median": 3.69,
     "peg": 3.15,
     "peg_median": null,
-    "fcf_yield": 4.73,
+    "fcf_yield": 4.74,
     "fcf_yield_median": null,
     "growth": 3.33,
     "growth_median": 14.62,
@@ -8179,13 +8173,13 @@
   "GS": {
    "name": "The Goldman Sachs Group, Inc.",
    "sector": "Financial Services",
-   "price": 875.68,
-   "price_change": -15.62,
-   "price_change_pct": -1.75,
-   "market_cap_b": 255.0,
+   "price": 893.28,
+   "price_change": 17.6,
+   "price_change_pct": 2.01,
+   "market_cap_b": 260.0,
    "rating": "BUY",
    "price_target": 1031.14,
-   "composite_score": 53.0,
+   "composite_score": 52.0,
    "dcf": {
     "bear": null,
     "base": null,
@@ -8207,9 +8201,9 @@
    "football": [
     {
      "method": "Residual Income",
-     "low": 565.95,
-     "mid": 628.6,
-     "high": 706.86
+     "low": 565.55,
+     "mid": 628.11,
+     "high": 706.24
     },
     {
      "method": "Analyst Consensus Target",
@@ -8225,36 +8219,32 @@
     }
    ],
    "residual_income": {
-    "value": 628.6,
+    "value": 628.11,
     "justified_pb": 1.69,
-    "actual_pb": 2.35,
+    "actual_pb": 2.4,
     "roe": 17.8,
     "book_value": 372.25,
     "cost_of_equity": 11.5,
     "growth": 2.5
    },
    "factors": {
-    "valuation": 74.0,
+    "valuation": 71.0,
     "growth": 71.0,
     "quality": 56.0,
     "momentum": 36.0,
-    "consensus": 46.0
+    "consensus": 45.0
    },
    "risk": {
     "var_95": -3.15,
     "cvar": -4.56,
-    "beta": 1.79,
-    "sharpe": 0.17,
-    "sortino": 0.27,
+    "beta": 1.82,
+    "sharpe": 0.23,
+    "sortino": 0.35,
     "max_drawdown": -23.62,
-    "vol_21d": 19.6,
-    "vol_63d": 27.4
+    "vol_21d": 20.4,
+    "vol_63d": 27.7
    },
    "price_history": [
-    {
-     "date": "2026-04-27",
-     "price": 929.14
-    },
     {
      "date": "2026-04-28",
      "price": 917.99
@@ -8754,25 +8744,29 @@
     {
      "date": "2026-10-23",
      "price": 875.68
+    },
+    {
+     "date": "2026-10-26",
+     "price": 893.28
     }
    ],
    "commentary": null,
    "financials": {
     "revenue_growth_yoy": 23.3,
     "net_margin": 31.2,
-    "pe_ttm": 12.0,
+    "pe_ttm": 12.2,
     "eps_next_yr": 74.49
    },
    "vs_sector": {
     "etf": "XLF",
     "peers": 7,
-    "fwd_pe": 12.06,
-    "fwd_pe_median": 13.08,
+    "fwd_pe": 12.31,
+    "fwd_pe_median": 13.15,
     "ev_ebitda": null,
     "ev_ebitda_median": null,
     "ev_sales": null,
     "ev_sales_median": null,
-    "peg": 2.85,
+    "peg": 2.91,
     "peg_median": 0.95,
     "fcf_yield": null,
     "fcf_yield_median": null,
@@ -8853,8 +8847,8 @@
     ],
     "insider": {
      "purchases": 145836,
-     "sales": 36628,
-     "net_shares": 109208,
+     "sales": 36878,
+     "net_shares": 108958,
      "net_pct": 7.2
     },
     "short": {
@@ -8864,12 +8858,6 @@
     }
    },
    "quarters": [
-    {
-     "period": "2025-03-31",
-     "revenue_b": 15.06,
-     "eps": null,
-     "op_margin": null
-    },
     {
      "period": "2025-06-30",
      "revenue_b": 14.58,
@@ -8896,7 +8884,7 @@
     },
     {
      "period": "2026-06-30",
-     "revenue_b": null,
+     "revenue_b": 20.34,
      "eps": 20.98,
      "op_margin": null
     },
@@ -8908,11 +8896,11 @@
     }
    ],
    "dupont": {
-    "net_margin": 29.9,
-    "asset_turnover": 0.029,
-    "equity_multiplier": 16.78,
-    "roe": 14.7,
-    "through": "2026-03-31"
+    "net_margin": 31.7,
+    "asset_turnover": 0.031,
+    "equity_multiplier": 17.33,
+    "roe": 17.1,
+    "through": "2026-06-30"
    },
    "quality": {
     "cfo_ni": null,
@@ -8923,10 +8911,6 @@
  },
  "benchmarks": {
   "SPX": [
-   {
-    "date": "2026-04-27",
-    "price": 7173.91
-   },
    {
     "date": "2026-04-28",
     "price": 7138.8
@@ -9426,13 +9410,13 @@
    {
     "date": "2026-10-23",
     "price": 7623.68
+   },
+   {
+    "date": "2026-10-26",
+    "price": 7676.77
    }
   ],
   "XLC": [
-   {
-    "date": "2026-04-27",
-    "price": 115.13
-   },
    {
     "date": "2026-04-28",
     "price": 115.07
@@ -9932,13 +9916,13 @@
    {
     "date": "2026-10-23",
     "price": 105.51
+   },
+   {
+    "date": "2026-10-26",
+    "price": 103.85
    }
   ],
   "XLF": [
-   {
-    "date": "2026-04-27",
-    "price": 51.45
-   },
    {
     "date": "2026-04-28",
     "price": 51.49
@@ -10438,13 +10422,13 @@
    {
     "date": "2026-10-23",
     "price": 55.9
+   },
+   {
+    "date": "2026-10-26",
+    "price": 56.02
    }
   ],
   "XLI": [
-   {
-    "date": "2026-04-27",
-    "price": 171.63
-   },
    {
     "date": "2026-04-28",
     "price": 170.1
@@ -10944,13 +10928,13 @@
    {
     "date": "2026-10-23",
     "price": 164.62
+   },
+   {
+    "date": "2026-10-26",
+    "price": 166.96
    }
   ],
   "XLK": [
-   {
-    "date": "2026-04-27",
-    "price": 160.19
-   },
    {
     "date": "2026-04-28",
     "price": 157.48
@@ -11450,13 +11434,13 @@
    {
     "date": "2026-10-23",
     "price": 183.23
+   },
+   {
+    "date": "2026-10-26",
+    "price": 186.32
    }
   ],
   "XLY": [
-   {
-    "date": "2026-04-27",
-    "price": 117.35
-   },
    {
     "date": "2026-04-28",
     "price": 116.52
@@ -11956,37 +11940,41 @@
    {
     "date": "2026-10-23",
     "price": 113.1
+   },
+   {
+    "date": "2026-10-26",
+    "price": 114.26
    }
   ]
  },
  "comps": {
   "AAPL": {
    "sector": "Technology",
-   "fwd_pe": 35.97,
-   "ev_ebitda": 30.01,
-   "ev_sales": 10.8,
-   "peg": 4.36,
-   "fcf_yield": 2.69,
+   "fwd_pe": 36.3,
+   "ev_ebitda": 30.29,
+   "ev_sales": 10.9,
+   "peg": 4.4,
+   "fcf_yield": 2.72,
    "growth": 10.36,
    "margin": 27.62,
    "roe": 148.75,
    "net_debt_ebitda": 0.13,
    "vol_63d": 24.5,
-   "ret_3m": 3.3,
+   "ret_3m": 1.2,
    "composite": 37.0,
    "factors": {
     "valuation": 10.0,
     "growth": 48.0,
     "quality": 83.0,
-    "momentum": 64.0,
+    "momentum": 62.0,
     "consensus": 23.0
    }
   },
   "AMZN": {
    "sector": "Consumer Cyclical",
-   "fwd_pe": 23.88,
-   "ev_ebitda": 16.66,
-   "ev_sales": 3.63,
+   "fwd_pe": 24.26,
+   "ev_ebitda": 16.92,
+   "ev_sales": 3.69,
    "peg": null,
    "fcf_yield": null,
    "growth": 14.62,
@@ -11994,19 +11982,19 @@
    "roe": 30.56,
    "net_debt_ebitda": 0.76,
    "vol_63d": 41.1,
-   "ret_3m": 7.2,
-   "composite": 63.0,
+   "ret_3m": 7.9,
+   "composite": 64.0,
    "factors": {
     "valuation": 67.0,
     "growth": 67.0,
     "quality": 50.0,
-    "momentum": 64.0,
-    "consensus": 65.0
+    "momentum": 67.0,
+    "consensus": 66.0
    }
   },
   "BAC": {
    "sector": "Financial Services",
-   "fwd_pe": 9.73,
+   "fwd_pe": 9.76,
    "ev_ebitda": null,
    "ev_sales": null,
    "peg": 0.6,
@@ -12015,341 +12003,341 @@
    "margin": 28.06,
    "roe": 10.73,
    "net_debt_ebitda": null,
-   "vol_63d": 21.7,
-   "ret_3m": -18.2,
-   "composite": 57.0,
+   "vol_63d": 21.6,
+   "ret_3m": -18.9,
+   "composite": 56.0,
    "factors": {
     "valuation": 86.0,
     "growth": 19.0,
     "quality": 41.0,
-    "momentum": 19.0,
+    "momentum": 17.0,
     "consensus": 72.0
    }
   },
   "BLK": {
    "sector": "Financial Services",
-   "fwd_pe": 17.4,
-   "ev_ebitda": 15.19,
-   "ev_sales": 6.39,
-   "peg": 1.44,
-   "fcf_yield": 1.93,
+   "fwd_pe": 17.52,
+   "ev_ebitda": 15.3,
+   "ev_sales": 6.44,
+   "peg": 1.46,
+   "fcf_yield": 1.92,
    "growth": 11.0,
    "margin": 24.22,
    "roe": null,
    "net_debt_ebitda": 0.09,
-   "vol_63d": 23.5,
-   "ret_3m": 5.8,
+   "vol_63d": 22.7,
+   "ret_3m": 3.3,
    "composite": 63.0,
    "factors": {
     "valuation": 31.0,
     "growth": 57.0,
     "quality": null,
-    "momentum": 69.0,
-    "consensus": 74.0
+    "momentum": 71.0,
+    "consensus": 72.0
    }
   },
   "CAT": {
    "sector": "Industrials",
-   "fwd_pe": 21.24,
-   "ev_ebitda": 21.99,
-   "ev_sales": 4.78,
-   "peg": 1.1,
-   "fcf_yield": 2.85,
+   "fwd_pe": 21.89,
+   "ev_ebitda": 22.59,
+   "ev_sales": 4.91,
+   "peg": 1.14,
+   "fcf_yield": 2.83,
    "growth": 11.39,
    "margin": 14.51,
    "roe": 56.97,
    "net_debt_ebitda": 2.41,
-   "vol_63d": 36.6,
-   "ret_3m": -21.3,
-   "composite": 58.0,
+   "vol_63d": 36.0,
+   "ret_3m": -17.5,
+   "composite": 59.0,
    "factors": {
     "valuation": 33.0,
     "growth": 76.0,
     "quality": 61.0,
-    "momentum": 7.0,
-    "consensus": 72.0
+    "momentum": 14.0,
+    "consensus": 71.0
    }
   },
   "CVX": {
    "sector": "Energy",
-   "fwd_pe": 14.76,
-   "ev_ebitda": 9.66,
-   "ev_sales": 2.34,
+   "fwd_pe": 14.52,
+   "ev_ebitda": 9.51,
+   "ev_sales": 2.3,
    "peg": null,
-   "fcf_yield": 5.9,
+   "fcf_yield": 5.94,
    "growth": -5.11,
    "margin": 9.83,
    "roe": 12.23,
    "net_debt_ebitda": 0.56,
-   "vol_63d": 23.4,
-   "ret_3m": 23.8,
+   "vol_63d": 23.2,
+   "ret_3m": 24.8,
    "composite": 50.0,
    "factors": {
     "valuation": 67.0,
     "growth": 95.0,
     "quality": 20.0,
-    "momentum": 98.0,
+    "momentum": 95.0,
     "consensus": 31.0
    }
   },
   "GE": {
    "sector": "Industrials",
-   "fwd_pe": 30.98,
-   "ev_ebitda": 26.61,
-   "ev_sales": 5.88,
-   "peg": 2.28,
-   "fcf_yield": 2.71,
+   "fwd_pe": 31.96,
+   "ev_ebitda": 27.43,
+   "ev_sales": 6.06,
+   "peg": 2.35,
+   "fcf_yield": 2.68,
    "growth": 11.69,
    "margin": 17.31,
    "roe": 50.17,
    "net_debt_ebitda": 0.93,
-   "vol_63d": 27.4,
-   "ret_3m": -20.9,
+   "vol_63d": 27.5,
+   "ret_3m": -20.6,
    "composite": 50.0,
    "factors": {
     "valuation": 21.0,
     "growth": 43.0,
     "quality": 61.0,
-    "momentum": 12.0,
+    "momentum": 10.0,
     "consensus": 66.0
    }
   },
   "GOOGL": {
    "sector": "Communication Services",
-   "fwd_pe": 20.63,
-   "ev_ebitda": 21.78,
-   "ev_sales": 8.46,
+   "fwd_pe": 20.87,
+   "ev_ebitda": 22.04,
+   "ev_sales": 8.56,
    "peg": null,
-   "fcf_yield": 1.36,
-   "growth": 25.33,
+   "fcf_yield": 1.37,
+   "growth": 25.16,
    "margin": 54.77,
    "roe": 48.68,
    "net_debt_ebitda": -0.7,
-   "vol_63d": 29.1,
-   "ret_3m": -1.9,
-   "composite": 62.0,
+   "vol_63d": 28.8,
+   "ret_3m": -5.0,
+   "composite": 61.0,
    "factors": {
     "valuation": 48.0,
     "growth": 81.0,
     "quality": 84.0,
-    "momentum": 40.0,
-    "consensus": 61.0
+    "momentum": 38.0,
+    "consensus": 60.0
    }
   },
   "GS": {
    "sector": "Financial Services",
-   "fwd_pe": 12.06,
+   "fwd_pe": 12.31,
    "ev_ebitda": null,
    "ev_sales": null,
-   "peg": 2.85,
+   "peg": 2.91,
    "fcf_yield": null,
    "growth": 1.37,
    "margin": 31.21,
    "roe": 17.75,
    "net_debt_ebitda": null,
-   "vol_63d": 27.4,
-   "ret_3m": -16.1,
-   "composite": 53.0,
+   "vol_63d": 27.7,
+   "ret_3m": -13.1,
+   "composite": 52.0,
    "factors": {
-    "valuation": 74.0,
+    "valuation": 71.0,
     "growth": 71.0,
     "quality": 56.0,
     "momentum": 36.0,
-    "consensus": 46.0
+    "consensus": 45.0
    }
   },
   "HD": {
    "sector": "Consumer Cyclical",
-   "fwd_pe": 19.93,
-   "ev_ebitda": 15.41,
+   "fwd_pe": 19.92,
+   "ev_ebitda": 15.37,
    "ev_sales": 2.24,
    "peg": 3.15,
-   "fcf_yield": 4.73,
+   "fcf_yield": 4.74,
    "growth": 3.33,
    "margin": 8.41,
    "roe": 104.3,
    "net_debt_ebitda": 2.48,
-   "vol_63d": 26.3,
-   "ret_3m": -4.1,
+   "vol_63d": 25.8,
+   "ret_3m": -6.6,
    "composite": 53.0,
    "factors": {
     "valuation": 69.0,
     "growth": 14.0,
     "quality": 52.0,
-    "momentum": 64.0,
-    "consensus": 57.0
+    "momentum": 62.0,
+    "consensus": 58.0
    }
   },
   "JEF": {
    "sector": "Financial Services",
-   "fwd_pe": 10.05,
+   "fwd_pe": 10.22,
    "ev_ebitda": null,
    "ev_sales": null,
-   "peg": 0.47,
+   "peg": 0.48,
    "fcf_yield": null,
    "growth": 6.55,
    "margin": 11.0,
    "roe": 8.59,
    "net_debt_ebitda": null,
-   "vol_63d": 26.8,
-   "ret_3m": -19.8,
-   "composite": 46.0,
+   "vol_63d": 26.7,
+   "ret_3m": -20.0,
+   "composite": 45.0,
    "factors": {
-    "valuation": 90.0,
+    "valuation": 93.0,
     "growth": 24.0,
     "quality": 19.0,
-    "momentum": 31.0,
+    "momentum": 24.0,
     "consensus": 51.0
    }
   },
   "JPM": {
    "sector": "Financial Services",
-   "fwd_pe": 13.08,
+   "fwd_pe": 13.15,
    "ev_ebitda": null,
    "ev_sales": null,
-   "peg": 2.08,
+   "peg": 2.09,
    "fcf_yield": null,
    "growth": 4.14,
    "margin": 34.59,
    "roe": 18.01,
    "net_debt_ebitda": null,
    "vol_63d": 17.2,
-   "ret_3m": -6.4,
-   "composite": 50.0,
+   "ret_3m": -6.0,
+   "composite": 51.0,
    "factors": {
     "valuation": 62.0,
     "growth": 33.0,
     "quality": 61.0,
-    "momentum": 48.0,
+    "momentum": 50.0,
     "consensus": 50.0
    }
   },
   "LAZ": {
    "sector": "Financial Services",
-   "fwd_pe": 11.73,
+   "fwd_pe": 11.88,
    "ev_ebitda": null,
    "ev_sales": null,
    "peg": 0.08,
    "fcf_yield": null,
-   "growth": 19.49,
+   "growth": 19.51,
    "margin": 5.62,
    "roe": 19.75,
    "net_debt_ebitda": null,
-   "vol_63d": 37.5,
-   "ret_3m": -12.4,
-   "composite": 46.0,
+   "vol_63d": 37.6,
+   "ret_3m": -10.8,
+   "composite": 47.0,
    "factors": {
     "valuation": 81.0,
     "growth": 29.0,
     "quality": 26.0,
-    "momentum": 50.0,
+    "momentum": 52.0,
     "consensus": null
    }
   },
   "META": {
    "sector": "Communication Services",
-   "fwd_pe": 17.99,
-   "ev_ebitda": 14.15,
-   "ev_sales": 6.81,
-   "peg": 1.1,
-   "fcf_yield": 1.75,
-   "growth": 21.6,
+   "fwd_pe": 17.64,
+   "ev_ebitda": 13.92,
+   "ev_sales": 6.7,
+   "peg": 1.07,
+   "fcf_yield": 1.78,
+   "growth": 21.62,
    "margin": 31.14,
    "roe": 32.26,
    "net_debt_ebitda": 0.28,
-   "vol_63d": 47.4,
-   "ret_3m": 8.3,
+   "vol_63d": 47.6,
+   "ret_3m": 6.3,
    "composite": 64.0,
    "factors": {
     "valuation": 43.0,
     "growth": 86.0,
     "quality": 67.0,
-    "momentum": 43.0,
-    "consensus": 69.0
+    "momentum": 38.0,
+    "consensus": 70.0
    }
   },
   "MS": {
    "sector": "Financial Services",
-   "fwd_pe": 13.46,
+   "fwd_pe": 13.71,
    "ev_ebitda": null,
    "ev_sales": null,
-   "peg": 2.27,
+   "peg": 2.31,
    "fcf_yield": null,
    "growth": 5.13,
    "margin": 25.63,
    "roe": null,
    "net_debt_ebitda": null,
-   "vol_63d": 25.5,
-   "ret_3m": -15.9,
+   "vol_63d": 25.8,
+   "ret_3m": -12.8,
    "composite": 37.0,
    "factors": {
     "valuation": 69.0,
     "growth": 38.0,
     "quality": null,
-    "momentum": 29.0,
-    "consensus": 29.0
+    "momentum": 31.0,
+    "consensus": 28.0
    }
   },
   "MSFT": {
    "sector": "Technology",
-   "fwd_pe": 22.48,
-   "ev_ebitda": 20.63,
-   "ev_sales": 12.07,
+   "fwd_pe": 22.43,
+   "ev_ebitda": 20.58,
+   "ev_sales": 12.05,
    "peg": 1.13,
-   "fcf_yield": 1.72,
-   "growth": 19.65,
+   "fcf_yield": 1.69,
+   "growth": 19.66,
    "margin": 40.3,
    "roe": 34.04,
    "net_debt_ebitda": 0.27,
    "vol_63d": 37.0,
-   "ret_3m": 35.1,
-   "composite": 60.0,
+   "ret_3m": 35.7,
+   "composite": 61.0,
    "factors": {
-    "valuation": 17.0,
+    "valuation": 14.0,
     "growth": 52.0,
     "quality": 77.0,
-    "momentum": 88.0,
-    "consensus": 62.0
+    "momentum": 86.0,
+    "consensus": 65.0
    }
   },
   "NVDA": {
    "sector": "Technology",
-   "fwd_pe": 13.57,
-   "ev_ebitda": 25.75,
-   "ev_sales": 17.1,
+   "fwd_pe": 13.69,
+   "ev_ebitda": 25.98,
+   "ev_sales": 17.26,
    "peg": 0.19,
-   "fcf_yield": 2.49,
+   "fcf_yield": 2.44,
    "growth": 68.15,
    "margin": 63.66,
    "roe": 117.21,
    "net_debt_ebitda": -0.12,
-   "vol_63d": 35.9,
-   "ret_3m": 7.5,
-   "composite": 76.0,
+   "vol_63d": 36.2,
+   "ret_3m": 9.8,
+   "composite": 78.0,
    "factors": {
     "valuation": 17.0,
     "growth": 100.0,
     "quality": 97.0,
-    "momentum": 55.0,
+    "momentum": 67.0,
     "consensus": 86.0
    }
   },
   "PG": {
    "sector": "Consumer Defensive",
-   "fwd_pe": 21.61,
-   "ev_ebitda": 15.75,
-   "ev_sales": 4.49,
-   "peg": 3.51,
-   "fcf_yield": 4.11,
+   "fwd_pe": 21.51,
+   "ev_ebitda": 15.69,
+   "ev_sales": 4.48,
+   "peg": 3.49,
+   "fcf_yield": 4.14,
    "growth": 3.29,
    "margin": 18.23,
    "roe": 29.61,
    "net_debt_ebitda": 0.94,
-   "vol_63d": 20.1,
-   "ret_3m": 9.1,
+   "vol_63d": 20.2,
+   "ret_3m": 8.1,
    "composite": 40.0,
    "factors": {
-    "valuation": 40.0,
+    "valuation": 43.0,
     "growth": 10.0,
     "quality": 50.0,
     "momentum": 86.0,
@@ -12358,7 +12346,7 @@
   },
   "PJT": {
    "sector": "Financial Services",
-   "fwd_pe": 16.44,
+   "fwd_pe": 16.43,
    "ev_ebitda": null,
    "ev_sales": null,
    "peg": 0.95,
@@ -12367,188 +12355,188 @@
    "margin": 10.58,
    "roe": 37.63,
    "net_debt_ebitda": null,
-   "vol_63d": 32.6,
-   "ret_3m": -16.4,
+   "vol_63d": 32.2,
+   "ret_3m": -17.4,
    "composite": 45.0,
    "factors": {
     "valuation": 40.0,
     "growth": 62.0,
     "quality": 48.0,
-    "momentum": 31.0,
+    "momentum": 29.0,
     "consensus": null
    }
   },
   "UNH": {
    "sector": "Healthcare",
-   "fwd_pe": 17.64,
-   "ev_ebitda": 14.45,
+   "fwd_pe": 17.62,
+   "ev_ebitda": 14.44,
    "ev_sales": 0.93,
    "peg": 1.35,
-   "fcf_yield": 6.29,
+   "fcf_yield": 6.41,
    "growth": 3.12,
    "margin": 3.53,
    "roe": 15.77,
    "net_debt_ebitda": 1.58,
-   "vol_63d": 24.0,
-   "ret_3m": 0.7,
-   "composite": 45.0,
+   "vol_63d": 23.7,
+   "ret_3m": -3.6,
+   "composite": 44.0,
    "factors": {
     "valuation": 71.0,
     "growth": 5.0,
     "quality": 16.0,
-    "momentum": 74.0,
+    "momentum": 71.0,
     "consensus": 48.0
    }
   },
   "XOM": {
    "sector": "Energy",
-   "fwd_pe": 15.03,
-   "ev_ebitda": 11.74,
-   "ev_sales": 2.21,
+   "fwd_pe": 14.74,
+   "ev_ebitda": 11.46,
+   "ev_sales": 2.16,
    "peg": null,
-   "fcf_yield": 4.06,
+   "fcf_yield": 4.03,
    "growth": 1.16,
    "margin": 9.07,
    "roe": 12.58,
    "net_debt_ebitda": 0.47,
-   "vol_63d": 23.9,
-   "ret_3m": 19.1,
+   "vol_63d": 23.7,
+   "ret_3m": 21.4,
    "composite": 41.0,
    "factors": {
     "valuation": 64.0,
     "growth": 90.0,
     "quality": 20.0,
-    "momentum": 93.0,
+    "momentum": 95.0,
     "consensus": 15.0
    }
   }
  },
  "pe_growth_fit": {
-  "slope": 0.004,
-  "intercept": 18.03,
+  "slope": 0.006,
+  "intercept": 18.13,
   "r2": 0.0,
   "n": 21
  },
  "sectors": {
-  "as_of": "2026-10-23",
+  "as_of": "2026-10-26",
   "rows": [
    {
     "etf": "XLC",
     "name": "Communication Services",
-    "ret_1d": -1.8,
-    "ret_1w": -4.4,
-    "ret_1m": -7.4,
-    "ret_3m": -1.7,
-    "ret_ytd": -9.6,
-    "prior_2m": 6.2
+    "ret_1d": -1.6,
+    "ret_1w": -5.7,
+    "ret_1m": -8.1,
+    "ret_3m": -5.0,
+    "ret_ytd": -11.0,
+    "prior_2m": 3.3
    },
    {
     "etf": "XLE",
     "name": "Energy",
-    "ret_1d": 2.6,
-    "ret_1w": 1.6,
-    "ret_1m": 10.8,
-    "ret_3m": 19.5,
-    "ret_ytd": 58.1,
-    "prior_2m": 7.9
+    "ret_1d": 0.4,
+    "ret_1w": 2.7,
+    "ret_1m": 12.3,
+    "ret_3m": 21.7,
+    "ret_ytd": 58.8,
+    "prior_2m": 8.4
    },
    {
     "etf": "XLF",
     "name": "Financials",
-    "ret_1d": -1.3,
-    "ret_1w": 0.7,
-    "ret_1m": 2.5,
-    "ret_3m": -1.4,
-    "ret_ytd": 3.3,
-    "prior_2m": -3.8
+    "ret_1d": 0.2,
+    "ret_1w": 1.7,
+    "ret_1m": 2.2,
+    "ret_3m": -2.4,
+    "ret_ytd": 3.5,
+    "prior_2m": -4.5
    },
    {
     "etf": "XLI",
     "name": "Industrials",
-    "ret_1d": -1.3,
-    "ret_1w": -1.9,
-    "ret_1m": -2.5,
-    "ret_3m": -9.9,
-    "ret_ytd": 7.0,
-    "prior_2m": -7.6
+    "ret_1d": 1.4,
+    "ret_1w": 0.2,
+    "ret_1m": -2.0,
+    "ret_3m": -8.3,
+    "ret_ytd": 8.5,
+    "prior_2m": -6.4
    },
    {
     "etf": "XLK",
     "name": "Technology",
-    "ret_1d": 0.5,
-    "ret_1w": -0.1,
-    "ret_1m": -5.9,
-    "ret_3m": 5.2,
-    "ret_ytd": 27.7,
-    "prior_2m": 11.8
+    "ret_1d": 1.7,
+    "ret_1w": 0.2,
+    "ret_1m": -5.1,
+    "ret_3m": 9.0,
+    "ret_ytd": 29.9,
+    "prior_2m": 14.9
    },
    {
     "etf": "XLP",
     "name": "Consumer Staples",
-    "ret_1d": -1.9,
-    "ret_1w": 0.7,
-    "ret_1m": 8.0,
-    "ret_3m": 4.1,
-    "ret_ytd": 15.8,
-    "prior_2m": -3.7
+    "ret_1d": -0.3,
+    "ret_1w": 0.9,
+    "ret_1m": 7.2,
+    "ret_3m": 1.7,
+    "ret_ytd": 15.4,
+    "prior_2m": -5.1
    },
    {
     "etf": "XLRE",
     "name": "Real Estate",
-    "ret_1d": 0.1,
-    "ret_1w": 1.0,
-    "ret_1m": 2.2,
+    "ret_1d": 0.5,
+    "ret_1w": 2.7,
+    "ret_1m": 3.0,
     "ret_3m": -6.2,
-    "ret_ytd": 8.0,
-    "prior_2m": -8.2
+    "ret_ytd": 8.6,
+    "prior_2m": -8.9
    },
    {
     "etf": "XLU",
     "name": "Utilities",
-    "ret_1d": -0.7,
-    "ret_1w": 0.8,
-    "ret_1m": 8.1,
-    "ret_3m": -6.1,
+    "ret_1d": -0.0,
+    "ret_1w": 2.9,
+    "ret_1m": 7.7,
+    "ret_3m": -5.8,
     "ret_ytd": 1.8,
-    "prior_2m": -13.2
+    "prior_2m": -12.6
    },
    {
     "etf": "XLV",
     "name": "Health Care",
-    "ret_1d": -1.1,
-    "ret_1w": 1.5,
-    "ret_1m": 5.5,
-    "ret_3m": 10.1,
+    "ret_1d": 0.0,
+    "ret_1w": 2.1,
+    "ret_1m": 5.0,
+    "ret_3m": 7.6,
     "ret_ytd": 17.2,
-    "prior_2m": 4.4
+    "prior_2m": 2.4
    },
    {
     "etf": "XLY",
     "name": "Consumer Discretionary",
-    "ret_1d": -1.7,
-    "ret_1w": 0.6,
-    "ret_1m": 2.5,
-    "ret_3m": 2.3,
-    "ret_ytd": -4.7,
-    "prior_2m": -0.2
+    "ret_1d": 1.0,
+    "ret_1w": -0.2,
+    "ret_1m": 3.3,
+    "ret_3m": 1.8,
+    "ret_ytd": -3.7,
+    "prior_2m": -1.5
    },
    {
     "etf": "SPX",
     "name": "S&P 500",
-    "ret_1d": -0.5,
-    "ret_1w": -0.5,
-    "ret_1m": -1.0,
-    "ret_3m": 2.8,
-    "ret_ytd": 11.4,
-    "prior_2m": 3.9
+    "ret_1d": 0.7,
+    "ret_1w": -0.2,
+    "ret_1m": -0.9,
+    "ret_3m": 3.3,
+    "ret_ytd": 12.1,
+    "prior_2m": 4.2
    }
   ]
  },
  "correlation_matrix": {
   "tickers": [
    "NVDA",
-   "META",
    "AMZN",
+   "META",
    "BLK",
    "GOOGL",
    "MSFT",
@@ -12560,122 +12548,122 @@
   "values": [
    [
     1.0,
-    0.13,
-    0.21,
-    0.14,
+    0.19,
+    0.11,
+    0.12,
     0.11,
     0.22,
-    0.54,
-    0.12,
-    -0.15,
-    0.41
+    0.51,
+    0.08,
+    -0.19,
+    0.38
    ],
    [
-    0.13,
+    0.19,
     1.0,
-    0.23,
+    0.22,
+    0.22,
+    0.72,
+    0.48,
+    0.17,
+    0.22,
+    0.0,
+    0.2
+   ],
+   [
     0.11,
-    0.35,
-    -0.02,
-    0.13,
-    0.11,
+    0.22,
+    1.0,
+    0.1,
+    0.36,
     -0.03,
-    0.06
-   ],
-   [
-    0.21,
-    0.23,
-    1.0,
-    0.23,
-    0.72,
-    0.48,
-    0.19,
-    0.24,
-    0.02,
-    0.22
-   ],
-   [
-    0.14,
     0.11,
-    0.23,
-    1.0,
-    0.2,
-    0.37,
-    0.32,
-    0.4,
-    0.31,
-    0.58
-   ],
-   [
-    0.11,
-    0.35,
-    0.72,
-    0.2,
-    1.0,
-    0.33,
-    0.08,
-    0.08,
-    0.05,
-    0.1
-   ],
-   [
-    0.22,
-    -0.02,
-    0.48,
-    0.37,
-    0.33,
-    1.0,
-    0.26,
-    0.25,
-    -0.05,
-    0.43
-   ],
-   [
-    0.54,
-    0.13,
-    0.19,
-    0.32,
-    0.08,
-    0.26,
-    1.0,
-    0.38,
-    -0.07,
-    0.64
+    0.1,
+    -0.04,
+    0.03
    ],
    [
     0.12,
-    0.11,
-    0.24,
-    0.4,
-    0.08,
-    0.25,
-    0.38,
+    0.22,
+    0.1,
     1.0,
-    0.07,
+    0.21,
+    0.37,
+    0.29,
+    0.38,
+    0.29,
     0.57
    ],
    [
-    -0.15,
-    -0.03,
-    0.02,
-    0.31,
-    0.05,
-    -0.05,
-    -0.07,
-    0.07,
+    0.11,
+    0.72,
+    0.36,
+    0.21,
     1.0,
-    0.24
+    0.33,
+    0.11,
+    0.09,
+    0.06,
+    0.12
    ],
    [
-    0.41,
-    0.06,
     0.22,
-    0.58,
+    0.48,
+    -0.03,
+    0.37,
+    0.33,
+    1.0,
+    0.25,
+    0.25,
+    -0.06,
+    0.44
+   ],
+   [
+    0.51,
+    0.17,
+    0.11,
+    0.29,
+    0.11,
+    0.25,
+    1.0,
+    0.33,
+    -0.13,
+    0.59
+   ],
+   [
+    0.08,
+    0.22,
     0.1,
-    0.43,
-    0.64,
+    0.38,
+    0.09,
+    0.25,
+    0.33,
+    1.0,
+    0.05,
+    0.54
+   ],
+   [
+    -0.19,
+    0.0,
+    -0.04,
+    0.29,
+    0.06,
+    -0.06,
+    -0.13,
+    0.05,
+    1.0,
+    0.2
+   ],
+   [
+    0.38,
+    0.2,
+    0.03,
     0.57,
-    0.24,
+    0.12,
+    0.44,
+    0.59,
+    0.54,
+    0.2,
     1.0
    ]
   ]
